@@ -1,0 +1,1 @@
+Này dùng để viết gom các hàm viết trong controller và đưa nó ra cho ui (Interface + Logic)

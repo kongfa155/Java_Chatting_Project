@@ -1,0 +1,1 @@
+Chỗ này dùng để lưu các kiểu dữ liệu mình đã thiết kế

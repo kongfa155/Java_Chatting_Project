@@ -8,6 +8,19 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>25</maven.compiler.release>
-        <exec.mainClass>com.mycompany.chattingapp.ChattingApp</exec.mainClass>
+        <exec.mainClass>chattingapp.MainApp</exec.mainClass>
     </properties>
+    <dependencies>
+        <dependency>
+        <groupId>com.formdev</groupId>
+        <artifactId>flatlaf</artifactId>
+        <version>3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.external</groupId>
+            <artifactId>AbsoluteLayout</artifactId>
+            <version>RELEASE280</version>
+        </dependency>
+    </dependencies>
+
 </project>

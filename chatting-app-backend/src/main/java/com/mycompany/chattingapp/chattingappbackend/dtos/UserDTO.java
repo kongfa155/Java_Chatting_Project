@@ -1,49 +1,55 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-package chattingapp.models;
+package com.mycompany.chattingapp.chattingappbackend.dtos;
 
 import java.time.LocalDateTime;
 
-/**
- *
- * @author CP
- */
-public class User {
+import com.mycompany.chattingapp.chattingappbackend.models.UserStatus;
 
-    //Properties
+public class UserDTO {
     private String userId;
     private Boolean gender;
     private String username;
     private String phoneNumber;
-    private String passwordHash;
     private String displayName;
     private String avatarUrl;
+    private UserStatus status;
     private LocalDateTime createdAt;
 
-    //Constructer
-    public User() {
-    }
-
-    public User(String userId, String username, String phoneNumber, String passwordHash,
-            String displayName, String avatarUrl, LocalDateTime createdAt) {
+    public UserDTO(String userId, Boolean gender, String username, String phoneNumber, String displayName, String avatarUrl, LocalDateTime createdAt, UserStatus status) {
         this.userId = userId;
+        this.gender = gender;
         this.username = username;
         this.phoneNumber = phoneNumber;
-        this.passwordHash = passwordHash;
         this.displayName = displayName;
         this.avatarUrl = avatarUrl;
         this.createdAt = createdAt;
+        this.status = status;
     }
 
-    //Getter & Setter
+    public UserDTO() {
+    }
+
+    public UserStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(UserStatus status) {
+        this.status = status;
+    }
+
     public String getUserId() {
         return userId;
     }
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public Boolean getGender() {
+        return gender;
+    }
+
+    public void setGender(Boolean gender) {
+        this.gender = gender;
     }
 
     public String getUsername() {
@@ -60,14 +66,6 @@ public class User {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
-    }
-
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
     }
 
     public String getDisplayName() {

@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package chattingapp.models;
+package com.mycompany.chattingapp.chattingappbackend.models;
 
 import java.time.LocalDateTime;
 
@@ -11,23 +11,26 @@ import java.time.LocalDateTime;
  * @author CP
  */
 public class Friendship {
+
     //Properties
     private String friendshipId;
     private String userId;
     private String friendId;
     private FriendshipStatus status;
     private LocalDateTime createdAt;
+
     //Contruster
     public Friendship() {
     }
 
-    public Friendship(String friendshipId, String userId, String friendId,FriendshipStatus status, LocalDateTime createdAt) {
+    public Friendship(String friendshipId, String userId, String friendId, FriendshipStatus status, LocalDateTime createdAt) {
         this.friendshipId = friendshipId;
         this.userId = userId;
         this.friendId = friendId;
         this.status = status;
         this.createdAt = createdAt;
     }
+
     // Getters & Setters
     public String getFriendshipId() {
         return friendshipId;

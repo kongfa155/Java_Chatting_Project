@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package chattingapp.models;
+package com.mycompany.chattingapp.chattingappbackend.models;
 
 import java.time.LocalDateTime;
 
@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
  *
  * @author CP
  */
-
 public class Message {
 
     //Properties
@@ -115,4 +114,3 @@ public class Message {
         this.fileUrl = fileUrl;
     }
 }
-

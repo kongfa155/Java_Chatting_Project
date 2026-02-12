@@ -1,4 +1,4 @@
-package chattingapp.models;
+package com.mycompany.chattingapp.chattingappbackend.models;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license

@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package chattingapp.models;
+package com.mycompany.chattingapp.chattingappbackend.models;
 
 import java.time.LocalDateTime;
 
@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
  * @author CP
  */
 public class Notification {
+
     //Properties
     private String notificationId;
     private String userId;
@@ -19,6 +20,7 @@ public class Notification {
     private boolean isDeleted;
     private LocalDateTime createdAt;
     private NotificationType type;
+
     //Contruster
     public Notification() {
     }
@@ -34,6 +36,7 @@ public class Notification {
         this.createdAt = createdAt;
         this.type = type;
     }
+
     // Getters & Setters
     public String getNotificationId() {
         return notificationId;

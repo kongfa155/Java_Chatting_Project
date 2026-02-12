@@ -1,0 +1,1 @@
+tạo 1 file tên application.properties trong cái folder resources. Dán mấy cái tui gửi trên gr vô - HUanz

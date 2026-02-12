@@ -4,6 +4,8 @@
  */
 package chattingapp.ui;
 
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author CP
@@ -55,7 +57,6 @@ public class RegisterFrame extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Đăng nhập");
         setMinimumSize(new java.awt.Dimension(400, 650));
-        setPreferredSize(new java.awt.Dimension(450, 650));
         setResizable(false);
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
@@ -117,18 +118,13 @@ public class RegisterFrame extends javax.swing.JFrame {
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addContainerGap()
                         .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(dangNhap)
                             .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(jPanel6Layout.createSequentialGroup()
-                                    .addContainerGap()
-                                    .addComponent(txtUsername, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGroup(jPanel6Layout.createSequentialGroup()
-                                    .addContainerGap()
-                                    .addComponent(txtDisplayName, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGroup(jPanel6Layout.createSequentialGroup()
-                                    .addContainerGap()
-                                    .addComponent(txtPhone, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addComponent(txtUsername, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(txtDisplayName, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(txtPhone, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
@@ -171,9 +167,9 @@ public class RegisterFrame extends javax.swing.JFrame {
 
         btnReg.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnReg.setText("Đăng ký");
-        btnReg.setActionCommand("Đăng ký");
         btnReg.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnReg.setPreferredSize(new java.awt.Dimension(336, 56));
+        btnReg.addActionListener(this::btnRegActionPerformed);
 
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
         jPanel7.setLayout(jPanel7Layout);
@@ -213,6 +209,31 @@ public class RegisterFrame extends javax.swing.JFrame {
         loginPage.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_dangNhapMouseClicked
+
+    private void btnRegActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegActionPerformed
+        // Lấy dữ liệu từ các Field
+        String username = txtUsername.getText().trim();
+        String displayName = txtDisplayName.getText().trim();
+        String phone = txtPhone.getText().trim();
+        String password = new String(txtPassword.getPassword());
+        String gender = radNam.isSelected() ? "Nam" : "Nữ";
+        
+        //Validate trống 
+        if (username.isEmpty() || displayName.isEmpty() || phone.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ tất cả các trường!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        //Validate tên tài khoản (nếu cần)
+        
+        //Validate mật khẩu (Tạm thời chỉ cần > 6 kí tự
+        if(password.length() < 6) {
+            JOptionPane.showMessageDialog(this, "Mật khẩu cần tối thiểu 6 ký tự", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        //Rồi làm gì với dữ liệu thì làm nhé
+    }//GEN-LAST:event_btnRegActionPerformed
 
     /**
      * @param args the command line arguments

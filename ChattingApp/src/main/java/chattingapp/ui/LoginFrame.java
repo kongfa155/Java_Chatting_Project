@@ -4,6 +4,8 @@
  */
 package chattingapp.ui;
 
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author CP
@@ -22,6 +24,10 @@ public class LoginFrame extends javax.swing.JFrame {
         //Cập nhật text hiển thị khi chưa nhập input cho số điện thoại và mật khẩu
         txtUsername.putClientProperty("JTextField.placeholderText", "Tên đăng nhập");
         txtPassword.putClientProperty("JTextField.placeholderText", "Mật khẩu");
+        
+        //Set trước cho Dialog
+        txtPhone.putClientProperty("JTextField.placeholderText", "Nhập số điện thoại...");
+        txtOTP.putClientProperty("JTextField.placeholderText", "XX.XX.XX");
     }
 
     /**
@@ -34,16 +40,111 @@ public class LoginFrame extends javax.swing.JFrame {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
+        quenMKDialog = new javax.swing.JDialog();
+        ForgotPanel = new javax.swing.JPanel();
+        PhonePanel = new javax.swing.JPanel();
+        btnGetOTP = new javax.swing.JButton();
+        txtPhone = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
+        OTPPanel = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        txtOTP = new javax.swing.JTextField();
+        btnVerify = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
-        jPanel5 = new javax.swing.JPanel();
+        PanelLogo = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        quenMK = new javax.swing.JPanel();
+        PanelInfo = new javax.swing.JPanel();
         txtUsername = new javax.swing.JTextField();
         txtPassword = new javax.swing.JPasswordField();
         taoTK = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jPanel7 = new javax.swing.JPanel();
+        quenMK = new javax.swing.JLabel();
+        PanelButton = new javax.swing.JPanel();
         btnLogin = new javax.swing.JButton();
+
+        quenMKDialog.setMinimumSize(new java.awt.Dimension(400, 500));
+        quenMKDialog.setModal(true);
+        quenMKDialog.setPreferredSize(new java.awt.Dimension(400, 500));
+
+        ForgotPanel.setMinimumSize(new java.awt.Dimension(400, 500));
+        ForgotPanel.setPreferredSize(new java.awt.Dimension(400, 500));
+        ForgotPanel.setLayout(new java.awt.CardLayout());
+
+        btnGetOTP.setText("Nhận mã xác thực");
+        btnGetOTP.addActionListener(this::btnGetOTPActionPerformed);
+
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 2, 18)); // NOI18N
+        jLabel2.setText("Vui lòng nhập số điện thoại để nhận mã xác thực");
+
+        javax.swing.GroupLayout PhonePanelLayout = new javax.swing.GroupLayout(PhonePanel);
+        PhonePanel.setLayout(PhonePanelLayout);
+        PhonePanelLayout.setHorizontalGroup(
+            PhonePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PhonePanelLayout.createSequentialGroup()
+                .addGroup(PhonePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(PhonePanelLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel2))
+                    .addGroup(PhonePanelLayout.createSequentialGroup()
+                        .addGap(94, 94, 94)
+                        .addComponent(btnGetOTP, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(PhonePanelLayout.createSequentialGroup()
+                        .addGap(40, 40, 40)
+                        .addComponent(txtPhone, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(13, Short.MAX_VALUE))
+        );
+        PhonePanelLayout.setVerticalGroup(
+            PhonePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PhonePanelLayout.createSequentialGroup()
+                .addGap(69, 69, 69)
+                .addComponent(jLabel2)
+                .addGap(50, 50, 50)
+                .addComponent(txtPhone, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnGetOTP, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(242, Short.MAX_VALUE))
+        );
+
+        ForgotPanel.add(PhonePanel, "card2");
+
+        jLabel4.setFont(new java.awt.Font("Segoe UI", 2, 18)); // NOI18N
+        jLabel4.setText("Vui lòng nhập mã xác thực");
+
+        btnVerify.setText("Xác thực");
+        btnVerify.addActionListener(this::btnVerifyActionPerformed);
+
+        javax.swing.GroupLayout OTPPanelLayout = new javax.swing.GroupLayout(OTPPanel);
+        OTPPanel.setLayout(OTPPanelLayout);
+        OTPPanelLayout.setHorizontalGroup(
+            OTPPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, OTPPanelLayout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jLabel4)
+                .addGap(93, 93, 93))
+            .addGroup(OTPPanelLayout.createSequentialGroup()
+                .addGroup(OTPPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(OTPPanelLayout.createSequentialGroup()
+                        .addGap(41, 41, 41)
+                        .addComponent(txtOTP, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(OTPPanelLayout.createSequentialGroup()
+                        .addGap(95, 95, 95)
+                        .addComponent(btnVerify, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(59, Short.MAX_VALUE))
+        );
+        OTPPanelLayout.setVerticalGroup(
+            OTPPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(OTPPanelLayout.createSequentialGroup()
+                .addGap(87, 87, 87)
+                .addComponent(jLabel4)
+                .addGap(18, 18, 18)
+                .addComponent(txtOTP, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(btnVerify, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(250, Short.MAX_VALUE))
+        );
+
+        ForgotPanel.add(OTPPanel, "card3");
+
+        quenMKDialog.getContentPane().add(ForgotPanel, java.awt.BorderLayout.CENTER);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Đăng nhập");
@@ -59,18 +160,18 @@ public class LoginFrame extends javax.swing.JFrame {
         jLabel1.setBackground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("ICON");
 
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
+        javax.swing.GroupLayout PanelLogoLayout = new javax.swing.GroupLayout(PanelLogo);
+        PanelLogo.setLayout(PanelLogoLayout);
+        PanelLogoLayout.setHorizontalGroup(
+            PanelLogoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PanelLogoLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 354, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-        jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
+        PanelLogoLayout.setVerticalGroup(
+            PanelLogoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PanelLogoLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 73, Short.MAX_VALUE)
                 .addContainerGap())
@@ -83,9 +184,9 @@ public class LoginFrame extends javax.swing.JFrame {
         gridBagConstraints.ipady = 57;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(40, 36, 0, 0);
-        jPanel1.add(jPanel5, gridBagConstraints);
+        jPanel1.add(PanelLogo, gridBagConstraints);
 
-        quenMK.setBackground(new java.awt.Color(255, 255, 255));
+        PanelInfo.setBackground(new java.awt.Color(255, 255, 255));
 
         taoTK.setForeground(new java.awt.Color(0, 104, 255));
         taoTK.setText("Tạo tài khoản");
@@ -95,35 +196,40 @@ public class LoginFrame extends javax.swing.JFrame {
             }
         });
 
-        jLabel3.setForeground(new java.awt.Color(0, 104, 255));
-        jLabel3.setText("Quên mật khẩu?");
+        quenMK.setForeground(new java.awt.Color(0, 104, 255));
+        quenMK.setText("Quên mật khẩu?");
+        quenMK.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                quenMKMouseClicked(evt);
+            }
+        });
 
-        javax.swing.GroupLayout quenMKLayout = new javax.swing.GroupLayout(quenMK);
-        quenMK.setLayout(quenMKLayout);
-        quenMKLayout.setHorizontalGroup(
-            quenMKLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(quenMKLayout.createSequentialGroup()
+        javax.swing.GroupLayout PanelInfoLayout = new javax.swing.GroupLayout(PanelInfo);
+        PanelInfo.setLayout(PanelInfoLayout);
+        PanelInfoLayout.setHorizontalGroup(
+            PanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PanelInfoLayout.createSequentialGroup()
                 .addGap(25, 25, 25)
-                .addGroup(quenMKLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(quenMKLayout.createSequentialGroup()
-                        .addComponent(jLabel3)
+                .addGroup(PanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(PanelInfoLayout.createSequentialGroup()
+                        .addComponent(quenMK)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 186, Short.MAX_VALUE)
                         .addComponent(taoTK))
                     .addComponent(txtUsername)
                     .addComponent(txtPassword))
                 .addContainerGap(34, Short.MAX_VALUE))
         );
-        quenMKLayout.setVerticalGroup(
-            quenMKLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(quenMKLayout.createSequentialGroup()
+        PanelInfoLayout.setVerticalGroup(
+            PanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PanelInfoLayout.createSequentialGroup()
                 .addGap(30, 30, 30)
                 .addComponent(txtUsername, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(32, 32, 32)
                 .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(quenMKLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(PanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(taoTK)
-                    .addComponent(jLabel3))
+                    .addComponent(quenMK))
                 .addContainerGap(38, Short.MAX_VALUE))
         );
 
@@ -135,26 +241,27 @@ public class LoginFrame extends javax.swing.JFrame {
         gridBagConstraints.ipady = 32;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(10, 30, 0, 0);
-        jPanel1.add(quenMK, gridBagConstraints);
+        jPanel1.add(PanelInfo, gridBagConstraints);
 
-        jPanel7.setBackground(new java.awt.Color(255, 255, 255));
+        PanelButton.setBackground(new java.awt.Color(255, 255, 255));
 
         btnLogin.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnLogin.setText("Đăng nhập");
         btnLogin.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnLogin.addActionListener(this::btnLoginActionPerformed);
 
-        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
-        jPanel7.setLayout(jPanel7Layout);
-        jPanel7Layout.setHorizontalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel7Layout.createSequentialGroup()
+        javax.swing.GroupLayout PanelButtonLayout = new javax.swing.GroupLayout(PanelButton);
+        PanelButton.setLayout(PanelButtonLayout);
+        PanelButtonLayout.setHorizontalGroup(
+            PanelButtonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PanelButtonLayout.createSequentialGroup()
                 .addGap(30, 30, 30)
                 .addComponent(btnLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(37, Short.MAX_VALUE))
         );
-        jPanel7Layout.setVerticalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel7Layout.createSequentialGroup()
+        PanelButtonLayout.setVerticalGroup(
+            PanelButtonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PanelButtonLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btnLogin, javax.swing.GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE)
                 .addGap(18, 18, 18))
@@ -168,7 +275,7 @@ public class LoginFrame extends javax.swing.JFrame {
         gridBagConstraints.ipady = 29;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(10, 30, 40, 0);
-        jPanel1.add(jPanel7, gridBagConstraints);
+        jPanel1.add(PanelButton, gridBagConstraints);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
@@ -183,6 +290,45 @@ public class LoginFrame extends javax.swing.JFrame {
         this.dispose();
         // TODO add your handling code here:
     }//GEN-LAST:event_taoTKMouseClicked
+
+    private void btnGetOTPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGetOTPActionPerformed
+        // TODO add your handling code here:
+        String SDT = txtPhone.getText();
+        if(SDT.length() != 10 && SDT.length() != 11) {
+            JOptionPane.showMessageDialog(this, "Số điện thoại không hợp lệ", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        java.awt.CardLayout card = (java.awt.CardLayout) ForgotPanel.getLayout();
+        card.next(ForgotPanel);
+    }//GEN-LAST:event_btnGetOTPActionPerformed
+
+    private void quenMKMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_quenMKMouseClicked
+        // TODO add your handling code here:
+        //Mở Dialog ngay tại vị trí của LoginFrame
+        quenMKDialog.setLocationRelativeTo(this);
+        quenMKDialog.setVisible(true);
+    }//GEN-LAST:event_quenMKMouseClicked
+
+    private void btnVerifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerifyActionPerformed
+        String OTP = txtOTP.getText();
+        //Kiểm tra OTP ở đây
+        
+    }//GEN-LAST:event_btnVerifyActionPerformed
+
+    private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
+        // TODO add your handling code here:
+        String username = txtUsername.getText();
+        char[] passwordChars = txtPassword.getPassword();
+        //Tạm thời convert sang String trước mặc dù nó không bảo mật
+        String password = new String(passwordChars);
+        if(username.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        MainFrame mainPage = new MainFrame();
+        mainPage.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_btnLoginActionPerformed
 
     /**
      * @param args the command line arguments
@@ -210,15 +356,25 @@ public class LoginFrame extends javax.swing.JFrame {
 //    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel ForgotPanel;
+    private javax.swing.JPanel OTPPanel;
+    private javax.swing.JPanel PanelButton;
+    private javax.swing.JPanel PanelInfo;
+    private javax.swing.JPanel PanelLogo;
+    private javax.swing.JPanel PhonePanel;
+    private javax.swing.JButton btnGetOTP;
     private javax.swing.JButton btnLogin;
+    private javax.swing.JButton btnVerify;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel7;
-    private javax.swing.JPanel quenMK;
+    private javax.swing.JLabel quenMK;
+    private javax.swing.JDialog quenMKDialog;
     private javax.swing.JLabel taoTK;
+    private javax.swing.JTextField txtOTP;
     private javax.swing.JPasswordField txtPassword;
+    private javax.swing.JTextField txtPhone;
     private javax.swing.JTextField txtUsername;
     // End of variables declaration//GEN-END:variables
 }

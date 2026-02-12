@@ -10,5 +10,5 @@ package chattingapp.model;
  */
 public enum NotificationType {
     FRIEND,
-MESSAGE,
+    MESSAGE,
 }

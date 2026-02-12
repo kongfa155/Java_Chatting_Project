@@ -1,15 +1,19 @@
+package com.mycompany.chattingapp.chattingappbackend.models;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package chattingapp.model;
 
 /**
  *
  * @author CP
  */
-public enum FriendshipStatus {
-    PENDING,
-    ACCEPTED,
-    DECLINED
-}
+public enum MessageType {
+        TEXT,
+        IMAGE,
+        FILE,
+        VIDEO,
+        AUDIO
+    }
+

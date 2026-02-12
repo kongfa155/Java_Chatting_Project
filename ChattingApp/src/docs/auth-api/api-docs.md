@@ -21,7 +21,7 @@ Success (201 Created): Đăng ký thành công
   "status": "success",
   "message": "User registered successfully",
   "data": {
-    "username": "string",
+    "display_name": "string",
     "status": "UNVERIFIED"
   }
 }
@@ -32,6 +32,14 @@ Success (201 Created): Đăng ký thành công
   "status": "error",
   "error_code": "USERNAME_EXISTS",
   "message": "Input username or phone number have been used, please use another username/phone number."
+}
+```
+Error (400 Bad Request): Số điện thoại đã có người sử dụng
+```json
+{
+  "status": "error",
+  "error_code": "PHONE_NUMBER_EXISTS",
+  "message": "Phone number exists."
 }
 ```
 #### Step 2: Nhận OTP xác thực.

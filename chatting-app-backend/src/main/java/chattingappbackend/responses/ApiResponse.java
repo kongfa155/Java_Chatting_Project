@@ -1,4 +1,4 @@
-package com.mycompany.chattingapp.chattingappbackend.responses;
+package chattingappbackend.responses;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 

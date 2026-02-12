@@ -1,4 +1,4 @@
-package com.mycompany.chattingapp.chattingappbackend.models;
+package chattingappbackend.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Id;

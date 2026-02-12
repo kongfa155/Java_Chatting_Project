@@ -1,4 +1,4 @@
-package com.mycompany.chattingapp.chattingappbackend;
+package chattingappbackend;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

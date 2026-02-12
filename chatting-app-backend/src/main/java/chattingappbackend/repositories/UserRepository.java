@@ -1,6 +1,6 @@
-package com.mycompany.chattingapp.chattingappbackend.repositories;
+package chattingappbackend.repositories;
 
-import com.mycompany.chattingapp.chattingappbackend.models.User;
+import chattingappbackend.models.User;
 import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;

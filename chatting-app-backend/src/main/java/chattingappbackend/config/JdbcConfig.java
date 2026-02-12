@@ -1,4 +1,4 @@
-package com.mycompany.chattingapp.chattingappbackend.config;
+package chattingappbackend.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;

@@ -1,6 +1,6 @@
-package com.mycompany.chattingapp.chattingappbackend.exceptions;
+package chattingappbackend.exceptions;
 
-import com.mycompany.chattingapp.chattingappbackend.responses.ApiResponse;
+import chattingappbackend.responses.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -13,4 +13,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(response);
 
     }
+    @ExceptionHandler(AppException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAppException(AppException ex){
+        ApiResponse<Void> response = new ApiResponse<>("error", ex.getMessage(), ex.getErrorCode(), null);
+        return ResponseEntity.badRequest().body(response);
+    }
+
 }

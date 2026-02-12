@@ -1,9 +1,9 @@
-package com.mycompany.chattingapp.chattingappbackend.controllers;
+package chattingappbackend.controllers;
 
-import com.mycompany.chattingapp.chattingappbackend.dtos.RegisterResponseDTO;
-import com.mycompany.chattingapp.chattingappbackend.models.User;
-import com.mycompany.chattingapp.chattingappbackend.responses.ApiResponse;
-import com.mycompany.chattingapp.chattingappbackend.services.UserService;
+import chattingappbackend.dtos.RegisterResponseDTO;
+import chattingappbackend.models.User;
+import chattingappbackend.responses.ApiResponse;
+import chattingappbackend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

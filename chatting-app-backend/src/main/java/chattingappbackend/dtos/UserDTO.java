@@ -1,8 +1,8 @@
-package com.mycompany.chattingapp.chattingappbackend.dtos;
+package chattingappbackend.dtos;
 
 import java.time.LocalDateTime;
 
-import com.mycompany.chattingapp.chattingappbackend.models.UserStatus;
+import chattingappbackend.models.UserStatus;
 
 public class UserDTO {
     private String userId;

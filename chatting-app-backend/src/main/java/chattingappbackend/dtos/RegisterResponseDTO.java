@@ -1,7 +1,7 @@
-package com.mycompany.chattingapp.chattingappbackend.dtos;
+package chattingappbackend.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.mycompany.chattingapp.chattingappbackend.models.UserStatus;
+import chattingappbackend.models.UserStatus;
 
 public class RegisterResponseDTO {
     @JsonProperty("display_name")

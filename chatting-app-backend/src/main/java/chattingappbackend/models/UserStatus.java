@@ -1,4 +1,4 @@
-package com.mycompany.chattingapp.chattingappbackend.models;
+package chattingappbackend.models;
 
 public enum UserStatus {
     UNVERIFIED, ACTIVATED, BANNED

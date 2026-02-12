@@ -1,12 +1,11 @@
-package com.mycompany.chattingapp.chattingappbackend.services;
+package chattingappbackend.services;
 
-import com.mycompany.chattingapp.chattingappbackend.dtos.RegisterResponseDTO;
-import com.mycompany.chattingapp.chattingappbackend.dtos.UserDTO;
-import com.mycompany.chattingapp.chattingappbackend.models.User;
-import com.mycompany.chattingapp.chattingappbackend.models.UserStatus;
-import com.mycompany.chattingapp.chattingappbackend.repositories.UserRepository;
+import chattingappbackend.dtos.RegisterResponseDTO;
+import chattingappbackend.exceptions.AppException;
+import chattingappbackend.models.User;
+import chattingappbackend.models.UserStatus;
+import chattingappbackend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,10 +24,10 @@ public class UserService {
 
     public RegisterResponseDTO register(User userModel){
         if(userRepository.findByUsername(userModel.getUsername()).isPresent()){
-            throw new RuntimeException("USERNAME_EXISTS");
+            throw new AppException("USERNAME_EXISTS","Input username or phone number have been used, please use another username/phone number.");
         }
         if(userRepository.existsByPhoneNumber(userModel.getPhoneNumber())){
-            throw new RuntimeException("PHONE_NUMBER_EXISTS");
+            throw new AppException("PHONE_NUMBER_EXISTS", "Phone number exists.");
         }
         userModel.setUserId(UUID.randomUUID().toString());
         userModel.setHashedPassword(passwordEncoder.encode(userModel.getHashedPassword()));

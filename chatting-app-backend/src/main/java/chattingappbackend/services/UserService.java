@@ -24,10 +24,10 @@ public class UserService {
 
     public RegisterResponseDTO register(User userModel){
         if(userRepository.findByUsername(userModel.getUsername()).isPresent()){
-            throw new AppException("USERNAME_EXISTS","Input username or phone number have been used, please use another username/phone number.");
+            throw new AppException("USERNAME_EXISTS","Input username have been used, please use another username.");
         }
         if(userRepository.existsByPhoneNumber(userModel.getPhoneNumber())){
-            throw new AppException("PHONE_NUMBER_EXISTS", "Phone number exists.");
+            throw new AppException("PHONE_NUMBER_EXISTS", "Input phone number have been used, please use another phone number.");
         }
         userModel.setUserId(UUID.randomUUID().toString());
         userModel.setHashedPassword(passwordEncoder.encode(userModel.getHashedPassword()));

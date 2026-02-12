@@ -31,7 +31,7 @@ Success (201 Created): Đăng ký thành công
 {
   "status": "error",
   "error_code": "USERNAME_EXISTS",
-  "message": "Input username or phone number have been used, please use another username/phone number."
+  "message": "Input username have been used, please use another username."
 }
 ```
 Error (400 Bad Request): Số điện thoại đã có người sử dụng
@@ -39,7 +39,7 @@ Error (400 Bad Request): Số điện thoại đã có người sử dụng
 {
   "status": "error",
   "error_code": "PHONE_NUMBER_EXISTS",
-  "message": "Phone number exists."
+  "message": "Input phone number have been used, please use another phone number."
 }
 ```
 #### Step 2: Nhận OTP xác thực.

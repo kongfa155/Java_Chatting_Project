@@ -4,6 +4,8 @@
  */
 package chattingapp.ui;
 
+import chattingapp.api.UserService;
+import chattingapp.dtos.RegisterRequestDTO;
 import javax.swing.JOptionPane;
 
 /**
@@ -216,8 +218,8 @@ public class RegisterFrame extends javax.swing.JFrame {
         String displayName = txtDisplayName.getText().trim();
         String phone = txtPhone.getText().trim();
         String password = new String(txtPassword.getPassword());
-        String gender = radNam.isSelected() ? "Nam" : "Nữ";
-        
+        Boolean gender = radNam.isSelected();
+        RegisterRequestDTO dto = new RegisterRequestDTO(gender,username,phone,displayName,"chuacourl",password);
         //Validate trống 
         if (username.isEmpty() || displayName.isEmpty() || phone.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ tất cả các trường!", "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -233,6 +235,10 @@ public class RegisterFrame extends javax.swing.JFrame {
         }
         
         //Rồi làm gì với dữ liệu thì làm nhé
+        UserService userService = new UserService();
+        userService.register(dto);
+        System.out.println("Da gui request");
+        
     }//GEN-LAST:event_btnRegActionPerformed
 
     /**

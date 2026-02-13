@@ -2,7 +2,6 @@ package chattingappbackend.controllers;
 
 import chattingappbackend.dtos.RegisterRequestDTO;
 import chattingappbackend.dtos.RegisterResponseDTO;
-import chattingappbackend.models.User;
 import chattingappbackend.responses.ApiResponse;
 import chattingappbackend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -5,6 +5,7 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/chatting-app-backend/pom.xml" />
+        <option value="$PROJECT_DIR$/ChattingApp/pom.xml" />
       </list>
     </option>
   </component>

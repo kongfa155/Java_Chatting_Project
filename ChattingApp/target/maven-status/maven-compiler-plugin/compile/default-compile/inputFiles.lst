@@ -1,5 +1,7 @@
+D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\components\ChatItemPanel.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\components\ChatListPanel.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\components\ChatPanel.java
+D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\components\MessageBubble.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\components\SideBarPanel.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\config\ThemeManager.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\MainApp.java
@@ -16,3 +18,4 @@ D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\ui\LoginFrame.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\ui\MainFrame.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\ui\RegisterFrame.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\utils\AvatarUtil.java
+D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\utils\TimeUtil.java

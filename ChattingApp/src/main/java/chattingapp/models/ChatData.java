@@ -9,24 +9,20 @@ package chattingapp.models;
  * @author CP
  */
 public class ChatData {
-    private String contactName;
-    private String avatarUrl;
+    private User contact;
     private Message lastMessage; 
     private int unreadCount;
-    public ChatData(String contactName, String avatarUrl, Message lastMessage, int unreadCount) {
-        this.contactName = contactName;
-        this.avatarUrl = avatarUrl;
+    
+    public ChatData(User contact, Message lastMessage, int unreadCount) {
+        this.contact = contact;
         this.lastMessage = lastMessage;
         this.unreadCount = unreadCount;
     }
 
-    public String getContactName() {
-        return contactName;
+    public User getContact() {
+        return contact;
     }
 
-    public String getAvatarUrl() {
-        return avatarUrl;
-    }
 
     public Message getLastMessage() {
         return lastMessage;
@@ -36,12 +32,8 @@ public class ChatData {
         return unreadCount;
     }
 
-    public void setContactName(String contactName) {
-        this.contactName = contactName;
-    }
-
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
+    public void setContact(User contact) {
+        this.contact = contact;
     }
 
     public void setLastMessage(Message lastMessage) {

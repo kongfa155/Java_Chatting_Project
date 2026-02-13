@@ -46,46 +46,18 @@ public class MainFrame extends javax.swing.JFrame {
         mainSplitPane = new javax.swing.JSplitPane();
         leftSplitPane = new javax.swing.JSplitPane();
         sideBarPanel2 = new chattingapp.components.SideBarPanel();
-        chatListPanel2 = new chattingapp.components.ChatListPanel();
-        chatPanel2 = new chattingapp.components.ChatPanel();
+        chatListPanel1 = new chattingapp.components.ChatListPanel();
+        chatPanel1 = new chattingapp.components.ChatPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("MainFrame");
         setResizable(false);
 
         leftSplitPane.setLeftComponent(sideBarPanel2);
-
-        chatListPanel2.setBackground(new java.awt.Color(255, 51, 51));
-
-        javax.swing.GroupLayout chatListPanel2Layout = new javax.swing.GroupLayout(chatListPanel2);
-        chatListPanel2.setLayout(chatListPanel2Layout);
-        chatListPanel2Layout.setHorizontalGroup(
-            chatListPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 94, Short.MAX_VALUE)
-        );
-        chatListPanel2Layout.setVerticalGroup(
-            chatListPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
-
-        leftSplitPane.setRightComponent(chatListPanel2);
+        leftSplitPane.setRightComponent(chatListPanel1);
 
         mainSplitPane.setLeftComponent(leftSplitPane);
-
-        chatPanel2.setBackground(new java.awt.Color(204, 255, 204));
-
-        javax.swing.GroupLayout chatPanel2Layout = new javax.swing.GroupLayout(chatPanel2);
-        chatPanel2.setLayout(chatPanel2Layout);
-        chatPanel2Layout.setHorizontalGroup(
-            chatPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 226, Short.MAX_VALUE)
-        );
-        chatPanel2Layout.setVerticalGroup(
-            chatPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
-
-        mainSplitPane.setRightComponent(chatPanel2);
+        mainSplitPane.setRightComponent(chatPanel1);
 
         getContentPane().add(mainSplitPane, java.awt.BorderLayout.CENTER);
 
@@ -118,8 +90,8 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private chattingapp.components.ChatListPanel chatListPanel2;
-    private chattingapp.components.ChatPanel chatPanel2;
+    private chattingapp.components.ChatListPanel chatListPanel1;
+    private chattingapp.components.ChatPanel chatPanel1;
     private javax.swing.JSplitPane leftSplitPane;
     private javax.swing.JSplitPane mainSplitPane;
     private chattingapp.components.SideBarPanel sideBarPanel2;

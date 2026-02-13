@@ -4,6 +4,12 @@
  */
 package chattingapp.components;
 
+import java.awt.Color;
+import java.awt.FlowLayout;
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
 /**
  *
  * @author CP
@@ -15,6 +21,28 @@ public class ChatPanel extends javax.swing.JPanel {
      */
     public ChatPanel() {
         initComponents();
+        ScrollMes.putClientProperty("JTextField.placeholderText", "Type a message...");
+    }
+
+    private void sendMessage() {
+
+        String text = txtMessage.getText().trim();
+        if (text.isEmpty()) {
+            return;
+        }
+
+        MessageBubble bubble
+                = new MessageBubble(text, true);
+
+        messageContainer.add(bubble);
+        messageContainer.revalidate();
+        messageContainer.repaint();
+
+        txtMessage.setText("");
+        MessageBubble friendMsg
+                = new MessageBubble("Hello bro", false);
+
+        messageContainer.add(friendMsg);
     }
 
     /**
@@ -26,19 +54,144 @@ public class ChatPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
+        headerPanel = new javax.swing.JPanel();
+        textWrapper = new javax.swing.JPanel();
+        lblName = new javax.swing.JLabel();
+        lblStatus = new javax.swing.JLabel();
+        optionPanel = new javax.swing.JPanel();
+        jButton1 = new javax.swing.JButton();
+        bottomWrapper = new javax.swing.JPanel();
+        drawerPanel = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        inputPanel = new javax.swing.JPanel();
+        btnAttach = new javax.swing.JButton();
+        ScrollMes = new javax.swing.JScrollPane();
+        txtMessage = new javax.swing.JTextArea();
+        btnSend = new javax.swing.JButton();
+        JScrollPane = new javax.swing.JScrollPane();
+        messageContainer = new javax.swing.JPanel();
+
+        setLayout(new java.awt.BorderLayout());
+
+        headerPanel.setBackground(new java.awt.Color(255, 255, 255));
+        headerPanel.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(230, 230, 230)));
+        headerPanel.setPreferredSize(new java.awt.Dimension(0, 60));
+        headerPanel.setLayout(new java.awt.BorderLayout());
+
+        textWrapper.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 15, 10, 15));
+        textWrapper.setOpaque(false);
+        textWrapper.setLayout(new javax.swing.BoxLayout(textWrapper, javax.swing.BoxLayout.Y_AXIS));
+
+        lblName.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        lblName.setText("FriendName");
+        textWrapper.add(lblName);
+
+        lblStatus.setBackground(new java.awt.Color(255, 255, 255));
+        lblStatus.setForeground(new java.awt.Color(0, 150, 0));
+        lblStatus.setText("Online");
+        textWrapper.add(lblStatus);
+
+        headerPanel.add(textWrapper, java.awt.BorderLayout.WEST);
+
+        optionPanel.setLayout(new java.awt.BorderLayout());
+
+        jButton1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jButton1.setText("...");
+        jButton1.setFocusable(false);
+        jButton1.setPreferredSize(new java.awt.Dimension(45, 40));
+        optionPanel.add(jButton1, java.awt.BorderLayout.CENTER);
+
+        headerPanel.add(optionPanel, java.awt.BorderLayout.EAST);
+
+        add(headerPanel, java.awt.BorderLayout.NORTH);
+
+        bottomWrapper.setBackground(new java.awt.Color(255, 255, 255));
+        bottomWrapper.setLayout(new java.awt.BorderLayout());
+
+        drawerPanel.setBackground(new java.awt.Color(245, 245, 245));
+        drawerPanel.setBorder(javax.swing.BorderFactory.createMatteBorder(1, 0, 1, 0, new java.awt.Color(230, 230, 230)));
+        drawerPanel.setPreferredSize(new java.awt.Dimension(0, 80));
+        drawerPanel.setLayout(new javax.swing.BoxLayout(drawerPanel, javax.swing.BoxLayout.X_AXIS));
+
+        jLabel1.setText("Image");
+        drawerPanel.add(jLabel1);
+
+        jLabel2.setText("File");
+        drawerPanel.add(jLabel2);
+
+        jLabel3.setText("Video");
+        drawerPanel.add(jLabel3);
+
+        bottomWrapper.add(drawerPanel, java.awt.BorderLayout.NORTH);
+
+        inputPanel.setBackground(new java.awt.Color(255, 255, 255));
+        inputPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        inputPanel.setPreferredSize(new java.awt.Dimension(0, 60));
+        inputPanel.setLayout(new java.awt.BorderLayout());
+
+        btnAttach.setText("+");
+        btnAttach.setPreferredSize(new java.awt.Dimension(45, 40));
+        btnAttach.addActionListener(this::btnAttachActionPerformed);
+        inputPanel.add(btnAttach, java.awt.BorderLayout.LINE_START);
+
+        txtMessage.setColumns(20);
+        txtMessage.setRows(5);
+        ScrollMes.setViewportView(txtMessage);
+
+        inputPanel.add(ScrollMes, java.awt.BorderLayout.CENTER);
+
+        btnSend.setText("Send");
+        btnSend.setPreferredSize(new java.awt.Dimension(70, 40));
+        btnSend.addActionListener(this::btnSendActionPerformed);
+        inputPanel.add(btnSend, java.awt.BorderLayout.EAST);
+
+        bottomWrapper.add(inputPanel, java.awt.BorderLayout.CENTER);
+
+        add(bottomWrapper, java.awt.BorderLayout.SOUTH);
+
+        JScrollPane.setBackground(new java.awt.Color(255, 255, 255));
+        JScrollPane.setBorder(null);
+
+        messageContainer.setBackground(new java.awt.Color(255, 255, 255));
+        messageContainer.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 15, 10, 15));
+        messageContainer.setLayout(new javax.swing.BoxLayout(messageContainer, javax.swing.BoxLayout.Y_AXIS));
+        JScrollPane.setViewportView(messageContainer);
+
+        add(JScrollPane, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnAttachActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAttachActionPerformed
+        // TODO add your handling code here:
+        drawerPanel.setVisible(!drawerPanel.isVisible());
+        inputPanel.revalidate();
+    }//GEN-LAST:event_btnAttachActionPerformed
+
+    private void btnSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendActionPerformed
+        // TODO add your handling code here:
+        sendMessage();
+    }//GEN-LAST:event_btnSendActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JScrollPane JScrollPane;
+    private javax.swing.JScrollPane ScrollMes;
+    private javax.swing.JPanel bottomWrapper;
+    private javax.swing.JButton btnAttach;
+    private javax.swing.JButton btnSend;
+    private javax.swing.JPanel drawerPanel;
+    private javax.swing.JPanel headerPanel;
+    private javax.swing.JPanel inputPanel;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel lblName;
+    private javax.swing.JLabel lblStatus;
+    private javax.swing.JPanel messageContainer;
+    private javax.swing.JPanel optionPanel;
+    private javax.swing.JPanel textWrapper;
+    private javax.swing.JTextArea txtMessage;
     // End of variables declaration//GEN-END:variables
 }

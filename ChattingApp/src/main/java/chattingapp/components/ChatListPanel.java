@@ -4,6 +4,10 @@
  */
 package chattingapp.components;
 
+import chattingapp.models.ChatData;
+import chattingapp.models.Message;
+import chattingapp.models.User;
+
 /**
  *
  * @author CP
@@ -15,6 +19,55 @@ public class ChatListPanel extends javax.swing.JPanel {
      */
     public ChatListPanel() {
         initComponents();
+        setupUI();
+        fakeData();
+    }
+
+    private void setupUI() {
+
+        // Search box đẹp hơn
+        txtSearch.putClientProperty("JTextField.placeholderText", "Search...");
+
+
+        txtSearch.setBorder(
+                javax.swing.BorderFactory.createEmptyBorder(10, 15, 10, 15)
+        );
+
+        // Scroll đẹp hơn
+        scrollPane.setBorder(null);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(10);
+
+        // Container spacing
+        listContainer.setBorder(
+                javax.swing.BorderFactory.createEmptyBorder(5, 0, 5, 0)
+        );
+        
+        scrollPane.getVerticalScrollBar().putClientProperty("JScrollBar.showButtons", false);
+    }
+
+    private void fakeData() {
+
+        listContainer.removeAll();
+
+        for (int i = 1; i <= 15; i++) {
+
+            User user = new User();
+            user.setDisplayName("Friend " + i);
+            user.setAvatarUrl("https://i.pravatar.cc/150?img=" + i);
+
+            Message msg = new Message();
+            msg.setContent("Hello bro this is message " + i);
+            msg.setSentAt(java.time.LocalDateTime.now().minusMinutes(i * 3));
+
+            ChatData data = new ChatData(user, msg, i % 4);
+
+            ChatItemPanel item = new ChatItemPanel(data);
+
+            listContainer.add(item);
+        }
+
+        listContainer.revalidate();
+        listContainer.repaint();
     }
 
     /**
@@ -26,19 +79,29 @@ public class ChatListPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
+        txtSearch = new javax.swing.JTextField();
+        scrollPane = new javax.swing.JScrollPane();
+        listContainer = new javax.swing.JPanel();
+
+        setMinimumSize(new java.awt.Dimension(280, 0));
+        setPreferredSize(new java.awt.Dimension(300, 0));
+        setLayout(new java.awt.BorderLayout());
+
+        txtSearch.setText("Search");
+        txtSearch.setMinimumSize(new java.awt.Dimension(64, 40));
+        txtSearch.setPreferredSize(new java.awt.Dimension(71, 45));
+        add(txtSearch, java.awt.BorderLayout.PAGE_START);
+
+        listContainer.setLayout(new javax.swing.BoxLayout(listContainer, javax.swing.BoxLayout.Y_AXIS));
+        scrollPane.setViewportView(listContainer);
+
+        add(scrollPane, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel listContainer;
+    private javax.swing.JScrollPane scrollPane;
+    private javax.swing.JTextField txtSearch;
     // End of variables declaration//GEN-END:variables
 }

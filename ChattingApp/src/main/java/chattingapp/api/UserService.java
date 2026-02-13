@@ -2,6 +2,8 @@ package chattingapp.api;
 
 import chattingapp.dtos.RegisterRequestDTO;
 import chattingapp.dtos.RegisterResponseDTO;
+import chattingapp.dtos.RegisterVerifyRequestDTO;
+import chattingapp.dtos.RegisterVerifyResponseDTO;
 
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -14,5 +16,11 @@ public class UserService extends BaseService{
         return ApiClient.getClient()
                 .sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(response -> handleResponse(response, RegisterResponseDTO.class));
+    }
+    public CompletableFuture<RegisterVerifyResponseDTO> verifyRegister(RegisterVerifyRequestDTO dto){
+        HttpRequest request = createPostRequest("/users/verify", dto);
+        return ApiClient.getClient()
+                .sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenApply(response -> handleResponse(response, RegisterVerifyResponseDTO.class));
     }
 }

@@ -4,6 +4,7 @@
  */
 package chattingapp.components;
 
+import chattingapp.ui.EditProfileDialog;
 import chattingapp.utils.AvatarUtil;
 import javax.swing.ImageIcon;
 
@@ -27,7 +28,7 @@ public class SideBarPanel extends javax.swing.JPanel {
     public final void  setAvatar(String avatarURL) {
 //        lblAvatar.setText("");
         new Thread(() -> {
-            ImageIcon icon = AvatarUtil.loadAvatar(avatarURL, 40);
+            ImageIcon icon = AvatarUtil.loadAvatar(avatarURL, 40, true);
 
             javax.swing.SwingUtilities.invokeLater ( 
                 () -> {
@@ -48,6 +49,11 @@ public class SideBarPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        userMenu = new javax.swing.JPopupMenu();
+        menuEditProfile = new javax.swing.JMenuItem();
+        menuUpdatePhone = new javax.swing.JMenuItem();
+        menuUpdatePassword = new javax.swing.JMenuItem();
+        menuLogout = new javax.swing.JMenuItem();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 10), new java.awt.Dimension(0, 10), new java.awt.Dimension(32767, 10));
         lblAvatar = new javax.swing.JLabel();
         filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 20), new java.awt.Dimension(0, 20), new java.awt.Dimension(32767, 20));
@@ -55,6 +61,19 @@ public class SideBarPanel extends javax.swing.JPanel {
         filler3 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 10), new java.awt.Dimension(0, 10), new java.awt.Dimension(32767, 10));
         btnNotify = new javax.swing.JButton();
         filler4 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 32767));
+
+        menuEditProfile.setText("Chỉnh sửa thông tin");
+        menuEditProfile.addActionListener(this::menuEditProfileActionPerformed);
+        userMenu.add(menuEditProfile);
+
+        menuUpdatePhone.setText("Cập nhật số điện thoại");
+        userMenu.add(menuUpdatePhone);
+
+        menuUpdatePassword.setText("Đổi mật khẩu");
+        userMenu.add(menuUpdatePassword);
+
+        menuLogout.setText("Đăng xuất");
+        userMenu.add(menuLogout);
 
         setBackground(new java.awt.Color(255, 255, 255));
         setMinimumSize(new java.awt.Dimension(70, 0));
@@ -65,10 +84,16 @@ public class SideBarPanel extends javax.swing.JPanel {
         lblAvatar.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblAvatar.setText("av");
         lblAvatar.setAlignmentX(0.5F);
+        lblAvatar.setComponentPopupMenu(userMenu);
         lblAvatar.setMaximumSize(new java.awt.Dimension(40, 40));
         lblAvatar.setMinimumSize(new java.awt.Dimension(40, 40));
         lblAvatar.setPreferredSize(new java.awt.Dimension(40, 40));
         lblAvatar.setVerifyInputWhenFocusTarget(false);
+        lblAvatar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblAvatarMouseClicked(evt);
+            }
+        });
         add(lblAvatar);
         add(filler2);
 
@@ -95,6 +120,21 @@ public class SideBarPanel extends javax.swing.JPanel {
         add(filler4);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void lblAvatarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblAvatarMouseClicked
+        // TODO add your handling code here:
+        //Bật cái này lên nếu muốn option show khi ấn chuột trái vào avatar
+//        userMenu.show(this, evt.getX(), evt.getY());
+    }//GEN-LAST:event_lblAvatarMouseClicked
+
+    private void menuEditProfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuEditProfileActionPerformed
+        // TODO add your handling code here:
+        EditProfileDialog dialogEdit = new EditProfileDialog();
+        dialogEdit.setLocationRelativeTo(null);
+        dialogEdit.setVisible(true);
+        
+        
+    }//GEN-LAST:event_menuEditProfileActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddFriend;
@@ -104,5 +144,10 @@ public class SideBarPanel extends javax.swing.JPanel {
     private javax.swing.Box.Filler filler3;
     private javax.swing.Box.Filler filler4;
     private javax.swing.JLabel lblAvatar;
+    private javax.swing.JMenuItem menuEditProfile;
+    private javax.swing.JMenuItem menuLogout;
+    private javax.swing.JMenuItem menuUpdatePassword;
+    private javax.swing.JMenuItem menuUpdatePhone;
+    private javax.swing.JPopupMenu userMenu;
     // End of variables declaration//GEN-END:variables
 }

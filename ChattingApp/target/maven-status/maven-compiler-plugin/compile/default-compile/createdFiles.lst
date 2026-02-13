@@ -3,6 +3,7 @@ chattingapp\models\MessageType.class
 chattingapp\api\BaseService.class
 chattingapp\config\ThemeManager.class
 chattingapp\models\ChatData.class
+chattingapp\ui\EditProfileDialog.class
 chattingapp\MainApp.class
 chattingapp\models\Friendship.class
 chattingapp\models\FriendshipStatus.class
@@ -16,6 +17,7 @@ chattingapp\models\UserStatus.class
 chattingapp\responses\ApiResponse.class
 chattingapp\components\ChatPanel.class
 chattingapp\models\User.class
+chattingapp\components\SideBarPanel$1.class
 chattingapp\ui\MainFrame.class
 chattingapp\api\UserService.class
 chattingapp\utils\AvatarUtil.class

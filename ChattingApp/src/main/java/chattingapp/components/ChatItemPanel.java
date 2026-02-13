@@ -37,7 +37,7 @@ public class ChatItemPanel extends javax.swing.JPanel {
         }
 
         // Avatar
-        lblAvatar.setIcon(AvatarUtil.loadAvatar(data.getContact().getAvatarUrl(), 40));
+        lblAvatar.setIcon(AvatarUtil.loadAvatar(data.getContact().getAvatarUrl(), 40, true));
 
         // Tên
         lblName.setText(data.getContact().getDisplayName());

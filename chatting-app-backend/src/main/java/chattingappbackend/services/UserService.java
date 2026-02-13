@@ -1,5 +1,6 @@
 package chattingappbackend.services;
 
+import chattingappbackend.dtos.RegisterRequestDTO;
 import chattingappbackend.dtos.RegisterResponseDTO;
 import chattingappbackend.exceptions.AppException;
 import chattingappbackend.models.User;
@@ -16,26 +17,35 @@ import java.util.UUID;
 public class UserService {
     private UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    public RegisterResponseDTO register(User userModel){
-        if(userRepository.findByUsername(userModel.getUsername()).isPresent()){
+
+
+    public RegisterResponseDTO register(RegisterRequestDTO requestDTO){
+        if(userRepository.findByUsername(requestDTO.getUsername()).isPresent()){
             throw new AppException("USERNAME_EXISTS","Input username have been used, please use another username.");
         }
-        if(userRepository.existsByPhoneNumber(userModel.getPhoneNumber())){
+        if(userRepository.existsByPhoneNumber(requestDTO.getPhoneNumber())){
             throw new AppException("PHONE_NUMBER_EXISTS", "Input phone number have been used, please use another phone number.");
         }
-        userModel.setUserId(UUID.randomUUID().toString());
-        userModel.setHashedPassword(passwordEncoder.encode(userModel.getHashedPassword()));
-        userModel.setCreatedAt(LocalDateTime.now());
-        userModel.setStatus(UserStatus.UNVERIFIED);
+        User user = new User(
+                UUID.randomUUID().toString(),
+                requestDTO.getGender(),
+                requestDTO.getUsername(),
+                requestDTO.getPhoneNumber(),
+                requestDTO.getDisplayName(),
+                requestDTO.getAvatarUrl(),
+                passwordEncoder.encode(requestDTO.getPassword()),
+                UserStatus.UNVERIFIED,
+                LocalDateTime.now()
 
-        userRepository.insertUser(userModel);
-        return new RegisterResponseDTO(userModel.getDisplayName(), userModel.getStatus());
+        );
+
+        userRepository.insertUser(user);
+        return new RegisterResponseDTO(user.getDisplayName(), user.getStatus());
     }
 
 }

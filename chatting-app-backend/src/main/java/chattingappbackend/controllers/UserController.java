@@ -1,5 +1,6 @@
 package chattingappbackend.controllers;
 
+import chattingappbackend.dtos.RegisterRequestDTO;
 import chattingappbackend.dtos.RegisterResponseDTO;
 import chattingappbackend.models.User;
 import chattingappbackend.responses.ApiResponse;
@@ -22,7 +23,7 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<RegisterResponseDTO>> register(@RequestBody User user){
+    public ResponseEntity<ApiResponse<RegisterResponseDTO>> register(@RequestBody RegisterRequestDTO user){
         RegisterResponseDTO result = userService.register(user);
         ApiResponse<RegisterResponseDTO> response = ApiResponse.success("User registered successfully", result);
         return new ResponseEntity<>(response, HttpStatus.CREATED);

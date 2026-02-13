@@ -57,7 +57,7 @@ Success (200 OK): Gửi mã OTP thành công
 ```json
 {
   "status": "success",
-  "message": "Sent OTP sucessfully",
+  "message": "Sent OTP successfully",
   "data": null
 }
 ```
@@ -205,7 +205,7 @@ Success (200 OK): Gửi mã OTP thành công
 ```json
 {
   "status": "success",
-  "message": "Sent OTP sucessfully",
+  "message": "Sent OTP successfully",
   "data": null
 }
 ```
@@ -307,7 +307,7 @@ Success (200 OK): Gửi mã OTP thành công
 ```json
 {
   "status": "success",
-  "message": "Sent OTP sucessfully",
+  "message": "Sent OTP successfully",
   "data": null
 }
 ```

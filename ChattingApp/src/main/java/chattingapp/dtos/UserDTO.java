@@ -1,52 +1,39 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-package chattingapp.models;
+package chattingapp.dtos;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import chattingapp.models.UserStatus;
 
 import java.time.LocalDateTime;
 
-/**
- *
- * @author CP
- */
-public class User {
-    @JsonProperty("user_id")
+public class UserDTO {
     private String userId;
-    @JsonProperty("gender")
     private Boolean gender;
-    @JsonProperty("username")
     private String username;
-    @JsonProperty("phone_number")
     private String phoneNumber;
-    @JsonProperty("display_name")
     private String displayName;
-    @JsonProperty("avatar_url")
     private String avatarUrl;
-    @JsonProperty("password")
-    private String hashedPassword;
-    @JsonProperty("status")
     private UserStatus status;
-    @JsonProperty("created_at")
     private LocalDateTime createdAt;
 
-    public User() {
-    }
-
-    public User(String userId, Boolean gender, String username, String phoneNumber,
-                String displayName, String avatarUrl, String hashedPassword,
-                UserStatus status, LocalDateTime createdAt) {
+    public UserDTO(String userId, Boolean gender, String username, String phoneNumber, String displayName, String avatarUrl, LocalDateTime createdAt, UserStatus status) {
         this.userId = userId;
         this.gender = gender;
         this.username = username;
         this.phoneNumber = phoneNumber;
         this.displayName = displayName;
         this.avatarUrl = avatarUrl;
-        this.hashedPassword = hashedPassword;
-        this.status = status;
         this.createdAt = createdAt;
+        this.status = status;
+    }
+
+    public UserDTO() {
+    }
+
+    public UserStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(UserStatus status) {
+        this.status = status;
     }
 
     public String getUserId() {
@@ -95,22 +82,6 @@ public class User {
 
     public void setAvatarUrl(String avatarUrl) {
         this.avatarUrl = avatarUrl;
-    }
-
-    public String getHashedPassword() {
-        return hashedPassword;
-    }
-
-    public void setHashedPassword(String hashedPassword) {
-        this.hashedPassword = hashedPassword;
-    }
-
-    public UserStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(UserStatus status) {
-        this.status = status;
     }
 
     public LocalDateTime getCreatedAt() {

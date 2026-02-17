@@ -4,6 +4,7 @@
  */
 package chattingapp.ui;
 
+import chattingapp.models.User;
 import chattingapp.utils.AvatarUtil;
 import java.awt.Event;
 import javax.swing.ImageIcon;
@@ -14,15 +15,26 @@ import javax.swing.ImageIcon;
  */
 public class EditProfileDialog extends javax.swing.JDialog {
 
+    private User currentUser;
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(EditProfileDialog.class.getName());
 
     /**
      * Creates new form EditProfileDialog
      */
     public EditProfileDialog() {
-        initComponents();
-        btnEdit.requestFocusInWindow(); 
+        this(null);
     }
+
+    public EditProfileDialog(User user) {
+        this.currentUser = user;
+        initComponents();
+        btnEdit.requestFocusInWindow();
+        txtUsername.setText(currentUser.getUsername());
+        txtDisplayname.setText(currentUser.getDisplayName());
+        txtURLAvatar.setText(currentUser.getAvatarUrl());
+
+    }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -165,7 +177,7 @@ public class EditProfileDialog extends javax.swing.JDialog {
         String displayName = txtDisplayname.getText();
         String username = txtUsername.getText();
         //Lưu vào csdl
-        
+
         //Đóng thằng này lại
         this.dispose();
     }//GEN-LAST:event_btnSaveActionPerformed

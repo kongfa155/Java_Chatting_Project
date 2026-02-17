@@ -4,7 +4,10 @@
  */
 package chattingapp.components;
 
+import chattingapp.models.User;
 import chattingapp.ui.EditProfileDialog;
+import chattingapp.ui.UpdatePasswordDialog;
+import chattingapp.ui.UpdatePhoneDialog;
 import chattingapp.utils.AvatarUtil;
 import javax.swing.ImageIcon;
 
@@ -17,25 +20,33 @@ public class SideBarPanel extends javax.swing.JPanel {
     /**
      * Creates new form SideBarPanel
      */
+    //Fake data
+    private User currentUser;
+
     public SideBarPanel() {
+        this(null);
+    }
+
+    public SideBarPanel(User user) {
+        this.currentUser = user;
         initComponents();
-        //Fake tạm sau này có User lấy URL sau
-        String userURLAva = "https://free.vector6.com/wp-content/uploads/2021/03/0000000556-chim-canh-cut-hoc-bai-tai-hinh-png-38-300x256.png";
-        setAvatar(userURLAva);
+
+        if (user != null) {
+            setAvatar(user.getAvatarUrl());
+        }
 
     }
 
-    public final void  setAvatar(String avatarURL) {
+    public final void setAvatar(String avatarURL) {
 //        lblAvatar.setText("");
         new Thread(() -> {
             ImageIcon icon = AvatarUtil.loadAvatar(avatarURL, 40, true);
 
-            javax.swing.SwingUtilities.invokeLater ( 
-                () -> {
-            lblAvatar.setIcon(icon);
-            }
-        
-        );
+            javax.swing.SwingUtilities.invokeLater(
+                    () -> {
+                        lblAvatar.setIcon(icon);
+                    }
+            );
         }).start();
 
     }
@@ -67,9 +78,11 @@ public class SideBarPanel extends javax.swing.JPanel {
         userMenu.add(menuEditProfile);
 
         menuUpdatePhone.setText("Cập nhật số điện thoại");
+        menuUpdatePhone.addActionListener(this::menuUpdatePhoneActionPerformed);
         userMenu.add(menuUpdatePhone);
 
         menuUpdatePassword.setText("Đổi mật khẩu");
+        menuUpdatePassword.addActionListener(this::menuUpdatePasswordActionPerformed);
         userMenu.add(menuUpdatePassword);
 
         menuLogout.setText("Đăng xuất");
@@ -128,12 +141,37 @@ public class SideBarPanel extends javax.swing.JPanel {
 
     private void menuEditProfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuEditProfileActionPerformed
         // TODO add your handling code here:
-        EditProfileDialog dialogEdit = new EditProfileDialog();
+        if (currentUser == null) {
+            return;
+        }
+
+        EditProfileDialog dialogEdit = new EditProfileDialog(currentUser);
         dialogEdit.setLocationRelativeTo(null);
         dialogEdit.setVisible(true);
-        
-        
+
     }//GEN-LAST:event_menuEditProfileActionPerformed
+
+    private void menuUpdatePhoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuUpdatePhoneActionPerformed
+        // TODO add your handling code here:
+        if (currentUser == null) {
+            return;
+        }
+
+        UpdatePhoneDialog dialogPhone = new UpdatePhoneDialog(currentUser);
+        dialogPhone.setLocationRelativeTo(null);
+        dialogPhone.setVisible(true);
+    }//GEN-LAST:event_menuUpdatePhoneActionPerformed
+
+    private void menuUpdatePasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuUpdatePasswordActionPerformed
+        // TODO add your handling code here:
+        if (currentUser == null) {
+            return;
+        }
+
+        UpdatePasswordDialog passDialog = new UpdatePasswordDialog(currentUser);
+        passDialog.setLocationRelativeTo(null);
+        passDialog.setVisible(true);
+    }//GEN-LAST:event_menuUpdatePasswordActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

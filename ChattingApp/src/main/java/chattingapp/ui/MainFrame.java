@@ -4,6 +4,8 @@
  */
 package chattingapp.ui;
 
+import chattingapp.components.SideBarPanel;
+import chattingapp.models.User;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 
@@ -12,28 +14,35 @@ import java.awt.Toolkit;
  * @author CP
  */
 public class MainFrame extends javax.swing.JFrame {
-    
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MainFrame.class.getName());
+    //Fake data
+    private User currentUser;
 
     /**
      * Creates new form MainFrame
      */
-    public MainFrame() {
+    public MainFrame(User user) {
+        this.currentUser = user;
         initComponents();
         initFrame();
-                leftSplitPane.setDividerLocation(70); 
-    mainSplitPane.setDividerLocation(300);
+        SideBarPanel newSideBar = new SideBarPanel(currentUser);
+        leftSplitPane.setLeftComponent(newSideBar);
+        leftSplitPane.setDividerLocation(70);
+        mainSplitPane.setDividerLocation(300);
     }
-    private void initFrame(){
+
+    private void initFrame() {
         //Set kích cỡ cho nó lên 3/4 màn hình
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-        int w = (int) (screen.width *0.75);
-        int h = (int) (screen.height *0.75);
-        setSize(w,h);
+        int w = (int) (screen.width * 0.75);
+        int h = (int) (screen.height * 0.75);
+        setSize(w, h);
 
         //Set ở giữa màn hình
         setLocationRelativeTo(null);
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -45,16 +54,16 @@ public class MainFrame extends javax.swing.JFrame {
 
         mainSplitPane = new javax.swing.JSplitPane();
         leftSplitPane = new javax.swing.JSplitPane();
-        sideBarPanel2 = new chattingapp.components.SideBarPanel();
         chatListPanel1 = new chattingapp.components.ChatListPanel();
+        sideBarPanel1 = new chattingapp.components.SideBarPanel();
         chatPanel1 = new chattingapp.components.ChatPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("MainFrame");
         setResizable(false);
 
-        leftSplitPane.setLeftComponent(sideBarPanel2);
         leftSplitPane.setRightComponent(chatListPanel1);
+        leftSplitPane.setLeftComponent(sideBarPanel1);
 
         mainSplitPane.setLeftComponent(leftSplitPane);
         mainSplitPane.setRightComponent(chatPanel1);
@@ -86,7 +95,16 @@ public class MainFrame extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new MainFrame().setVisible(true));
+        java.awt.EventQueue.invokeLater(() -> {
+            // Fake user để test FE
+            User fakeUser = new User();
+            fakeUser.setUserId("U01");
+            fakeUser.setUsername("cp123");
+            fakeUser.setDisplayName("CP Dev");
+            fakeUser.setPhoneNumber("0987654321");
+            fakeUser.setAvatarUrl("https://free.vector6.com/wp-content/uploads/2021/03/0000000556-chim-canh-cut-hoc-bai-tai-hinh-png-38-300x256.png");
+            new MainFrame(fakeUser).setVisible(true);
+        });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -94,6 +112,6 @@ public class MainFrame extends javax.swing.JFrame {
     private chattingapp.components.ChatPanel chatPanel1;
     private javax.swing.JSplitPane leftSplitPane;
     private javax.swing.JSplitPane mainSplitPane;
-    private chattingapp.components.SideBarPanel sideBarPanel2;
+    private chattingapp.components.SideBarPanel sideBarPanel1;
     // End of variables declaration//GEN-END:variables
 }

@@ -9,6 +9,8 @@ D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\components\SideBarPan
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\config\ThemeManager.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\dtos\RegisterRequestDTO.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\dtos\RegisterResponseDTO.java
+D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\dtos\RegisterVerifyRequestDTO.java
+D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\dtos\RegisterVerifyResponseDTO.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\dtos\UserDTO.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\MainApp.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\models\ChatData.java
@@ -24,6 +26,9 @@ D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\responses\ApiResponse
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\ui\EditProfileDialog.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\ui\LoginFrame.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\ui\MainFrame.java
+D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\ui\OTPFrame.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\ui\RegisterFrame.java
+D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\ui\UpdatePasswordDialog.java
+D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\ui\UpdatePhoneDialog.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\utils\AvatarUtil.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\utils\TimeUtil.java

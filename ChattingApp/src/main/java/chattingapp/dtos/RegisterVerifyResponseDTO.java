@@ -1,6 +1,8 @@
 package chattingapp.dtos;
 
-import chattingappbackend.models.UserStatus;
+import chattingapp.models.UserStatus;
+//Ông viết lên FE thì ông xài kiểu dữ liệu của FE nhe ông, ông làm z nó lỗi
+//import chattingappbackend.models.UserStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.sql.Timestamp;

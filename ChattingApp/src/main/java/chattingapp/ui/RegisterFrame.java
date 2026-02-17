@@ -238,7 +238,12 @@ public class RegisterFrame extends javax.swing.JFrame {
         UserService userService = new UserService();
         userService.register(dto);
         System.out.println("Da gui request");
-        
+        //Nếu thành công thì làm cái này
+//        if (true )
+        OTPFrame otpFrame = new OTPFrame(phone);
+        otpFrame.setVisible(true);
+        this.dispose();
+        //Còn thất bại thì tùy ông
     }//GEN-LAST:event_btnRegActionPerformed
 
     /**

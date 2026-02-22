@@ -1,13 +1,16 @@
+chattingapp\components\SearchResultItemPanel.class
 chattingapp\ui\LoginFrame$2.class
 chattingapp\models\MessageType.class
 chattingapp\ui\UpdatePhoneDialog.class
 chattingapp\api\BaseService.class
 chattingapp\config\ThemeManager.class
+chattingapp\components\AddFriendPopupPanel.class
 chattingapp\models\ChatData.class
 chattingapp\ui\EditProfileDialog.class
 chattingapp\MainApp.class
 chattingapp\models\Friendship.class
 chattingapp\dtos\RegisterVerifyRequestDTO.class
+chattingapp\components\FriendRequestItemPanel.class
 chattingapp\models\FriendshipStatus.class
 chattingapp\components\SideBarPanel.class
 chattingapp\dtos\RegisterRequestDTO.class

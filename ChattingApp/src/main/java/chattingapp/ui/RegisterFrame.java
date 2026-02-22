@@ -13,7 +13,7 @@ import javax.swing.JOptionPane;
  * @author CP
  */
 public class RegisterFrame extends javax.swing.JFrame {
-    
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(RegisterFrame.class.getName());
 
     /**
@@ -28,7 +28,7 @@ public class RegisterFrame extends javax.swing.JFrame {
         txtDisplayName.putClientProperty("JTextField.placeholderText", "Tên hiển thị");
         txtPhone.putClientProperty("JTextField.placeholderText", "Số điện thoại");
         txtPassword.putClientProperty("JTextField.placeholderText", "Mật khẩu");
-        
+
     }
 
     /**
@@ -219,31 +219,49 @@ public class RegisterFrame extends javax.swing.JFrame {
         String phone = txtPhone.getText().trim();
         String password = new String(txtPassword.getPassword());
         Boolean gender = radNam.isSelected();
-        RegisterRequestDTO dto = new RegisterRequestDTO(gender,username,phone,displayName,"chuacourl",password);
+        RegisterRequestDTO dto = new RegisterRequestDTO(gender, username, phone, displayName, "chuacourl", password);
         //Validate trống 
         if (username.isEmpty() || displayName.isEmpty() || phone.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ tất cả các trường!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
+
         //Validate tên tài khoản (nếu cần)
-        
         //Validate mật khẩu (Tạm thời chỉ cần > 6 kí tự
-        if(password.length() < 6) {
+        if (password.length() < 6) {
             JOptionPane.showMessageDialog(this, "Mật khẩu cần tối thiểu 6 ký tự", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
+
         //Rồi làm gì với dữ liệu thì làm nhé
         UserService userService = new UserService();
-        userService.register(dto);
-        System.out.println("Da gui request");
-        //Nếu thành công thì làm cái này
-//        if (true )
-        OTPFrame otpFrame = new OTPFrame(phone);
-        otpFrame.setVisible(true);
-        this.dispose();
-        //Còn thất bại thì tùy ông
+        btnReg.setEnabled(false);
+        userService.register(dto)
+                .thenAccept(response -> {
+                    // Thành công
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+                        JOptionPane.showMessageDialog(this,
+                                "Đăng ký thành công! Vui lòng nhập OTP",
+                                "Thành công",
+                                JOptionPane.INFORMATION_MESSAGE);
+
+                        OTPFrame otpFrame = new OTPFrame(phone);
+                        otpFrame.setVisible(true);
+                        this.dispose();
+                    });
+                })
+                .exceptionally(ex -> {
+                    // Thất bại
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+                        JOptionPane.showMessageDialog(this,
+                                "Đăng ký thất bại: " + ex.getMessage(),
+                                "Lỗi",
+                                JOptionPane.ERROR_MESSAGE);
+
+                        btnReg.setEnabled(true);
+                    });
+                    return null;
+                });
     }//GEN-LAST:event_btnRegActionPerformed
 
     /**

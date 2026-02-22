@@ -1,10 +1,13 @@
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\api\ApiClient.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\api\BaseService.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\api\UserService.java
+D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\components\AddFriendPopupPanel.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\components\ChatItemPanel.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\components\ChatListPanel.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\components\ChatPanel.java
+D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\components\FriendRequestItemPanel.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\components\MessageBubble.java
+D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\components\SearchResultItemPanel.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\components\SideBarPanel.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\config\ThemeManager.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\dtos\RegisterRequestDTO.java

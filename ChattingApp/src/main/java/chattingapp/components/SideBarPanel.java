@@ -10,11 +10,13 @@ import chattingapp.ui.UpdatePasswordDialog;
 import chattingapp.ui.UpdatePhoneDialog;
 import chattingapp.utils.AvatarUtil;
 import javax.swing.ImageIcon;
+import javax.swing.JPopupMenu;
 
 /**
  *
  * @author CP
  */
+
 public class SideBarPanel extends javax.swing.JPanel {
 
     /**
@@ -118,6 +120,7 @@ public class SideBarPanel extends javax.swing.JPanel {
         btnAddFriend.setMaximumSize(new java.awt.Dimension(40, 40));
         btnAddFriend.setMinimumSize(new java.awt.Dimension(40, 40));
         btnAddFriend.setPreferredSize(new java.awt.Dimension(40, 40));
+        btnAddFriend.addActionListener(this::btnAddFriendActionPerformed);
         add(btnAddFriend);
         add(filler3);
 
@@ -172,6 +175,22 @@ public class SideBarPanel extends javax.swing.JPanel {
         passDialog.setLocationRelativeTo(null);
         passDialog.setVisible(true);
     }//GEN-LAST:event_menuUpdatePasswordActionPerformed
+
+    private void btnAddFriendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddFriendActionPerformed
+        // TODO add your handling code here:
+    //Tạo nhanh một Dialog thay vì tạo hẳn một dialog mới
+        javax.swing.JDialog dialog = new javax.swing.JDialog(
+                javax.swing.SwingUtilities.getWindowAncestor(this),
+                "Thêm bạn",
+                javax.swing.JDialog.ModalityType.APPLICATION_MODAL
+        );
+
+        AddFriendPopupPanel panel = new AddFriendPopupPanel();
+        dialog.setContentPane(panel);
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+    }//GEN-LAST:event_btnAddFriendActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

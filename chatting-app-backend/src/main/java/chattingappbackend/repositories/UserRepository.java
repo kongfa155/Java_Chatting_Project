@@ -1,15 +1,16 @@
 package chattingappbackend.repositories;
 
-import chattingappbackend.dtos.RegisterVerifyResponseDTO;
-import chattingappbackend.models.User;
-import chattingappbackend.models.UserStatus;
+import java.util.Optional;
+
 import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import chattingappbackend.dtos.RegisterVerifyResponseDTO;
+import chattingappbackend.models.User;
+import chattingappbackend.models.UserStatus;
 
 @Repository
 public interface UserRepository extends CrudRepository<User, String> {
@@ -32,5 +33,8 @@ public interface UserRepository extends CrudRepository<User, String> {
 
     @Query("SELECT user_id, username, display_name, gender, status, created_at FROM users WHERE username = :username")
     Optional<RegisterVerifyResponseDTO> findUserForVerification(@Param("username") String username);
+
+    @Query("SELECT * FROM users WHERE phone_number= :phone_number")
+    Optional<User> findByPhoneNumber(@Param("phone_number")  String phoneNumber);
 
 }

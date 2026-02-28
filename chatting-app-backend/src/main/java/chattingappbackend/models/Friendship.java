@@ -6,17 +6,30 @@ package chattingappbackend.models;
 
 import java.time.LocalDateTime;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  *
  * @author CP
  */
+@Table("friendships")
 public class Friendship {
 
     //Properties
+    @Id
+    @JsonProperty("friendship_id")
     private String friendshipId;
+    @JsonProperty("user_id")
     private String userId;
+    @JsonProperty("friend_id")
     private String friendId;
+
     private FriendshipStatus status;
+    
+    @JsonProperty("created_at")
     private LocalDateTime createdAt;
 
     //Contruster

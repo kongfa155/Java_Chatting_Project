@@ -143,7 +143,7 @@ public class UpdatePhoneDialog extends javax.swing.JDialog {
         if (!newPhone.matches("\\d{10}") && !newPhone.matches("\\d{11}")) {
             JOptionPane.showMessageDialog(this, "Số điện thoại không hợp lệ", "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
-
+        
         //Gọi OTP và mở qua trang validate 
         OTPFrame otp = new OTPFrame(newPhone);
         otp.setVisible(true);

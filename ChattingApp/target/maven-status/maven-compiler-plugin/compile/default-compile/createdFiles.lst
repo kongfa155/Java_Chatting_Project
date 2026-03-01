@@ -1,4 +1,5 @@
 chattingapp\components\SearchResultItemPanel.class
+chattingapp\components\ChatItemPanel$ChatItemClickListener.class
 chattingapp\ui\LoginFrame$2.class
 chattingapp\models\MessageType.class
 chattingapp\ui\UpdatePhoneDialog.class
@@ -33,6 +34,7 @@ chattingapp\components\SideBarPanel$1.class
 chattingapp\ui\MainFrame.class
 chattingapp\api\UserService.class
 chattingapp\utils\AvatarUtil.class
+chattingapp\components\ChatListPanel$ChatSelectionListener.class
 chattingapp\models\NotificationType.class
 chattingapp\components\ChatListPanel.class
 chattingapp\dtos\RegisterResponseDTO.class

@@ -14,8 +14,12 @@ import chattingapp.utils.TimeUtil;
  */
 public class ChatItemPanel extends javax.swing.JPanel {
 
+    private ChatData data;
+    private ChatItemClickListener listener;
+
     public ChatItemPanel(ChatData data) {
         initComponents();
+        this.data = data;
         bindData(data);
         initHoverEffect();
         lblUnread.setVisible(false);
@@ -27,7 +31,12 @@ public class ChatItemPanel extends javax.swing.JPanel {
     public ChatItemPanel() {
 
         initComponents();
-        
+
+    }
+    //Hàm xử lý khi click vào item
+    public interface ChatItemClickListener {
+
+        void onChatItemClick(ChatData data);
     }
 
     private void bindData(ChatData data) {
@@ -87,7 +96,9 @@ public class ChatItemPanel extends javax.swing.JPanel {
 
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
-                setSelected(true);
+                if (listener != null) {
+                    listener.onChatItemClick(data);
+                }
             }
         });
     }
@@ -100,6 +111,10 @@ public class ChatItemPanel extends javax.swing.JPanel {
         } else {
             setBackground(java.awt.Color.WHITE);
         }
+    }
+
+    public void setChatItemClickListener(ChatItemClickListener listener) {
+        this.listener = listener;
     }
 
     /**

@@ -9,6 +9,8 @@ import java.awt.FlowLayout;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import chattingapp.models.ChatData;
+import chattingapp.models.Message;
 
 /**
  *
@@ -43,6 +45,43 @@ public class ChatPanel extends javax.swing.JPanel {
                 = new MessageBubble("Hello bro", false);
 
         messageContainer.add(friendMsg);
+    }
+
+    public void loadChat(ChatData data) {
+
+        if (data == null) {
+            return;
+        }
+
+        // Set header
+        lblName.setText(data.getContact().getDisplayName());
+        lblStatus.setText("Online");
+
+        // Clear tin nhắn cũ
+        messageContainer.removeAll();
+
+        // Fake load message list
+        for (int i = 0; i < 5; i++) {
+
+            MessageBubble bubble;
+
+            if (i % 2 == 0) {
+                bubble = new MessageBubble(
+                        "Message from " + data.getContact().getDisplayName(),
+                        false
+                );
+            } else {
+                bubble = new MessageBubble(
+                        "My reply " + i,
+                        true
+                );
+            }
+
+            messageContainer.add(bubble);
+        }
+
+        messageContainer.revalidate();
+        messageContainer.repaint();
     }
 
     /**
@@ -170,6 +209,7 @@ public class ChatPanel extends javax.swing.JPanel {
 
     private void btnSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendActionPerformed
         // TODO add your handling code here:
+        String mess = txtMessage.getText();
         sendMessage();
     }//GEN-LAST:event_btnSendActionPerformed
 

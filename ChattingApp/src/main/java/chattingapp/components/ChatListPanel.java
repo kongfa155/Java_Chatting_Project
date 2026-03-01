@@ -14,6 +14,9 @@ import chattingapp.models.User;
  */
 public class ChatListPanel extends javax.swing.JPanel {
 
+    private ChatItemPanel selectedItem;
+    private ChatSelectionListener chatSelectionListener;
+
     /**
      * Creates new form ChatListPanel
      */
@@ -28,7 +31,6 @@ public class ChatListPanel extends javax.swing.JPanel {
         // Search box đẹp hơn
         txtSearch.putClientProperty("JTextField.placeholderText", "Search...");
 
-
         txtSearch.setBorder(
                 javax.swing.BorderFactory.createEmptyBorder(10, 15, 10, 15)
         );
@@ -41,8 +43,13 @@ public class ChatListPanel extends javax.swing.JPanel {
         listContainer.setBorder(
                 javax.swing.BorderFactory.createEmptyBorder(5, 0, 5, 0)
         );
-        
+
         scrollPane.getVerticalScrollBar().putClientProperty("JScrollBar.showButtons", false);
+    }
+
+    public interface ChatSelectionListener {
+
+        void onChatSelected(ChatData data);
     }
 
     private void fakeData() {
@@ -51,23 +58,49 @@ public class ChatListPanel extends javax.swing.JPanel {
 
         for (int i = 1; i <= 15; i++) {
 
+            // Tạo user giả
             User user = new User();
             user.setDisplayName("Friend " + i);
             user.setAvatarUrl("https://i.pravatar.cc/150?img=" + i);
 
+            // Tạo message giả
             Message msg = new Message();
             msg.setContent("Hello bro this is message " + i);
-            msg.setSentAt(java.time.LocalDateTime.now().minusMinutes(i * 3));
+            msg.setSentAt(
+                    java.time.LocalDateTime.now().minusMinutes(i * 5)
+            );
 
+            // Tạo ChatData
             ChatData data = new ChatData(user, msg, i % 4);
 
+            // Tạo ChatItemPanel
             ChatItemPanel item = new ChatItemPanel(data);
 
+            // GẮN LISTENER
+            item.setChatItemClickListener(clickedData -> {
+
+                if (selectedItem != null) {
+                    selectedItem.setSelected(false);
+                }
+
+                item.setSelected(true);
+                selectedItem = item;
+
+                if (chatSelectionListener != null) {
+                    chatSelectionListener.onChatSelected(clickedData);
+                }
+            });
+
+            // Thêm vào list
             listContainer.add(item);
         }
 
         listContainer.revalidate();
         listContainer.repaint();
+    }
+
+    public void setChatSelectionListener(ChatSelectionListener listener) {
+        this.chatSelectionListener = listener;
     }
 
     /**

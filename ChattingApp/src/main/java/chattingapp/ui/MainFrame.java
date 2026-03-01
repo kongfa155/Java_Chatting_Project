@@ -30,6 +30,9 @@ public class MainFrame extends javax.swing.JFrame {
         leftSplitPane.setLeftComponent(newSideBar);
         leftSplitPane.setDividerLocation(70);
         mainSplitPane.setDividerLocation(300);
+        chatListPanel1.setChatSelectionListener(data -> {
+            chatPanel1.loadChat(data);
+        });
     }
 
     private void initFrame() {

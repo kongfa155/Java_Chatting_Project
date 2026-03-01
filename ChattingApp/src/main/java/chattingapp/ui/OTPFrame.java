@@ -67,6 +67,7 @@ public class OTPFrame extends javax.swing.JFrame {
         jPanel1.add(filler2);
 
         btnReSend.setText("Gửi lại mã");
+        btnReSend.addActionListener(this::btnReSendActionPerformed);
         jPanel2.add(btnReSend);
 
         btnVerify.setText("Xác thực");
@@ -85,7 +86,14 @@ public class OTPFrame extends javax.swing.JFrame {
     private void btnVerifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerifyActionPerformed
         String OTP = txtOTP.getText();
         //Kiểm tra OTP ở đây
+        //Cho về giao diện Login
+        
     }//GEN-LAST:event_btnVerifyActionPerformed
+
+    private void btnReSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReSendActionPerformed
+        // TODO add your handling code here:
+        //Thêm xử lý gửi lại mã
+    }//GEN-LAST:event_btnReSendActionPerformed
 
     /**
      * @param args the command line arguments

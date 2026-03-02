@@ -34,8 +34,9 @@ public class ChatItemPanel extends javax.swing.JPanel {
 
     }
     //Hàm xử lý khi click vào item
+    //Hãy tưởng tượng cái này như là một kênh đàm thoại, ai muốn sử dụng kênh đàm thoại này này thì phải setup hàm onChatItemClick
     public interface ChatItemClickListener {
-
+        //Kiểm tra coi có ai đăng lắng nghe không, nếu có truyền dữ liệu của nó đi
         void onChatItemClick(ChatData data);
     }
 
@@ -93,7 +94,9 @@ public class ChatItemPanel extends javax.swing.JPanel {
                     setBackground(java.awt.Color.WHITE);
                 }
             }
-
+            
+            
+            //Dùng để ChatItem thông báo đến toàn hệ thống là có người click
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
                 if (listener != null) {

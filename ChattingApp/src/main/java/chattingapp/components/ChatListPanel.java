@@ -25,7 +25,9 @@ public class ChatListPanel extends javax.swing.JPanel {
         setupUI();
         fakeData();
     }
-
+    //Hàm này sau này dùng để cập nhật lại list khi có tin nhắn mới
+    public void receiveNewMessage(){};
+    
     private void setupUI() {
 
         // Search box đẹp hơn
@@ -46,12 +48,12 @@ public class ChatListPanel extends javax.swing.JPanel {
 
         scrollPane.getVerticalScrollBar().putClientProperty("JScrollBar.showButtons", false);
     }
-
+    //Đây là kênh đàm thoại cấp cao, dùng để cho các quản lý giao tiếp tới nhau
     public interface ChatSelectionListener {
 
         void onChatSelected(ChatData data);
     }
-
+    //Sau này cần một hàm LoadData trả về các đối tượng ChatData (cần tên, avatar, tin nhắn cuối cùng, số tin nhắn chưa đọc)
     private void fakeData() {
 
         listContainer.removeAll();
@@ -77,12 +79,13 @@ public class ChatListPanel extends javax.swing.JPanel {
             ChatItemPanel item = new ChatItemPanel(data);
 
             // GẮN LISTENER
+            //Ông này muốn xài đàm thoại trên kênh nên là định nghĩa một hàm setChatItemClick, hàm sẽ chạy khi có người click vào một item
             item.setChatItemClickListener(clickedData -> {
-
+                //Unselect vật phẩm cũ
                 if (selectedItem != null) {
                     selectedItem.setSelected(false);
                 }
-
+                //Select vật phẩm mới
                 item.setSelected(true);
                 selectedItem = item;
 

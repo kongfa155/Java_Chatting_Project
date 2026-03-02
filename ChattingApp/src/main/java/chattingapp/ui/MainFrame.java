@@ -30,6 +30,8 @@ public class MainFrame extends javax.swing.JFrame {
         leftSplitPane.setLeftComponent(newSideBar);
         leftSplitPane.setDividerLocation(70);
         mainSplitPane.setDividerLocation(300);
+        
+        //Cấp cao thiết lập kênh đàm thoại, yêu cầu chatPanel tiếng hành load lại giao diện khung chat
         chatListPanel1.setChatSelectionListener(data -> {
             chatPanel1.loadChat(data);
         });

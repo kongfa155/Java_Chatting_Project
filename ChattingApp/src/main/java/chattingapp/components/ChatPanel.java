@@ -59,7 +59,7 @@ public class ChatPanel extends javax.swing.JPanel {
 
         // Clear tin nhắn cũ
         messageContainer.removeAll();
-
+        //Sau này chỗ này cần gọi hàm lấy tất cả tin nhắn giữa 2 người, kiểm tra xem ai là người gửi để biết set bong bong chat bên trái hay phải
         // Fake load message list
         for (int i = 0; i < 5; i++) {
 

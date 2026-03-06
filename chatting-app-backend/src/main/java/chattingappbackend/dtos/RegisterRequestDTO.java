@@ -7,8 +7,8 @@ public class RegisterRequestDTO {
     private Boolean gender;
     @JsonProperty("username")
     private String username;
-    @JsonProperty("phone_number")
-    private String phoneNumber;
+    @JsonProperty("email")
+    private String email;
     @JsonProperty("display_name")
     private String displayName;
     @JsonProperty("avatar_url")
@@ -32,12 +32,12 @@ public class RegisterRequestDTO {
         this.username = username;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
+    public String getEmail() {
+        return email;
     }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getDisplayName() {
@@ -64,10 +64,10 @@ public class RegisterRequestDTO {
         this.password = password;
     }
 
-    public RegisterRequestDTO(Boolean gender, String username, String phoneNumber, String displayName, String avatarUrl, String password) {
+    public RegisterRequestDTO(Boolean gender, String username, String email, String displayName, String avatarUrl, String password) {
         this.gender = gender;
         this.username = username;
-        this.phoneNumber = phoneNumber;
+        this.email = email;
         this.displayName = displayName;
         this.avatarUrl = avatarUrl;
         this.password = password;

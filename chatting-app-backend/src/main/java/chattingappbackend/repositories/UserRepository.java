@@ -20,11 +20,14 @@ public interface UserRepository extends CrudRepository<User, String> {
     Optional<String> findPhoneNumberByUsername(@Param("username") String username);
     @Query("SELECT COUNT(*) > 0 FROM users WHERE phone_number = :phoneNumber")
     boolean existsByPhoneNumber(@Param("phoneNumber") String phoneNumber);
+    @Query("SELECT COUNT(*) > 0 FROM users WHERE email =:email")
+    boolean existsByEmail(@Param("email") String email);
     @Query("SELECT status FROM users WHERE username = :username")
     Optional<UserStatus> findStatusByUsername(@Param("username") String username);
+
     @Modifying
-    @Query("INSERT INTO users (user_id, gender, username, phone_number, display_name, avatar_url, password, status, created_at) " +
-            "VALUES (:#{#u.userId}, :#{#u.gender}, :#{#u.username}, :#{#u.phoneNumber}, :#{#u.displayName}, :#{#u.avatarUrl}, :#{#u.hashedPassword}, :#{#u.status}, :#{#u.createdAt})")
+    @Query("INSERT INTO users (user_id, gender, username, email, display_name, avatar_url, password, status, created_at) " +
+            "VALUES (:#{#u.userId}, :#{#u.gender}, :#{#u.username}, :#{#u.email}, :#{#u.displayName}, :#{#u.avatarUrl}, :#{#u.hashedPassword}, :#{#u.status}, :#{#u.createdAt})")
     void insertUser(@Param("u") User u);
     @Modifying
     @Query("UPDATE users SET status = :status WHERE username = :username")

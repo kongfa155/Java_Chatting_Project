@@ -7,7 +7,7 @@
 {
   "username": "string",
   "password": "string",
-  "phone_number": "string",
+  "email": "string",
   "display_name": "string",
   "avatar_url": "string",
   "gender": "boolean"
@@ -188,7 +188,7 @@ Error (400 Bad Request): Sai mật khẩu cũ
 }
 ```
 ### Đổi số điện thoại
-#### Step 1: Nhận OTP đổi số điện thoại
+#### Step 1: Nhận OTP doi email
 + Endpoint: /api/users/get-change-phone-number-otp
 + Method: POST
 + Request body:
@@ -196,7 +196,7 @@ Error (400 Bad Request): Sai mật khẩu cũ
 {
   "user_id": "string",
   "password": "string",
-  "new_phone_number": "string"
+  "new_email": "string"
 }
 ```
 + Response body:
@@ -231,7 +231,7 @@ Error (400 Bad Request): Số điện thoại đã có người sử dụng
 ```json
 {
   "user_id": "string",
-  "new_phone_number": "string",
+  "new_email": "string",
   "otp": "string"
 }
 ```

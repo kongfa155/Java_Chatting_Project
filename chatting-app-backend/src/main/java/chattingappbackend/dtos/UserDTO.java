@@ -8,17 +8,17 @@ public class UserDTO {
     private String userId;
     private Boolean gender;
     private String username;
-    private String phoneNumber;
+    private String email;
     private String displayName;
     private String avatarUrl;
     private UserStatus status;
     private LocalDateTime createdAt;
 
-    public UserDTO(String userId, Boolean gender, String username, String phoneNumber, String displayName, String avatarUrl, LocalDateTime createdAt, UserStatus status) {
+    public UserDTO(String userId, Boolean gender, String username, String email, String displayName, String avatarUrl, LocalDateTime createdAt, UserStatus status) {
         this.userId = userId;
         this.gender = gender;
         this.username = username;
-        this.phoneNumber = phoneNumber;
+        this.email = email;
         this.displayName = displayName;
         this.avatarUrl = avatarUrl;
         this.createdAt = createdAt;
@@ -60,12 +60,12 @@ public class UserDTO {
         this.username = username;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
+    public String getEmail() {
+        return email;
     }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getDisplayName() {

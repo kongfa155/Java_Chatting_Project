@@ -16,8 +16,8 @@ public class User {
     private Boolean gender;
     @JsonProperty("username")
     private String username;
-    @JsonProperty("phone_number")
-    private String phoneNumber;
+    @JsonProperty("email")
+    private String email;
     @JsonProperty("display_name")
     private String displayName;
     @JsonProperty("avatar_url")
@@ -30,11 +30,11 @@ public class User {
     @JsonProperty("created_at")
     private LocalDateTime createdAt;
 
-    public User(String userId, Boolean gender, String username, String phoneNumber, String displayName, String avatarUrl, String hashedPassword, UserStatus status, LocalDateTime createdAt) {
+    public User(String userId, Boolean gender, String username, String email, String displayName, String avatarUrl, String hashedPassword, UserStatus status, LocalDateTime createdAt) {
         this.userId = userId;
         this.gender = gender;
         this.username = username;
-        this.phoneNumber = phoneNumber;
+        this.email = email;
         this.displayName = displayName;
         this.avatarUrl = avatarUrl;
         this.hashedPassword = hashedPassword;
@@ -69,12 +69,12 @@ public class User {
         this.username = username;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
+    public String getEmail() {
+        return email;
     }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+    public void setEmail(String phoneNumber) {
+        this.email = email;
     }
 
     public String getDisplayName() {

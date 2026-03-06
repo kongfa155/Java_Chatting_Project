@@ -43,14 +43,14 @@ public class UserService {
         if(userRepository.findByUsername(requestDTO.getUsername()).isPresent()){
             throw new AppException("USERNAME_EXISTS","Input username have been used, please use another username.");
         }
-        if(userRepository.existsByPhoneNumber(requestDTO.getPhoneNumber())){
-            throw new AppException("PHONE_NUMBER_EXISTS", "Input phone number have been used, please use another phone number.");
+        if(userRepository.existsByEmail(requestDTO.getEmail())){
+            throw new AppException("EMAIL_EXISTS", "Input email have been used, please use another phone number.");
         }
         User user = new User(
                 UUID.randomUUID().toString(),
                 requestDTO.getGender(),
                 requestDTO.getUsername(),
-                requestDTO.getPhoneNumber(),
+                requestDTO.getEmail(),
                 requestDTO.getDisplayName(),
                 requestDTO.getAvatarUrl(),
                 passwordEncoder.encode(requestDTO.getPassword()),

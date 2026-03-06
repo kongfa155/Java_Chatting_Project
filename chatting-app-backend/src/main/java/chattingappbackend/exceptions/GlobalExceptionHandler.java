@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiResponse<Void>> handleRuntimeException(RuntimeException ex){
-        ApiResponse<Void> response = new ApiResponse<>("error", ex.getMessage(), "SYSTEM_ERROR", null);
+        ApiResponse<Void> response = new ApiResponse<>("error", "Invalid requset", "SYSTEM_ERROR", null);
         return ResponseEntity.badRequest().body(response);
 
     }

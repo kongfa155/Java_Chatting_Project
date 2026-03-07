@@ -44,7 +44,7 @@ public class UserService {
             throw new AppException("USERNAME_EXISTS","Input username have been used, please use another username.");
         }
         if(userRepository.existsByEmail(requestDTO.getEmail())){
-            throw new AppException("EMAIL_EXISTS", "Input email have been used, please use another phone number.");
+            throw new AppException("EMAIL_EXISTS", "Input email have been used, please use another email.");
         }
         User user = new User(
                 UUID.randomUUID().toString(),
@@ -71,8 +71,8 @@ public class UserService {
         if(currentStatus!=UserStatus.UNVERIFIED){
             throw new AppException("ACCOUNT_ALREADY_VERIFIED", "Account have already been verified");
         }
-        String phoneNumber = userRepository.findPhoneNumberByUsername(username).orElse(null);
-        boolean sent = otpService.sendOTP(phoneNumber);
+        String email = userRepository.findEmailByUsername(username).orElse(null);
+        boolean sent = otpService.sendOTP(email);
         if(sent) {
             return ApiResponse.success("Sent OTP successfully", null);
         }   else{
@@ -84,8 +84,8 @@ public class UserService {
         if(userStatus!=UserStatus.UNVERIFIED){
             throw new AppException("ACCOUNT_ALREADY_VERIFIED","Account have already been verified");
         }
-        String phoneNumber =  userRepository.findPhoneNumberByUsername(requestDTO.getUsername()).orElse(null);
-        boolean verify = otpService.checkOTP(requestDTO.getOtp(), phoneNumber);
+        String email =  userRepository.findEmailByUsername(requestDTO.getUsername()).orElse(null);
+        boolean verify = otpService.checkOTP(requestDTO.getOtp(), email);
         if(verify){
             userRepository.updateStatusByUsername(requestDTO.getUsername(), UserStatus.ACTIVATED);
             RegisterVerifyResponseDTO response = userRepository.findUserForVerification(requestDTO.getUsername()).orElse(null);

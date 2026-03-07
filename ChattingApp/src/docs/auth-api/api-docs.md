@@ -34,12 +34,12 @@ Success (201 Created): Đăng ký thành công
   "message": "Input username have been used, please use another username."
 }
 ```
-Error (400 Bad Request): Số điện thoại đã có người sử dụng
+Error (400 Bad Request): Email đã có người sử dụng
 ```json
 {
   "status": "error",
-  "error_code": "PHONE_NUMBER_EXISTS",
-  "message": "Input phone number have been used, please use another phone number."
+  "error_code": "EMAIL_EXISTS",
+  "message": "Input email have been used, please use another email."
 }
 ```
 #### Step 2: Nhận OTP xác thực.

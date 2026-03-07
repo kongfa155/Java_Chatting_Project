@@ -8,9 +8,8 @@ import com.twilio.rest.verify.v2.service.VerificationCheck;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
-
+@Deprecated
 @Service
-@Primary
 public class TwilioService implements OTPService{
 
     private final TwilioConfig twilioConfig;
@@ -37,9 +36,9 @@ public class TwilioService implements OTPService{
         }
     }
     @Override
-    public boolean checkOTP(String code, String rawPhoneNumber){
+    public boolean checkOTP(String code, String email){
         try {
-            String phoneNumber = PhoneNumberHelper.formatPhoneNumber(rawPhoneNumber);
+            String phoneNumber = PhoneNumberHelper.formatPhoneNumber(email);
             VerificationCheck verificationCheck = VerificationCheck.creator(
                             twilioConfig.getVerifyServiceSid())
                     .setTo(phoneNumber)

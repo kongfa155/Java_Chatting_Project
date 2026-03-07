@@ -18,6 +18,8 @@ public interface UserRepository extends CrudRepository<User, String> {
     Optional<User> findByUsername(@Param("username") String username);
     @Query("SELECT phone_number FROM users WHERE username = :username")
     Optional<String> findPhoneNumberByUsername(@Param("username") String username);
+    @Query("SELECT email FROM users WHERE username= :username")
+    Optional<String> findEmailByUsername(@Param("username") String username);
     @Query("SELECT COUNT(*) > 0 FROM users WHERE phone_number = :phoneNumber")
     boolean existsByPhoneNumber(@Param("phoneNumber") String phoneNumber);
     @Query("SELECT COUNT(*) > 0 FROM users WHERE email =:email")

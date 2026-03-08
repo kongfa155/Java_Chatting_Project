@@ -4,22 +4,28 @@
  */
 package chattingapp.ui;
 
+import chattingapp.dtos.RegisterOTPRequestDTO;
+import chattingapp.dtos.RegisterVerifyRequestDTO;
+import chattingapp.services.UserService;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author CP
  */
 public class OTPFrame extends javax.swing.JFrame {
-
+    private String username;
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(OTPFrame.class.getName());
 
     /**
      * Creates new form OTPVerify
      */
-    public OTPFrame(String SDT) {
+    public OTPFrame(String email, String username) {
+        this.username= username;
         initComponents();
         lblNoti.setText("<html><center>"
                 + "Vui lòng nhập mã xác thực<br>"
-                + "Chúng tôi đã gửi mã đến <b>" + SDT + "</b>"
+                + "Chúng tôi đã gửi mã đến <b>" + email + "</b>"
                 + "</center></html>");
 
         txtOTP.putClientProperty("JTextField.placeholderText", "XX.XX.XX");
@@ -46,6 +52,7 @@ public class OTPFrame extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setPreferredSize(new java.awt.Dimension(400, 500));
+        getContentPane().setLayout(new java.awt.BorderLayout());
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEmptyBorder(60, 40, 40, 40));
         jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.Y_AXIS));
@@ -84,15 +91,42 @@ public class OTPFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnVerifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerifyActionPerformed
-        String OTP = txtOTP.getText();
-        //Kiểm tra OTP ở đây
-        //Cho về giao diện Login
-        
+       String otp = txtOTP.getText().trim();
+    btnVerify.setEnabled(false);
+    
+    new UserService().verifyRegister(new RegisterVerifyRequestDTO(username, otp))
+        .thenAccept(response -> {
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                JOptionPane.showMessageDialog(this, "Xác thực thành công!");
+                new LoginFrame().setVisible(true);
+                this.dispose();
+            });
+        })
+        .exceptionally(ex -> {
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                JOptionPane.showMessageDialog(this, "Lỗi: " + (ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage()));
+                btnVerify.setEnabled(true);
+            });
+            return null;
+        });
     }//GEN-LAST:event_btnVerifyActionPerformed
 
     private void btnReSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReSendActionPerformed
-        // TODO add your handling code here:
-        //Thêm xử lý gửi lại mã
+        btnReSend.setEnabled(false);
+    
+    new UserService().getRegisterOTP(new RegisterOTPRequestDTO(username))
+        .thenAccept(v -> {
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                JOptionPane.showMessageDialog(this, "Mã OTP mới đã được gửi!");
+                btnReSend.setEnabled(true);
+            });
+        })
+        .exceptionally(ex -> {
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                btnReSend.setEnabled(true);
+            });
+            return null;
+        });
     }//GEN-LAST:event_btnReSendActionPerformed
 
     /**

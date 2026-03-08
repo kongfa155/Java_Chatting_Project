@@ -6,7 +6,7 @@ package chattingapp.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  *
@@ -30,14 +30,14 @@ public class User {
     @JsonProperty("status")
     private UserStatus status;
     @JsonProperty("created_at")
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     public User() {
     }
 
     public User(String userId, Boolean gender, String username, String phoneNumber,
                 String displayName, String avatarUrl, String hashedPassword,
-                UserStatus status, LocalDateTime createdAt) {
+                UserStatus status, Instant createdAt) {
         this.userId = userId;
         this.gender = gender;
         this.username = username;
@@ -113,11 +113,11 @@ public class User {
         this.status = status;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 }

@@ -119,7 +119,7 @@
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="txtUsername" alignment="0" min="-2" pref="336" max="-2" attributes="0"/>
                                       <Component id="txtDisplayName" min="-2" pref="336" max="-2" attributes="0"/>
-                                      <Component id="txtPhone" min="-2" pref="336" max="-2" attributes="0"/>
+                                      <Component id="txtEmail" min="-2" pref="336" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
@@ -152,7 +152,7 @@
                       <EmptySpace pref="13" max="32767" attributes="0"/>
                       <Component id="txtDisplayName" min="-2" pref="59" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="txtPhone" min="-2" pref="59" max="-2" attributes="0"/>
+                      <Component id="txtEmail" min="-2" pref="59" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="txtPassword" min="-2" pref="55" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
@@ -179,7 +179,10 @@
             </Component>
             <Component class="javax.swing.JTextField" name="txtDisplayName">
             </Component>
-            <Component class="javax.swing.JTextField" name="txtPhone">
+            <Component class="javax.swing.JTextField" name="txtEmail">
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtEmailActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JRadioButton" name="radNam">
               <Properties>

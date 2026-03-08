@@ -1,4 +1,4 @@
-package chattingapp.api;
+package chattingapp.services;
 
 import java.net.http.HttpClient;
 import java.time.Duration;

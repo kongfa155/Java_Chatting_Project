@@ -5,6 +5,7 @@
 package chattingapp.ui;
 
 import chattingapp.models.User;
+import chattingapp.services.UserService;
 import javax.swing.JOptionPane;
 
 /**
@@ -132,21 +133,47 @@ public class UpdatePhoneDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_btnCancelPhoneActionPerformed
 
     private void btnSavePhoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSavePhoneActionPerformed
-        // TODO add your handling code here:
         String newPhone = txtNewPhone.getText().trim();
-        if (newPhone.isEmpty()) {
-            javax.swing.JOptionPane.showMessageDialog(this,
-                    "Vui lòng nhập số điện thoại mới");
-            return;
-        }
-        //Validate số điện thoại
-        if (!newPhone.matches("\\d{10}") && !newPhone.matches("\\d{11}")) {
-            JOptionPane.showMessageDialog(this, "Số điện thoại không hợp lệ", "Lỗi", JOptionPane.ERROR_MESSAGE);
-        }
-        
-        //Gọi OTP và mở qua trang validate 
-        OTPFrame otp = new OTPFrame(newPhone);
-        otp.setVisible(true);
+    
+    // 1. Validate trống
+    if (newPhone.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Vui lòng nhập số điện thoại mới");
+        return;
+    }
+    
+    // 2. Validate định dạng số điện thoại
+    if (!newPhone.matches("\\d{10}") && !newPhone.matches("\\d{11}")) {
+        JOptionPane.showMessageDialog(this, "Số điện thoại không hợp lệ (phải có 10 hoặc 11 chữ số)", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    // 3. Vô hiệu hóa nút để tránh spam
+    btnSavePhone.setEnabled(false);
+
+    // 4. Gọi Service gửi OTP (Backend của bạn dùng username để tìm user và gửi OTP)
+    UserService userService = new UserService();
+    userService.getRegisterOTP(new chattingapp.dtos.RegisterOTPRequestDTO(currentUser.getUsername()))
+        .thenAccept(v -> {
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                JOptionPane.showMessageDialog(this, "Mã xác thực đã được gửi đến số điện thoại mới!");
+                
+                // TRUYỀN ĐỦ 2 THAM SỐ:
+                // Thao số 1: newPhone (để hiện lên lblNoti của OTPFrame)
+                // Tham số 2: username (để OTPFrame có cái mà gọi verifyRegister)
+                OTPFrame otp = new OTPFrame(newPhone, currentUser.getUsername());
+                
+                otp.setVisible(true);
+                this.dispose();
+            });
+        })
+        .exceptionally(ex -> {
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                String msg = (ex.getCause() != null) ? ex.getCause().getMessage() : ex.getMessage();
+                JOptionPane.showMessageDialog(this, "Lỗi gửi OTP: " + msg, "Lỗi", JOptionPane.ERROR_MESSAGE);
+                btnSavePhone.setEnabled(true);
+            });
+            return null;
+        });
     }//GEN-LAST:event_btnSavePhoneActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

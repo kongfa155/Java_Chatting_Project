@@ -4,7 +4,8 @@
  */
 package chattingapp.ui;
 
-import chattingapp.api.UserService;
+import chattingapp.dtos.RegisterOTPRequestDTO;
+import chattingapp.services.UserService;
 import chattingapp.dtos.RegisterRequestDTO;
 import javax.swing.JOptionPane;
 
@@ -26,7 +27,7 @@ public class RegisterFrame extends javax.swing.JFrame {
         //Cập nhật text hiển thị khi chưa nhập input
         txtUsername.putClientProperty("JTextField.placeholderText", "Tên đăng nhập");
         txtDisplayName.putClientProperty("JTextField.placeholderText", "Tên hiển thị");
-        txtPhone.putClientProperty("JTextField.placeholderText", "Số điện thoại");
+        txtEmail.putClientProperty("JTextField.placeholderText", "Email");
         txtPassword.putClientProperty("JTextField.placeholderText", "Mật khẩu");
 
     }
@@ -50,7 +51,7 @@ public class RegisterFrame extends javax.swing.JFrame {
         txtPassword = new javax.swing.JPasswordField();
         dangNhap = new javax.swing.JLabel();
         txtDisplayName = new javax.swing.JTextField();
-        txtPhone = new javax.swing.JTextField();
+        txtEmail = new javax.swing.JTextField();
         radNam = new javax.swing.JRadioButton();
         radNu = new javax.swing.JRadioButton();
         jPanel7 = new javax.swing.JPanel();
@@ -60,6 +61,7 @@ public class RegisterFrame extends javax.swing.JFrame {
         setTitle("Đăng nhập");
         setMinimumSize(new java.awt.Dimension(400, 650));
         setResizable(false);
+        getContentPane().setLayout(new java.awt.BorderLayout());
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setBorder(javax.swing.BorderFactory.createEmptyBorder(30, 30, 30, 30));
@@ -106,6 +108,8 @@ public class RegisterFrame extends javax.swing.JFrame {
             }
         });
 
+        txtEmail.addActionListener(this::txtEmailActionPerformed);
+
         buttonGroup1.add(radNam);
         radNam.setSelected(true);
         radNam.setText("Nam");
@@ -126,7 +130,7 @@ public class RegisterFrame extends javax.swing.JFrame {
                             .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(txtUsername, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addComponent(txtDisplayName, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(txtPhone, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
@@ -149,7 +153,7 @@ public class RegisterFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
                 .addComponent(txtDisplayName, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtPhone, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -216,53 +220,67 @@ public class RegisterFrame extends javax.swing.JFrame {
         // Lấy dữ liệu từ các Field
         String username = txtUsername.getText().trim();
         String displayName = txtDisplayName.getText().trim();
-        String phone = txtPhone.getText().trim();
+        String email = txtEmail.getText().trim();
         String password = new String(txtPassword.getPassword());
         Boolean gender = radNam.isSelected();
-        RegisterRequestDTO dto = new RegisterRequestDTO(gender, username, phone, displayName, "chuacourl", password);
+        RegisterRequestDTO dto = new RegisterRequestDTO(gender, username, email, displayName, "chuacourl", password);
         //Validate trống 
-        if (username.isEmpty() || displayName.isEmpty() || phone.isEmpty() || password.isEmpty()) {
+        if (username.isEmpty() || displayName.isEmpty() || email.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ tất cả các trường!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         //Validate tên tài khoản (nếu cần)
         //Validate mật khẩu (Tạm thời chỉ cần > 6 kí tự
-        if (password.length() < 6) {
-            JOptionPane.showMessageDialog(this, "Mật khẩu cần tối thiểu 6 ký tự", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
 
         //Rồi làm gì với dữ liệu thì làm nhé
         UserService userService = new UserService();
         btnReg.setEnabled(false);
-        userService.register(dto)
-                .thenAccept(response -> {
-                    // Thành công
-                    javax.swing.SwingUtilities.invokeLater(() -> {
-                        JOptionPane.showMessageDialog(this,
-                                "Đăng ký thành công! Vui lòng nhập OTP",
-                                "Thành công",
-                                JOptionPane.INFORMATION_MESSAGE);
 
-                        OTPFrame otpFrame = new OTPFrame(phone);
-                        otpFrame.setVisible(true);
-                        this.dispose();
-                    });
-                })
-                .exceptionally(ex -> {
-                    // Thất bại
-                    javax.swing.SwingUtilities.invokeLater(() -> {
-                        JOptionPane.showMessageDialog(this,
-                                "Đăng ký thất bại: " + ex.getMessage(),
-                                "Lỗi",
-                                JOptionPane.ERROR_MESSAGE);
+        btnReg.setEnabled(false); // Vô hiệu hóa nút để tránh gửi trùng
 
-                        btnReg.setEnabled(true);
-                    });
-                    return null;
-                });
+userService.register(dto)
+    .thenCompose(regResponse -> {
+        // Bước 1 thành công: Đăng ký User xong.
+        // Bước 2: Tạo DTO để lấy OTP tự động. 
+        // Lưu ý: Dùng username từ dto ban đầu để gọi service.
+        RegisterOTPRequestDTO otpDto = new RegisterOTPRequestDTO(dto.getUsername());
+        
+        return userService.getRegisterOTP(otpDto); 
+    })
+    .thenAccept(otpResponse -> {
+        // Cả 2 bước Đăng ký và Gửi OTP đều thành công
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            JOptionPane.showMessageDialog(this,
+                    "Đăng ký thành công! Mã OTP đã được gửi đến email của bạn.",
+                    "Thông báo",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+            // Chuyển sang màn hình OTP
+            OTPFrame otpFrame = new OTPFrame(dto.getEmail(), dto.getUsername());
+    otpFrame.setVisible(true);
+    this.dispose();
+        });
+    })
+    .exceptionally(ex -> {
+        // Xử lý lỗi cho cả toàn bộ quy trình (lỗi ở bước 1 hoặc bước 2 đều nhảy vào đây)
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            String errorMsg = ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage();
+            
+            JOptionPane.showMessageDialog(this,
+                    "Lỗi: " + errorMsg,
+                    "Đăng ký thất bại",
+                    JOptionPane.ERROR_MESSAGE);
+
+            btnReg.setEnabled(true);
+        });
+        return null;
+    });
     }//GEN-LAST:event_btnRegActionPerformed
+
+    private void txtEmailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtEmailActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtEmailActionPerformed
 
     /**
      * @param args the command line arguments
@@ -301,8 +319,8 @@ public class RegisterFrame extends javax.swing.JFrame {
     private javax.swing.JRadioButton radNam;
     private javax.swing.JRadioButton radNu;
     private javax.swing.JTextField txtDisplayName;
+    private javax.swing.JTextField txtEmail;
     private javax.swing.JPasswordField txtPassword;
-    private javax.swing.JTextField txtPhone;
     private javax.swing.JTextField txtUsername;
     // End of variables declaration//GEN-END:variables
 }

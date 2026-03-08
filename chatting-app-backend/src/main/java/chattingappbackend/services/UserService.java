@@ -97,7 +97,9 @@ public class UserService {
     }
     public ApiResponse<LoginResponseDTO> login(LoginRequetDTO requestDTO){
         User user = userRepository.findByUsername(requestDTO.getUsername()).orElseThrow(()->new AppException("INVALID_CREDENTIALS","Wrong username or password."));
-
+        if(user.getStatus()!=UserStatus.ACTIVATED){
+            throw new AppException("ACCOUNT_IS_NOT_ACTIVATED","Account status is not activated.");
+        }
         boolean isMatch = passwordEncoder.matches(requestDTO.getPassword(), user.getHashedPassword());
         if(isMatch){
             LoginResponseDTO response = new LoginResponseDTO(jwtService.generateToken(user.getUsername()),(((int) JwtService.EXPIRATION_TIME)/1000), user.getUserId(), user.getUsername(), user.getDisplayName(), user.getGender(), user.getStatus(), user.getCreatedAt());

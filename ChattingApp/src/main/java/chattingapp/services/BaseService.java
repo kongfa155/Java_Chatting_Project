@@ -1,4 +1,4 @@
-package chattingapp.api;
+package chattingapp.services;
 import chattingapp.responses.ApiResponse;
 import tools.jackson.databind.JavaType;
 import tools.jackson.databind.ObjectMapper;

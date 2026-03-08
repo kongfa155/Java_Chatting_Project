@@ -4,7 +4,10 @@
  */
 package chattingapp.ui;
 
+import chattingapp.dtos.LoginRequetDTO;
+import chattingapp.dtos.RegisterOTPRequestDTO;
 import chattingapp.models.User;
+import chattingapp.services.UserService;
 import javax.swing.JOptionPane;
 
 /**
@@ -64,7 +67,7 @@ public class LoginFrame extends javax.swing.JFrame {
 
         quenMKDialog.setMinimumSize(new java.awt.Dimension(400, 500));
         quenMKDialog.setModal(true);
-        quenMKDialog.setPreferredSize(new java.awt.Dimension(400, 500));
+        quenMKDialog.getContentPane().setLayout(new java.awt.BorderLayout());
 
         ForgotPanel.setMinimumSize(new java.awt.Dimension(400, 500));
         ForgotPanel.setPreferredSize(new java.awt.Dimension(400, 500));
@@ -151,6 +154,7 @@ public class LoginFrame extends javax.swing.JFrame {
         setTitle("Đăng nhập");
         setMinimumSize(new java.awt.Dimension(400, 500));
         setResizable(false);
+        getContentPane().setLayout(new java.awt.BorderLayout());
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setBorder(javax.swing.BorderFactory.createEmptyBorder(30, 30, 30, 30));
@@ -210,22 +214,22 @@ public class LoginFrame extends javax.swing.JFrame {
         PanelInfoLayout.setHorizontalGroup(
             PanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(PanelInfoLayout.createSequentialGroup()
-                .addGap(25, 25, 25)
+                .addContainerGap()
                 .addGroup(PanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(PanelInfoLayout.createSequentialGroup()
                         .addComponent(quenMK)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 186, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(taoTK))
-                    .addComponent(txtUsername)
-                    .addComponent(txtPassword))
+                    .addComponent(txtUsername, javax.swing.GroupLayout.PREFERRED_SIZE, 366, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 366, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(34, Short.MAX_VALUE))
         );
         PanelInfoLayout.setVerticalGroup(
             PanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(PanelInfoLayout.createSequentialGroup()
-                .addGap(30, 30, 30)
+                .addGap(29, 29, 29)
                 .addComponent(txtUsername, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(32, 32, 32)
+                .addGap(33, 33, 33)
                 .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(PanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -256,16 +260,13 @@ public class LoginFrame extends javax.swing.JFrame {
         PanelButtonLayout.setHorizontalGroup(
             PanelButtonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(PanelButtonLayout.createSequentialGroup()
-                .addGap(30, 30, 30)
+                .addGap(19, 19, 19)
                 .addComponent(btnLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(37, Short.MAX_VALUE))
         );
         PanelButtonLayout.setVerticalGroup(
             PanelButtonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(PanelButtonLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(btnLogin, javax.swing.GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE)
-                .addGap(18, 18, 18))
+            .addComponent(btnLogin, javax.swing.GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE)
         );
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -326,17 +327,46 @@ public class LoginFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
-        //Fake user 
-         User fakeUser = new User();
-            fakeUser.setUserId("U01");
-            fakeUser.setUsername("cp123");
-            fakeUser.setDisplayName("CP Dev");
-            fakeUser.setPhoneNumber("0987654321");
-            fakeUser.setAvatarUrl("https://free.vector6.com/wp-content/uploads/2021/03/0000000556-chim-canh-cut-hoc-bai-tai-hinh-png-38-300x256.png");
-        MainFrame mainPage = new MainFrame(fakeUser);
-        mainPage.setVisible(true);
-        this.dispose();
+        btnLogin.setEnabled(false);
+        UserService userService = new UserService();
+
+    userService.login(new LoginRequetDTO(username, password))
+        .thenAccept(response -> {
+            // Đăng nhập thành công (Backend trả về ACTIVATED)
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                // Giả sử bạn dùng dữ liệu từ response.getData() để hiển thị MainFrame
+                new MainFrame(null).setVisible(true); 
+                this.dispose();
+            });
+        })
+        .exceptionally(ex -> {
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                String errorMsg = ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage();
+
+                if (errorMsg.contains("ACCOUNT_IS_NOT_ACTIVATED")) {
+                    int choice = JOptionPane.showConfirmDialog(this, 
+                        "Tài khoản chưa kích hoạt. Bạn có muốn nhận mã OTP để xác thực ngay không?", 
+                        "Thông báo", JOptionPane.YES_NO_OPTION);
+                    
+                    if (choice == JOptionPane.YES_OPTION) {
+                        // Gọi API lấy OTP rồi mới chuyển Frame
+                       userService.getRegisterOTP(new RegisterOTPRequestDTO(username))
+        .thenAccept(v -> {
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                // Ở đây ta dùng chính username cho cả 2 tham số 
+                // hoặc nếu bạn có email từ backend thì truyền vào
+                new OTPFrame(username, username).setVisible(true);
+                this.dispose();
+            });
+        });
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(this, "Lỗi: " + errorMsg, "Đăng nhập thất bại", JOptionPane.ERROR_MESSAGE);
+                }
+                btnLogin.setEnabled(true);
+            });
+            return null;
+        });
     }//GEN-LAST:event_btnLoginActionPerformed
 
     /**

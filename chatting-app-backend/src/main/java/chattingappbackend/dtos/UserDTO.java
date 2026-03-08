@@ -1,7 +1,6 @@
 package chattingappbackend.dtos;
 
-import java.time.LocalDateTime;
-
+import java.time.Instant;
 import chattingappbackend.models.UserStatus;
 
 public class UserDTO {
@@ -12,9 +11,9 @@ public class UserDTO {
     private String displayName;
     private String avatarUrl;
     private UserStatus status;
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
-    public UserDTO(String userId, Boolean gender, String username, String email, String displayName, String avatarUrl, LocalDateTime createdAt, UserStatus status) {
+    public UserDTO(String userId, Boolean gender, String username, String email, String displayName, String avatarUrl, Instant createdAt, UserStatus status) {
         this.userId = userId;
         this.gender = gender;
         this.username = username;
@@ -84,11 +83,11 @@ public class UserDTO {
         this.avatarUrl = avatarUrl;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 }

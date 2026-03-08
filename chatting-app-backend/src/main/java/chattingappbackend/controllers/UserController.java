@@ -1,5 +1,6 @@
 package chattingappbackend.controllers;
 
+import chattingappbackend.dtos.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,11 +9,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import chattingappbackend.dtos.RegisterOTPRequestDTO;
-import chattingappbackend.dtos.RegisterRequestDTO;
-import chattingappbackend.dtos.RegisterResponseDTO;
-import chattingappbackend.dtos.RegisterVerifyRequestDTO;
-import chattingappbackend.dtos.RegisterVerifyResponseDTO;
 import chattingappbackend.responses.ApiResponse;
 import chattingappbackend.services.UserService;
 
@@ -27,22 +23,25 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<RegisterResponseDTO>> register(@RequestBody RegisterRequestDTO user){
-        RegisterResponseDTO result = userService.register(user);
-        ApiResponse<RegisterResponseDTO> response = ApiResponse.success("User registered successfully", result);
+        ApiResponse response= userService.register(user);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
     @PostMapping("/get-register-otp")
     public ResponseEntity<ApiResponse<Void>> sendRegisterOTP(@RequestBody RegisterOTPRequestDTO dto){
 
         ApiResponse<Void> response = userService.sendRegisterOTP(dto.getUsername());
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.OK);
 
     }
     @PostMapping("/verify")
     public ResponseEntity<ApiResponse<RegisterVerifyResponseDTO>> verifyRegister(@RequestBody RegisterVerifyRequestDTO dto){
-        RegisterVerifyResponseDTO result = userService.verifyRegister(dto);
-        ApiResponse<RegisterVerifyResponseDTO> response = ApiResponse.success("Account verified successfully", result);
-        return new ResponseEntity<>(response,HttpStatus.CREATED );
+        ApiResponse response = userService.verifyRegister(dto);
+        return new ResponseEntity<>(response,HttpStatus.OK );
+    }
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<LoginResponseDTO>> login(@RequestBody LoginRequetDTO dto){
+        ApiResponse response = userService.login(dto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 }

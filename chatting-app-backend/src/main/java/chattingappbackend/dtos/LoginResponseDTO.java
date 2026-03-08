@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.Instant;
 
-public class RegisterVerifyResponseDTO {
+public class LoginResponseDTO {
     @JsonProperty("access_token")
     private String accessToken;
     @JsonProperty("expires_in")
@@ -22,20 +22,6 @@ public class RegisterVerifyResponseDTO {
     private UserStatus status;
     @JsonProperty("created_at")
     private Instant createdAt;
-
-    public RegisterVerifyResponseDTO(String accessToken, int expiresIn, String userId, String username, String displayName, boolean gender, UserStatus status, Instant createdAt) {
-        this.accessToken = accessToken;
-        this.expiresIn = expiresIn;
-        this.userId = userId;
-        this.username = username;
-        this.displayName = displayName;
-        this.gender = gender;
-        this.status = status;
-        this.createdAt = createdAt;
-    }
-
-    public RegisterVerifyResponseDTO() {
-    }
 
     public String getAccessToken() {
         return accessToken;
@@ -98,6 +84,20 @@ public class RegisterVerifyResponseDTO {
     }
 
     public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LoginResponseDTO() {
+    }
+
+    public LoginResponseDTO(String accessToken, int expiresIn, String userId, String username, String displayName, boolean gender, UserStatus status, Instant createdAt) {
+        this.accessToken = accessToken;
+        this.expiresIn = expiresIn;
+        this.userId = userId;
+        this.username = username;
+        this.displayName = displayName;
+        this.gender = gender;
+        this.status = status;
         this.createdAt = createdAt;
     }
 }

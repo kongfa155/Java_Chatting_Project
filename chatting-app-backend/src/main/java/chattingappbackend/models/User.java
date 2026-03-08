@@ -5,7 +5,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+
 
 @Table(value ="users")
 public class User {
@@ -28,9 +29,9 @@ public class User {
     @JsonProperty("status")
     private UserStatus status;
     @JsonProperty("created_at")
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
-    public User(String userId, Boolean gender, String username, String email, String displayName, String avatarUrl, String hashedPassword, UserStatus status, LocalDateTime createdAt) {
+    public User(String userId, Boolean gender, String username, String email, String displayName, String avatarUrl, String hashedPassword, UserStatus status, Instant createdAt) {
         this.userId = userId;
         this.gender = gender;
         this.username = username;
@@ -109,11 +110,11 @@ public class User {
         this.status = status;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 }

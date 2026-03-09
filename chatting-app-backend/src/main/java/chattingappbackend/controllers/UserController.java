@@ -1,13 +1,11 @@
 package chattingappbackend.controllers;
 
 import chattingappbackend.dtos.*;
+import chattingappbackend.exceptions.AppException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import chattingappbackend.responses.ApiResponse;
 import chattingappbackend.services.UserService;
@@ -41,6 +39,15 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponseDTO>> login(@RequestBody LoginRequetDTO dto){
         ApiResponse response = userService.login(dto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    @PostMapping("/change-password")
+    public ResponseEntity<ApiResponse<Void>> changePassword(@RequestHeader("Authorization") String authHeader, @RequestBody ChangePasswordRequestDTO dto){
+        if(authHeader==null||!authHeader.startsWith("Bearer ")){
+            throw new AppException("INVALID_TOKEN","Your token is outdated or missing.");
+        }
+        String token = authHeader.substring(7);
+        ApiResponse response = userService.changePassword(token,dto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

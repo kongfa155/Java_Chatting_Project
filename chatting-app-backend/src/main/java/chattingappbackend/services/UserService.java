@@ -87,7 +87,7 @@ public class UserService {
         if(verify){
             userRepository.updateStatusByUsername(requestDTO.getUsername(), UserStatus.ACTIVATED);
             RegisterVerifyResponseDTO response = userRepository.findUserForVerification(requestDTO.getUsername()).orElseThrow(()-> new AppException("INVALID_USERNAME","Input username is invalid."));
-            response.setAccessToken(jwtService.generateToken(response.getUsername()));
+            response.setAccessToken(jwtService.generateToken(response.getUsername(), response.getUserId()));
             response.setExpiresIn(((int) JwtService.EXPIRATION_TIME)/1000);
             return ApiResponse.success("Account verified successfully", response);
 
@@ -102,10 +102,23 @@ public class UserService {
         }
         boolean isMatch = passwordEncoder.matches(requestDTO.getPassword(), user.getHashedPassword());
         if(isMatch){
-            LoginResponseDTO response = new LoginResponseDTO(jwtService.generateToken(user.getUsername()),(((int) JwtService.EXPIRATION_TIME)/1000), user.getUserId(), user.getUsername(), user.getDisplayName(), user.getGender(), user.getStatus(), user.getCreatedAt());
+            LoginResponseDTO response = new LoginResponseDTO(jwtService.generateToken(user.getUsername(), user.getUserId()),(((int) JwtService.EXPIRATION_TIME)/1000), user.getUserId(), user.getUsername(), user.getDisplayName(), user.getGender(), user.getStatus(), user.getCreatedAt());
             return ApiResponse.success("Login successfully", response);
         }else{
             throw new AppException("INVALID_CREDENTIALS","Wrong username or password.");
+        }
+
+    }
+    public ApiResponse<Void> changePassword(String jwt, ChangePasswordRequestDTO dto){
+        String userIdFromJWT = jwtService.extractUserId(jwt);
+
+        User user = userRepository.findByUserId(userIdFromJWT).orElseThrow(()-> new AppException("USER_NOT_EXISTS","Can't find this user"));
+        boolean isMatch = passwordEncoder.matches(dto.getOldPassword(), user.getHashedPassword());
+        if(isMatch){
+            userRepository.updatePasswordByUserId(userIdFromJWT, passwordEncoder.encode(dto.getNewPassword()));
+            return ApiResponse.success("Changed password successfully",null);
+        }else{
+            throw new AppException("WRONG_OLD_PASSWORD", "Wrong old password.");
         }
 
     }

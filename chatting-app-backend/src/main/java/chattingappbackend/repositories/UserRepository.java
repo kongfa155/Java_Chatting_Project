@@ -14,6 +14,8 @@ import chattingappbackend.models.UserStatus;
 
 @Repository
 public interface UserRepository extends CrudRepository<User, String> {
+    @Query("SELECT * FROM users WHERE user_id = :userId")
+    Optional<User> findByUserId(@Param("userId") String userId);
     @Query("SELECT * FROM users WHERE username = :username")
     Optional<User> findByUsername(@Param("username") String username);
     @Query("SELECT phone_number FROM users WHERE username = :username")
@@ -34,7 +36,9 @@ public interface UserRepository extends CrudRepository<User, String> {
     @Modifying
     @Query("UPDATE users SET status = :status WHERE username = :username")
     void updateStatusByUsername(@Param("username") String username, @Param("status") UserStatus status);
-
+    @Modifying
+    @Query("UPDATE users SET password = :password WHERE user_id = :userId")
+    void updatePasswordByUserId(@Param("userId") String userId, @Param("password") String password);
 
     @Query("SELECT user_id, username, display_name, gender, status, created_at FROM users WHERE username = :username")
     Optional<RegisterVerifyResponseDTO> findUserForVerification(@Param("username") String username);

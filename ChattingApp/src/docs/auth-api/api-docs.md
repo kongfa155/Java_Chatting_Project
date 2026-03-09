@@ -154,8 +154,8 @@ Error (403 Forbidden): Tài khoản chưa xác thực
 ```json
 {
   "status": "error",
-  "error_code": "ACCOUNT_NOT_VERIFIED",
-  "message": "Account have not been verified."
+  "error_code": "ACCOUNT_IS_NOT_VERIFIED",
+  "message": "Account status is not activated."
 }
 ```
 ### Đổi mật khẩu

@@ -4,26 +4,30 @@
  */
 package chattingappbackend.models;
 
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-/**
- *
- * @author CP
- */
+@Entity
+@Table(name = "messages")
 public class Message {
 
     //Properties
+    @Id
     private String messageId;
+
     private String senderId;
     private String receiverId;
     private String content;
     private boolean isRead;
     private LocalDateTime sentAt;
+
+    @Enumerated(EnumType.STRING)
     private MessageType messageType;
+
     private boolean isDeleted;
     private String fileUrl;
 
-    //Constructer
+    //Constructor
     public Message() {
     }
 

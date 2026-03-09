@@ -10,11 +10,46 @@ package chattingapp.components;
  */
 public class SearchResultItemPanel extends javax.swing.JPanel {
 
+    private String email;
+
     /**
      * Creates new form SearchResultItemPanel
      */
-    public SearchResultItemPanel() {
+    public SearchResultItemPanel(String name, String phone, String email) {
         initComponents();
+
+        lblName.setText(name);
+        lblPhone.setText(phone);
+        this.email = email;
+    }
+
+    private void sendFriendRequest() {
+
+        chattingapp.services.FriendService friendService
+                = new chattingapp.services.FriendService();
+
+        btnAddFriend.setEnabled(false);
+
+        friendService.sendFriendRequest(email)
+                .thenRun(() -> {
+
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+                        btnAddFriend.setText("Đã gửi");
+                    });
+
+                })
+                .exceptionally(ex -> {
+
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+                        btnAddFriend.setEnabled(true);
+                        javax.swing.JOptionPane.showMessageDialog(
+                                this,
+                                "Gửi lời mời thất bại"
+                        );
+                    });
+
+                    return null;
+                });
     }
 
     /**
@@ -32,6 +67,9 @@ public class SearchResultItemPanel extends javax.swing.JPanel {
         lblName = new javax.swing.JLabel();
         lblPhone = new javax.swing.JLabel();
 
+        setMaximumSize(new java.awt.Dimension(250, 55));
+        setMinimumSize(new java.awt.Dimension(250, 55));
+        setPreferredSize(new java.awt.Dimension(250, 55));
         setLayout(new java.awt.BorderLayout());
 
         lblAvatar.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -60,12 +98,9 @@ public class SearchResultItemPanel extends javax.swing.JPanel {
         add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void sendFriendRequest() {
-
-}
     private void btnAddFriendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddFriendActionPerformed
         // TODO add your handling code here:
-        btnAddFriend.addActionListener(e -> sendFriendRequest());
+        sendFriendRequest();
     }//GEN-LAST:event_btnAddFriendActionPerformed
 
 

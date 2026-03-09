@@ -1,7 +1,7 @@
 chattingapp\components\SearchResultItemPanel.class
 chattingapp\ui\LoginFrame$2.class
 chattingapp\models\MessageType.class
-chattingapp\ui\UpdatePhoneDialog.class
+chattingapp\dtos\SendFriendDTO.class
 chattingapp\config\ThemeManager.class
 chattingapp\models\ChatData.class
 chattingapp\services\UserService.class
@@ -13,15 +13,18 @@ chattingapp\models\FriendshipStatus.class
 chattingapp\components\SideBarPanel.class
 chattingapp\dtos\RegisterRequestDTO.class
 chattingapp\components\ChatItemPanel$1.class
+chattingapp\services\FriendService.class
 chattingapp\responses\ApiResponse.class
 chattingapp\dtos\RegisterVerifyResponseDTO.class
 chattingapp\ui\MainFrame.class
 chattingapp\utils\AvatarUtil.class
+chattingapp\utils\SessionManager.class
 chattingapp\components\ChatListPanel$ChatSelectionListener.class
 chattingapp\components\ChatListPanel.class
 chattingapp\dtos\LoginRequetDTO.class
 chattingapp\dtos\RegisterResponseDTO.class
 chattingapp\dtos\RegisterOTPRequestDTO.class
+chattingapp\dtos\SearchDTO.class
 chattingapp\components\ChatItemPanel$ChatItemClickListener.class
 chattingapp\components\AddFriendPopupPanel.class
 chattingapp\components\NotificationListPanel.class
@@ -32,6 +35,7 @@ chattingapp\models\Message.class
 chattingapp\ui\UpdatePasswordDialog.class
 chattingapp\ui\OTPFrame.class
 chattingapp\components\MessageBubble.class
+chattingapp\ui\UpdateEmailDialog.class
 chattingapp\dtos\UserDTO.class
 chattingapp\ui\LoginFrame$1.class
 chattingapp\ui\RegisterFrame.class
@@ -47,4 +51,5 @@ chattingapp\models\NotificationType.class
 chattingapp\ui\LoginFrame.class
 chattingapp\components\NotificationItemPanel$1.class
 chattingapp\models\Notification.class
+chattingapp\dtos\FriendRequestResponseDTO.class
 chattingapp\ui\RegisterFrame$1.class

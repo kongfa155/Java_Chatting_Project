@@ -1,12 +1,14 @@
 package chattingappbackend.services;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import chattingappbackend.dtos.FriendRequestResponseDTO;
 import chattingappbackend.exceptions.AppException;
 import chattingappbackend.models.Friendship;
 import chattingappbackend.models.FriendshipStatus;
@@ -44,7 +46,18 @@ public class FriendshipService {
                 = friendshipRepository.findFriendshipBetween(senderId, receiver.getUserId());
 
         if (existing.isPresent()) {
-            throw new AppException("FRIENDSHIP_EXISTS", "Hai bạn hiện tại đã là bạn rồi");
+            if (existing.get().getStatus() == FriendshipStatus.ACCEPTED) {
+                throw new AppException("ALREADY_FRIENDS", "Already friends");
+            }
+
+            if (existing.get().getStatus() == FriendshipStatus.PENDING) {
+                throw new AppException("REQUEST_ALREADY_SENT", "Friend request already sent");
+            }
+
+            if (existing.get().getStatus() == FriendshipStatus.DECLINED) {
+                friendshipRepository.updateStatus(existing.get().getFriendshipId(), FriendshipStatus.PENDING);
+                return ApiResponse.success("Friend request resent", null);
+            }
         }
 
         Friendship friendship = new Friendship(
@@ -58,7 +71,7 @@ public class FriendshipService {
         friendshipRepository.insertFriendship(friendship);
 
         //Tạo thông báo
-        notificationService.createNotification(receiver.getUserId(), "Bạn có lời mời kết bạn mới đến từ" + sender.getDisplayName(), NotificationType.FRIEND);
+        notificationService.createNotification(receiver.getUserId(), "Bạn có lời mời kết bạn mới đến từ " + sender.getDisplayName(), NotificationType.FRIEND);
 
         return ApiResponse.success("Friend request sent", null);
     }
@@ -81,11 +94,53 @@ public class FriendshipService {
         return ApiResponse.success("Friend request accepted", null);
     }
 
+    public ApiResponse<Void> rejectRequest(String friendshipId, String currentUserId) {
+
+        Friendship friendship = friendshipRepository.findById(friendshipId)
+                .orElseThrow(()
+                        -> new AppException("NOT_FOUND", "Friendship not found"));
+
+        if (!friendship.getFriendId().equals(currentUserId)) {
+            throw new AppException("FORBIDDEN", "You are not allowed");
+        }
+
+        friendshipRepository.updateStatus(
+                friendshipId,
+                FriendshipStatus.DECLINED
+        );
+
+        return ApiResponse.success("Friend request reject", null);
+    }
+
     public FriendshipStatus checkFriendship(String userA, String userB) {
 
         return friendshipRepository
                 .findFriendshipBetween(userA, userB)
                 .map(Friendship::getStatus)
                 .orElse(null);
+    }
+
+    public ApiResponse<List<FriendRequestResponseDTO>> getPendingRequests(String userId) {
+
+        var requests = friendshipRepository.findPendingRequests(userId);
+        System.out.println("==== DEBUG REQUESTS ====");
+        for (FriendRequestResponseDTO r : requests) {
+            System.out.println("Name: " + r.getDisplayName());
+            System.out.println("UserId: " + r.getUserId());
+        }
+        return ApiResponse.success(
+                "Pending friend requests fetched",
+                requests
+        );
+    }
+
+    public ApiResponse<List<FriendRequestResponseDTO>> getFriends(String userId) {
+
+        var friends = friendshipRepository.findFriend(userId);
+
+        return ApiResponse.success(
+                "Friend list fetched",
+                friends
+        );
     }
 }

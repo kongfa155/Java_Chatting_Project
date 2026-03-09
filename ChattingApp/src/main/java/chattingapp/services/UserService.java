@@ -1,8 +1,11 @@
 package chattingapp.services;
 
 import chattingapp.dtos.*;
+import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
 
 public class UserService extends BaseService {
@@ -34,5 +37,21 @@ public class UserService extends BaseService {
         return ApiClient.getClient()
                 .sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(response -> handleResponse(response, LoginResponseDTO.class));
+    }
+    
+    //Tìm kiếm 
+    public CompletableFuture<SearchDTO> searchUser(String email) {
+
+        String encodedEmail = URLEncoder.encode(email, StandardCharsets.UTF_8);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(ApiClient.getBaseUrl() + "/users/search?email=" + encodedEmail))
+                .GET()
+                .header("Content-Type", "application/json")
+                .build();
+
+        return ApiClient.getClient()
+                .sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenApply(response -> handleResponse(response, SearchDTO.class));
     }
 }

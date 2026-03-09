@@ -6,9 +6,11 @@ package chattingapp.components;
 
 import chattingapp.models.User;
 import chattingapp.ui.EditProfileDialog;
+import chattingapp.ui.LoginFrame;
 import chattingapp.ui.UpdatePasswordDialog;
-import chattingapp.ui.UpdatePhoneDialog;
+import chattingapp.ui.UpdateEmailDialog;
 import chattingapp.utils.AvatarUtil;
+import chattingapp.utils.SessionManager;
 import javax.swing.ImageIcon;
 import javax.swing.JPopupMenu;
 
@@ -25,17 +27,16 @@ public class SideBarPanel extends javax.swing.JPanel {
     private User currentUser;
 
     public SideBarPanel() {
-        this(null);
+        initComponents();
+        loadUser();
     }
 
-    public SideBarPanel(User user) {
-        this.currentUser = user;
-        initComponents();
+    private void loadUser() {
+        currentUser = SessionManager.getCurrentUser();
 
-        if (user != null) {
-            setAvatar(user.getAvatarUrl());
+        if (currentUser != null) {
+            setAvatar(currentUser.getAvatarUrl());
         }
-
     }
 
     public final void setAvatar(String avatarURL) {
@@ -78,7 +79,8 @@ public class SideBarPanel extends javax.swing.JPanel {
         menuEditProfile.addActionListener(this::menuEditProfileActionPerformed);
         userMenu.add(menuEditProfile);
 
-        menuUpdatePhone.setText("Cập nhật số điện thoại");
+        menuUpdatePhone.setText("Cập nhật Email");
+        menuUpdatePhone.setToolTipText("");
         menuUpdatePhone.addActionListener(this::menuUpdatePhoneActionPerformed);
         userMenu.add(menuUpdatePhone);
 
@@ -87,6 +89,7 @@ public class SideBarPanel extends javax.swing.JPanel {
         userMenu.add(menuUpdatePassword);
 
         menuLogout.setText("Đăng xuất");
+        menuLogout.addActionListener(this::menuLogoutActionPerformed);
         userMenu.add(menuLogout);
 
         setBackground(new java.awt.Color(255, 255, 255));
@@ -148,7 +151,7 @@ public class SideBarPanel extends javax.swing.JPanel {
             return;
         }
 
-        EditProfileDialog dialogEdit = new EditProfileDialog(currentUser);
+        EditProfileDialog dialogEdit = new EditProfileDialog();
         dialogEdit.setLocationRelativeTo(null);
         dialogEdit.setVisible(true);
 
@@ -160,7 +163,7 @@ public class SideBarPanel extends javax.swing.JPanel {
             return;
         }
 
-        UpdatePhoneDialog dialogPhone = new UpdatePhoneDialog(currentUser);
+        UpdateEmailDialog dialogPhone = new UpdateEmailDialog();
         dialogPhone.setLocationRelativeTo(null);
         dialogPhone.setVisible(true);
     }//GEN-LAST:event_menuUpdatePhoneActionPerformed
@@ -171,7 +174,7 @@ public class SideBarPanel extends javax.swing.JPanel {
             return;
         }
 
-        UpdatePasswordDialog passDialog = new UpdatePasswordDialog(currentUser);
+        UpdatePasswordDialog passDialog = new UpdatePasswordDialog();
         passDialog.setLocationRelativeTo(null);
         passDialog.setVisible(true);
     }//GEN-LAST:event_menuUpdatePasswordActionPerformed
@@ -205,6 +208,15 @@ public class SideBarPanel extends javax.swing.JPanel {
         // hiển thị bên phải nút
         popup.show(btnNotify, btnNotify.getWidth() + 5, 0);
     }//GEN-LAST:event_btnNotifyActionPerformed
+
+    private void menuLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuLogoutActionPerformed
+        // TODO add your handling code here:
+        SessionManager.clearSession();
+
+        new LoginFrame().setVisible(true);
+
+        javax.swing.SwingUtilities.getWindowAncestor(this).dispose();
+    }//GEN-LAST:event_menuLogoutActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

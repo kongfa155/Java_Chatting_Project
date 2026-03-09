@@ -42,6 +42,7 @@ public class SearchResultItemPanel extends javax.swing.JPanel {
         add(lblAvatar, java.awt.BorderLayout.LINE_START);
 
         btnAddFriend.setText("Kết bạn");
+        btnAddFriend.addActionListener(this::btnAddFriendActionPerformed);
         add(btnAddFriend, java.awt.BorderLayout.EAST);
 
         jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.Y_AXIS));
@@ -58,6 +59,14 @@ public class SearchResultItemPanel extends javax.swing.JPanel {
 
         add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void sendFriendRequest() {
+
+}
+    private void btnAddFriendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddFriendActionPerformed
+        // TODO add your handling code here:
+        btnAddFriend.addActionListener(e -> sendFriendRequest());
+    }//GEN-LAST:event_btnAddFriendActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

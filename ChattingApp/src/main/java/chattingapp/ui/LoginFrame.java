@@ -15,7 +15,7 @@ import javax.swing.JOptionPane;
  * @author CP
  */
 public class LoginFrame extends javax.swing.JFrame {
-    
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(LoginFrame.class.getName());
 
     /**
@@ -28,7 +28,7 @@ public class LoginFrame extends javax.swing.JFrame {
         //Cập nhật text hiển thị khi chưa nhập input cho số điện thoại và mật khẩu
         txtUsername.putClientProperty("JTextField.placeholderText", "Tên đăng nhập");
         txtPassword.putClientProperty("JTextField.placeholderText", "Mật khẩu");
-        
+
         //Set trước cho Dialog
         txtPhone.putClientProperty("JTextField.placeholderText", "Nhập số điện thoại...");
         txtOTP.putClientProperty("JTextField.placeholderText", "XX.XX.XX");
@@ -296,7 +296,7 @@ public class LoginFrame extends javax.swing.JFrame {
     private void btnGetOTPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGetOTPActionPerformed
         // TODO add your handling code here:
         String SDT = txtPhone.getText();
-        if(SDT.length() != 10 && SDT.length() != 11) {
+        if (SDT.length() != 10 && SDT.length() != 11) {
             JOptionPane.showMessageDialog(this, "Số điện thoại không hợp lệ", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -314,7 +314,7 @@ public class LoginFrame extends javax.swing.JFrame {
     private void btnVerifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerifyActionPerformed
         String OTP = txtOTP.getText();
         //Kiểm tra OTP ở đây
-        
+
     }//GEN-LAST:event_btnVerifyActionPerformed
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
@@ -323,50 +323,57 @@ public class LoginFrame extends javax.swing.JFrame {
         char[] passwordChars = txtPassword.getPassword();
         //Tạm thời convert sang String trước mặc dù nó không bảo mật
         String password = new String(passwordChars);
-        if(username.isEmpty() || password.isEmpty()) {
+        if (username.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
         btnLogin.setEnabled(false);
         UserService userService = new UserService();
 
-    userService.login(new LoginRequetDTO(username, password))
-        .thenAccept(response -> {
-            // Đăng nhập thành công (Backend trả về ACTIVATED)
-            javax.swing.SwingUtilities.invokeLater(() -> {
-                // Giả sử bạn dùng dữ liệu từ response.getData() để hiển thị MainFrame
-                new MainFrame(null).setVisible(true); 
-                this.dispose();
-            });
-        })
-        .exceptionally(ex -> {
-            javax.swing.SwingUtilities.invokeLater(() -> {
-                String errorMsg = ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage();
+        userService.login(new LoginRequetDTO(username, password))
+                .thenAccept(response -> {
+                    // Đăng nhập thành công (Backend trả về ACTIVATED)
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+                        
+                        User user = new User();
+                        user.setUserId(response.getUserId());
+                        user.setUsername(response.getUsername());
+                        user.setDisplayName(response.getDisplayName());
+                        //Set mặc định nếu chưa có
+                        user.setAvatarUrl("https://i.pinimg.com/736x/bc/43/98/bc439871417621836a0eeea768d60944.jpg");
+                        // Giả sử bạn dùng dữ liệu từ response.getData() để hiển thị MainFrame
+                        new MainFrame(user).setVisible(true);
+                        this.dispose();
+                    });
+                })
+                .exceptionally(ex -> {
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+                        String errorMsg = ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage();
 
-                if (errorMsg.contains("ACCOUNT_IS_NOT_ACTIVATED")) {
-                    int choice = JOptionPane.showConfirmDialog(this, 
-                        "Tài khoản chưa kích hoạt. Bạn có muốn nhận mã OTP để xác thực ngay không?", 
-                        "Thông báo", JOptionPane.YES_NO_OPTION);
-                    
-                    if (choice == JOptionPane.YES_OPTION) {
-                        // Gọi API lấy OTP rồi mới chuyển Frame
-                       userService.getRegisterOTP(new RegisterOTPRequestDTO(username))
-        .thenAccept(v -> {
-            javax.swing.SwingUtilities.invokeLater(() -> {
-                // Ở đây ta dùng chính username cho cả 2 tham số 
-                // hoặc nếu bạn có email từ backend thì truyền vào
-                new OTPFrame(username, username).setVisible(true);
-                this.dispose();
-            });
-        });
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(this, "Lỗi: " + errorMsg, "Đăng nhập thất bại", JOptionPane.ERROR_MESSAGE);
-                }
-                btnLogin.setEnabled(true);
-            });
-            return null;
-        });
+                        if (errorMsg.contains("ACCOUNT_IS_NOT_ACTIVATED")) {
+                            int choice = JOptionPane.showConfirmDialog(this,
+                                    "Tài khoản chưa kích hoạt. Bạn có muốn nhận mã OTP để xác thực ngay không?",
+                                    "Thông báo", JOptionPane.YES_NO_OPTION);
+
+                            if (choice == JOptionPane.YES_OPTION) {
+                                // Gọi API lấy OTP rồi mới chuyển Frame
+                                userService.getRegisterOTP(new RegisterOTPRequestDTO(username))
+                                        .thenAccept(v -> {
+                                            javax.swing.SwingUtilities.invokeLater(() -> {
+                                                // Ở đây ta dùng chính username cho cả 2 tham số 
+                                                // hoặc nếu bạn có email từ backend thì truyền vào
+                                                new OTPFrame(username, username).setVisible(true);
+                                                this.dispose();
+                                            });
+                                        });
+                            }
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Lỗi: " + errorMsg, "Đăng nhập thất bại", JOptionPane.ERROR_MESSAGE);
+                        }
+                        btnLogin.setEnabled(true);
+                    });
+                    return null;
+                });
     }//GEN-LAST:event_btnLoginActionPerformed
 
     /**

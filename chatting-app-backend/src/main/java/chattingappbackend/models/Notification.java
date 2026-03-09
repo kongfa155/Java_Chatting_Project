@@ -6,19 +6,37 @@ package chattingappbackend.models;
 
 import java.time.LocalDateTime;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  *
  * @author CP
  */
+@Table("notifications")
 public class Notification {
 
     //Properties
+    @Id
+    @JsonProperty("notification_id")
     private String notificationId;
+
+    @JsonProperty("user_id")
     private String userId;
+
     private String content;
+
+    @JsonProperty("is_read")
     private boolean isRead;
+
+    @JsonProperty("is_deleted")
     private boolean isDeleted;
+
+    @JsonProperty("created_at")
     private LocalDateTime createdAt;
+
     private NotificationType type;
 
     //Contruster

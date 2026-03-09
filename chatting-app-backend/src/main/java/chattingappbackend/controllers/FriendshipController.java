@@ -14,16 +14,17 @@ import chattingappbackend.services.FriendshipService;
 @RestController
 @RequestMapping("/api/friendships")
 public class FriendshipController {
+
     @Autowired
     FriendshipService friendshipService;
-    
+
     @PostMapping("/send")
     public ResponseEntity<ApiResponse<Void>> send(
-            @RequestParam String phoneNumber,
+            @RequestParam String email,
             @RequestParam String currentUserId
     ) {
         return ResponseEntity.ok(
-                friendshipService.sendFriendRequest(currentUserId, phoneNumber)
+                friendshipService.sendFriendRequest(currentUserId, email)
         );
     }
 

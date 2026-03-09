@@ -16,7 +16,6 @@ import javax.swing.JPopupMenu;
  *
  * @author CP
  */
-
 public class SideBarPanel extends javax.swing.JPanel {
 
     /**
@@ -132,6 +131,7 @@ public class SideBarPanel extends javax.swing.JPanel {
         btnNotify.setMaximumSize(new java.awt.Dimension(40, 40));
         btnNotify.setMinimumSize(new java.awt.Dimension(40, 40));
         btnNotify.setPreferredSize(new java.awt.Dimension(40, 40));
+        btnNotify.addActionListener(this::btnNotifyActionPerformed);
         add(btnNotify);
         add(filler4);
     }// </editor-fold>//GEN-END:initComponents
@@ -178,7 +178,7 @@ public class SideBarPanel extends javax.swing.JPanel {
 
     private void btnAddFriendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddFriendActionPerformed
         // TODO add your handling code here:
-    //Tạo nhanh một Dialog thay vì tạo hẳn một dialog mới
+        //Tạo nhanh một Dialog thay vì tạo hẳn một dialog mới
         javax.swing.JDialog dialog = new javax.swing.JDialog(
                 javax.swing.SwingUtilities.getWindowAncestor(this),
                 "Thêm bạn",
@@ -191,6 +191,20 @@ public class SideBarPanel extends javax.swing.JPanel {
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
     }//GEN-LAST:event_btnAddFriendActionPerformed
+
+    private void btnNotifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNotifyActionPerformed
+        // TODO add your handling code here:
+        JPopupMenu popup = new JPopupMenu();
+
+        NotificationListPanel panel = new NotificationListPanel();
+        panel.setPreferredSize(new java.awt.Dimension(300, 400));
+
+        popup.setLayout(new java.awt.BorderLayout());
+        popup.add(panel);
+
+        // hiển thị bên phải nút
+        popup.show(btnNotify, btnNotify.getWidth() + 5, 0);
+    }//GEN-LAST:event_btnNotifyActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

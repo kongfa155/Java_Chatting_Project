@@ -1,5 +1,5 @@
 package chattingappbackend.dtos;
 
 public class SendFriendDTO {
-    private String phoneNumber;
+    private String email;
 }

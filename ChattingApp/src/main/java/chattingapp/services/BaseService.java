@@ -1,4 +1,5 @@
 package chattingapp.services;
+
 import chattingapp.responses.ApiResponse;
 import tools.jackson.databind.JavaType;
 import tools.jackson.databind.ObjectMapper;
@@ -7,7 +8,9 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 public class BaseService {
+
     protected final ObjectMapper objectMapper = new ObjectMapper();
+
     protected <T> T handleResponse(HttpResponse<String> response, Class<T> dataType) {
         try {
             JavaType type = objectMapper.getTypeFactory()
@@ -24,50 +27,52 @@ public class BaseService {
             throw new RuntimeException("System Error: " + e.getMessage());
         }
     }
-    protected HttpRequest createGetRequest(String endpoint){
+
+    protected HttpRequest createGetRequest(String endpoint) {
         return HttpRequest.newBuilder()
-                .uri(URI.create(ApiClient.getBaseUrl()+endpoint))
+                .uri(URI.create(ApiClient.getBaseUrl() + endpoint))
                 .header("Content-Type", "application/json")
                 .header("Accept", "application/json")
                 .GET()
                 .build();
     }
-    protected HttpRequest createPostRequest(String endpoint, Object dto){
-        try{
+
+    protected HttpRequest createPostRequest(String endpoint, Object dto) {
+        try {
             String jsonBody = objectMapper.writeValueAsString(dto);
             return HttpRequest.newBuilder()
-                    .uri(URI.create(ApiClient.getBaseUrl()+endpoint))
+                    .uri(URI.create(ApiClient.getBaseUrl() + endpoint))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                     .build();
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException("Error when converting DTO to JSON in Service layer", e);
         }
 
-
     }
 
-    protected HttpRequest createPutRequest(String endpoint, Object dto){
-        try{
+    protected HttpRequest createPutRequest(String endpoint, Object dto) {
+        try {
             String jsonBody = objectMapper.writeValueAsString(dto);
             return HttpRequest.newBuilder()
-                    .uri(URI.create(ApiClient.getBaseUrl()+endpoint))
+                    .uri(URI.create(ApiClient.getBaseUrl() + endpoint))
                     .header("Content-Type", "application/json")
                     .PUT(HttpRequest.BodyPublishers.ofString(jsonBody))
                     .build();
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException("Error when converting DTO to JSON in Service layer", e);
         }
     }
+
     protected HttpRequest createPatchRequest(String endpoint, Object dto) {
-        try{
+        try {
             String jsonBody = objectMapper.writeValueAsString(dto);
             return HttpRequest.newBuilder()
-                    .uri(URI.create(ApiClient.getBaseUrl()+endpoint))
+                    .uri(URI.create(ApiClient.getBaseUrl() + endpoint))
                     .header("Content-Type", "application/json")
                     .method("PATCH", HttpRequest.BodyPublishers.ofString(jsonBody))
                     .build();
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException("Error when converting DTO to JSON in Service layer", e);
         }
     }
@@ -80,4 +85,31 @@ public class BaseService {
                 .build();
     }
 
+    protected <T> java.util.List<T> handleResponseList(
+            HttpResponse<String> response,
+            Class<T> dataType) {
+
+        try {
+
+            JavaType listType = objectMapper.getTypeFactory()
+                    .constructCollectionType(java.util.List.class, dataType);
+
+            JavaType type = objectMapper.getTypeFactory()
+                    .constructParametricType(ApiResponse.class, listType);
+
+            ApiResponse<java.util.List<T>> apiResponse
+                    = objectMapper.readValue(response.body(), type);
+
+            if (response.statusCode() >= 200 && response.statusCode() < 300) {
+                return apiResponse.getData();
+            } else {
+                throw new RuntimeException(
+                        apiResponse.getErrorCode() + ": " + apiResponse.getMessage()
+                );
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException("System Error: " + e.getMessage());
+        }
+    }
 }

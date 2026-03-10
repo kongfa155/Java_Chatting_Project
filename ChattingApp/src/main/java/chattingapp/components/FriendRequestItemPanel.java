@@ -10,11 +10,84 @@ package chattingapp.components;
  */
 public class FriendRequestItemPanel extends javax.swing.JPanel {
 
+    private String requestId;
+
     /**
      * Creates new form FriendRequestItemPanel
      */
     public FriendRequestItemPanel() {
         initComponents();
+    }
+
+    public FriendRequestItemPanel(String requestId, String name) {
+        initComponents();
+
+        this.requestId = requestId;
+        lblName.setText(name);
+    }
+
+    private void acceptRequest() {
+
+        chattingapp.services.FriendService service
+                = new chattingapp.services.FriendService();
+
+        btnAccept.setEnabled(false);
+        btnReject.setEnabled(false);
+
+        service.acceptFriendRequest(requestId)
+                .thenRun(() -> {
+
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+                        lblName.setText(lblName.getText() + " (đã kết bạn)");
+                    });
+
+                })
+                .exceptionally(ex -> {
+
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+                        btnAccept.setEnabled(true);
+                        btnReject.setEnabled(true);
+
+                        javax.swing.JOptionPane.showMessageDialog(
+                                this,
+                                "Không thể chấp nhận lời mời"
+                        );
+                    });
+
+                    return null;
+                });
+    }
+
+    private void rejectRequest() {
+
+        chattingapp.services.FriendService service
+                = new chattingapp.services.FriendService();
+
+        btnAccept.setEnabled(false);
+        btnReject.setEnabled(false);
+
+        service.rejectFriendRequest(requestId)
+                .thenRun(() -> {
+
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+                        lblName.setText("Đã từ chối");
+                    });
+
+                })
+                .exceptionally(ex -> {
+
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+                        btnAccept.setEnabled(true);
+                        btnReject.setEnabled(true);
+
+                        javax.swing.JOptionPane.showMessageDialog(
+                                this,
+                                "Không thể từ chối"
+                        );
+                    });
+
+                    return null;
+                });
     }
 
     /**
@@ -41,6 +114,9 @@ public class FriendRequestItemPanel extends javax.swing.JPanel {
         lblAvatar.setPreferredSize(new java.awt.Dimension(40, 40));
         add(lblAvatar, java.awt.BorderLayout.LINE_START);
 
+        lblName.setBackground(new java.awt.Color(255, 255, 255));
+        lblName.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        lblName.setForeground(new java.awt.Color(255, 0, 0));
         lblName.setText("Tên");
         add(lblName, java.awt.BorderLayout.CENTER);
 
@@ -49,6 +125,7 @@ public class FriendRequestItemPanel extends javax.swing.JPanel {
         btnAccept.setBackground(new java.awt.Color(0, 51, 255));
         btnAccept.setForeground(new java.awt.Color(255, 255, 255));
         btnAccept.setText("Đồng ý");
+        btnAccept.addActionListener(this::btnAcceptActionPerformed);
         jPanel1.add(btnAccept);
 
         btnReject.setBackground(new java.awt.Color(204, 204, 204));
@@ -57,6 +134,11 @@ public class FriendRequestItemPanel extends javax.swing.JPanel {
 
         add(jPanel1, java.awt.BorderLayout.LINE_END);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnAcceptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAcceptActionPerformed
+        // TODO add your handling code here:
+        acceptRequest();
+    }//GEN-LAST:event_btnAcceptActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

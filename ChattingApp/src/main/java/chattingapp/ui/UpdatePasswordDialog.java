@@ -5,6 +5,7 @@
 package chattingapp.ui;
 
 import chattingapp.models.User;
+import chattingapp.utils.SessionManager;
 import javax.swing.JOptionPane;
 
 /**
@@ -20,13 +21,9 @@ public class UpdatePasswordDialog extends javax.swing.JDialog {
      */
     private User currentUser;
 
-    public UpdatePasswordDialog(User user) {
-        this.currentUser = user;
-        initComponents();
-    }
-
     public UpdatePasswordDialog() {
-        this(null);
+        initComponents();
+        currentUser = SessionManager.getCurrentUser();
     }
 
     /**
@@ -91,12 +88,6 @@ public class UpdatePasswordDialog extends javax.swing.JDialog {
         jLabel3.setText("Mật khẩu mới");
 
         jLabel4.setText("Xác nhận mật khẩu mới");
-
-        txtCurrentPass.setText("jPasswordField1");
-
-        txtNewPass.setText("jPasswordField1");
-
-        txtConfirmPass.setText("jPasswordField1");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);

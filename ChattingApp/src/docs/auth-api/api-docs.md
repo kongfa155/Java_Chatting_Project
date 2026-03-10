@@ -187,9 +187,9 @@ Error (400 Bad Request): Sai mật khẩu cũ
   "message": "Wrong old password."
 }
 ```
-### Đổi số điện thoại
+### Doi email
 #### Step 1: Nhận OTP doi email
-+ Endpoint: /api/users/get-change-phone-number-otp
++ Endpoint: /api/users/get-change-email-otp
 + Method: POST
 + Request body:
 ```json
@@ -217,15 +217,15 @@ Error (400 Bad Request): Sai mật khẩu
   "message": "Wrong password."
 }
 ```
-Error (400 Bad Request): Số điện thoại đã có người sử dụng
+Error (400 Bad Request): email đã có người sử dụng
 ```json
 {
   "status": "error",
-  "error_code": "PHONE_NUMBER_EXISTS",
-  "message": "Phone number exists."
+  "error_code": "EMAIL_EXISTS",
+  "message": "EMAIL exists."
 }
 ```
-+ Endpoint: /api/users/change-phone-number
++ Endpoint: /api/users/change-email
 + Method: PATCH
 + Request body:
 ```json
@@ -237,11 +237,11 @@ Error (400 Bad Request): Số điện thoại đã có người sử dụng
 ```
 + Response body:
 
-Success (200 OK): Đổi số điện thoai thành công
+Success (200 OK): Đổi email thành công
 ```json
 {
   "status": "success",
-  "message": "Changed phone number successfully",
+  "message": "Changed email successfully",
   "data": null
 }
 ```

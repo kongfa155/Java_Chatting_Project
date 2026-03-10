@@ -29,7 +29,7 @@
           <Font name="Segoe UI" size="18" style="1"/>
         </Property>
         <Property name="horizontalAlignment" type="int" value="0"/>
-        <Property name="text" type="java.lang.String" value="C&#x1ead;p nh&#x1ead;t s&#x1ed1; &#x111;i&#x1ec7;n tho&#x1ea1;i"/>
+        <Property name="text" type="java.lang.String" value="C&#x1ead;p nh&#x1ead;t Email"/>
       </Properties>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
@@ -49,9 +49,9 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace min="-2" pref="71" max="-2" attributes="0"/>
-                  <Component id="btnSavePhone" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnSaveEmail" min="-2" max="-2" attributes="0"/>
                   <EmptySpace pref="153" max="32767" attributes="0"/>
-                  <Component id="btnCancelPhone" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnCancelEmail" min="-2" max="-2" attributes="0"/>
                   <EmptySpace min="-2" pref="82" max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -61,8 +61,8 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace min="-2" pref="36" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="btnSavePhone" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="btnCancelPhone" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="btnSaveEmail" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="btnCancelEmail" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace pref="41" max="32767" attributes="0"/>
               </Group>
@@ -70,20 +70,20 @@
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JButton" name="btnSavePhone">
+        <Component class="javax.swing.JButton" name="btnSaveEmail">
           <Properties>
             <Property name="text" type="java.lang.String" value="L&#x1b0;u"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSavePhoneActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSaveEmailActionPerformed"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JButton" name="btnCancelPhone">
+        <Component class="javax.swing.JButton" name="btnCancelEmail">
           <Properties>
             <Property name="text" type="java.lang.String" value="H&#x1ee7;y"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCancelPhoneActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCancelEmailActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>
@@ -106,8 +106,8 @@
                   </Group>
                   <EmptySpace min="-2" pref="40" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                      <Component id="txtCurrentPhone" max="32767" attributes="0"/>
-                      <Component id="txtNewPhone" pref="250" max="32767" attributes="0"/>
+                      <Component id="txtCurrentEmail" max="32767" attributes="0"/>
+                      <Component id="txtNewEmail" pref="250" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
@@ -119,12 +119,12 @@
                   <EmptySpace min="-2" pref="14" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="txtCurrentPhone" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="txtCurrentEmail" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace min="-2" pref="38" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="txtNewPhone" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="txtNewEmail" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace pref="79" max="32767" attributes="0"/>
               </Group>
@@ -134,10 +134,10 @@
       <SubComponents>
         <Component class="javax.swing.JLabel" name="jLabel2">
           <Properties>
-            <Property name="text" type="java.lang.String" value="S&#x1ed1; &#x111;i&#x1ec7;n tho&#x1ea1;i hi&#x1ec7;n t&#x1ea1;i"/>
+            <Property name="text" type="java.lang.String" value="Email hi&#x1ec7;n t&#x1ea1;i"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JTextField" name="txtCurrentPhone">
+        <Component class="javax.swing.JTextField" name="txtCurrentEmail">
           <Properties>
             <Property name="editable" type="boolean" value="false"/>
             <Property name="toolTipText" type="java.lang.String" value=""/>
@@ -145,10 +145,10 @@
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel3">
           <Properties>
-            <Property name="text" type="java.lang.String" value="S&#x1ed1; &#x111;i&#x1ec7;n tho&#x1ea1;i m&#x1edb;i"/>
+            <Property name="text" type="java.lang.String" value="Email m&#x1edb;i"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JTextField" name="txtNewPhone">
+        <Component class="javax.swing.JTextField" name="txtNewEmail">
         </Component>
       </SubComponents>
     </Container>

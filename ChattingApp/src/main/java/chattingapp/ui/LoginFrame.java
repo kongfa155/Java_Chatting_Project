@@ -8,6 +8,7 @@ import chattingapp.dtos.LoginRequetDTO;
 import chattingapp.dtos.RegisterOTPRequestDTO;
 import chattingapp.models.User;
 import chattingapp.services.UserService;
+import chattingapp.utils.SessionManager;
 import javax.swing.JOptionPane;
 
 /**
@@ -341,8 +342,10 @@ public class LoginFrame extends javax.swing.JFrame {
                         user.setDisplayName(response.getDisplayName());
                         //Set mặc định nếu chưa có
                         user.setAvatarUrl("https://i.pinimg.com/736x/bc/43/98/bc439871417621836a0eeea768d60944.jpg");
-                        // Giả sử bạn dùng dữ liệu từ response.getData() để hiển thị MainFrame
-                        new MainFrame(user).setVisible(true);
+                        
+
+                        SessionManager.setSession(response.getAccessToken(), user);
+                        new MainFrame().setVisible(true);
                         this.dispose();
                     });
                 })

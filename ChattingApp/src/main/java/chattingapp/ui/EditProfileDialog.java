@@ -6,6 +6,7 @@ package chattingapp.ui;
 
 import chattingapp.models.User;
 import chattingapp.utils.AvatarUtil;
+import chattingapp.utils.SessionManager;
 import java.awt.Event;
 import javax.swing.ImageIcon;
 
@@ -22,18 +23,22 @@ public class EditProfileDialog extends javax.swing.JDialog {
      * Creates new form EditProfileDialog
      */
     public EditProfileDialog() {
-        this(null);
-    }
-
-    public EditProfileDialog(User user) {
-        this.currentUser = user;
         initComponents();
+        loadUser();
         btnEdit.requestFocusInWindow();
-        txtUsername.setText(currentUser.getUsername());
-        txtDisplayname.setText(currentUser.getDisplayName());
-        txtURLAvatar.setText(currentUser.getAvatarUrl());
-
     }
+
+private void loadUser() {
+    currentUser = SessionManager.getCurrentUser();
+
+    if (currentUser == null) return;
+
+    txtUsername.setText(currentUser.getUsername());
+    txtDisplayname.setText(currentUser.getDisplayName());
+    txtURLAvatar.setText(currentUser.getAvatarUrl());
+
+    previewAvatar(currentUser.getAvatarUrl());
+}
 
 
     /**

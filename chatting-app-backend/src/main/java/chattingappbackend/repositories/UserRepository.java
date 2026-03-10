@@ -18,12 +18,10 @@ public interface UserRepository extends CrudRepository<User, String> {
     Optional<User> findByUserId(@Param("userId") String userId);
     @Query("SELECT * FROM users WHERE username = :username")
     Optional<User> findByUsername(@Param("username") String username);
-    @Query("SELECT phone_number FROM users WHERE username = :username")
-    Optional<String> findPhoneNumberByUsername(@Param("username") String username);
+
     @Query("SELECT email FROM users WHERE username= :username")
     Optional<String> findEmailByUsername(@Param("username") String username);
-    @Query("SELECT COUNT(*) > 0 FROM users WHERE phone_number = :phoneNumber")
-    boolean existsByPhoneNumber(@Param("phoneNumber") String phoneNumber);
+
     @Query("SELECT COUNT(*) > 0 FROM users WHERE email =:email")
     boolean existsByEmail(@Param("email") String email);
     @Query("SELECT status FROM users WHERE username = :username")
@@ -39,7 +37,9 @@ public interface UserRepository extends CrudRepository<User, String> {
     @Modifying
     @Query("UPDATE users SET password = :password WHERE user_id = :userId")
     void updatePasswordByUserId(@Param("userId") String userId, @Param("password") String password);
-
+    @Modifying
+    @Query("UPDATE users SET email = :newEmail WHERE user_id = :userId")
+    void updateEmailByUserId(@Param("userId") String userId, @Param("newEmail") String newEmail);
     @Query("SELECT user_id, username, display_name, gender, status, created_at FROM users WHERE username = :username")
     Optional<RegisterVerifyResponseDTO> findUserForVerification(@Param("username") String username);
 

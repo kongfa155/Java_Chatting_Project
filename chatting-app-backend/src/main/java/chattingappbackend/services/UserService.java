@@ -122,6 +122,38 @@ public class UserService {
         }
 
     }
+    public ApiResponse<Void> getChangeEmailOTP(String jwt, ChangeEmailOTPRequestDTO dto){
+        String userId = jwtService.extractUserId(jwt);
+        User user = userRepository.findByUserId(userId).orElseThrow(()-> new AppException("USER_NOT_EXISTS", "Can't find this user"));
+        boolean isMatch = passwordEncoder.matches(dto.getPassword(), user.getHashedPassword());
+        if(!isMatch){
+            throw new AppException("INVALID_CREDENTIALS", "Wrong password");
+        }else{
+            if(userRepository.existsByEmail(dto.getNewEmail())){
+                throw new AppException("EMAIL_EXISTS", "Email exists");
+            }else{
+                otpService.sendOTP(dto.getNewEmail());
+                return ApiResponse.success("Sent OTP successfully", null);
+            }
+        }
+    }
+    public ApiResponse<Void> changeEmail(String jwt, ChangeEmailRequestDTO dto){
+        String userId = jwtService.extractUserId(jwt);
+        User user = userRepository.findByUserId(userId).orElseThrow(()-> new AppException("USER_NOT_EXISTS", "Can't find this user"));
+
+        boolean isMatch = otpService.checkOTP(dto.getOtp(), dto.getNewEmail());
+        if(!isMatch){
+            throw new AppException("INVALID_OTP", "Input OTP is invalid");
+        }else{
+            if(userRepository.existsByEmail(dto.getNewEmail())){
+                throw new AppException("EMAIL_EXISTS", "Email exists");
+            }else{
+                userRepository.updateEmailByUserId(userId, dto.getNewEmail());
+                return ApiResponse.success("Changed email successfully", null);
+            }
+
+        }
+    }
 
     @Autowired
     public void setJwtService(JwtService jwtService) {

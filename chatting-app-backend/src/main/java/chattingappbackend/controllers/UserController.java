@@ -50,5 +50,23 @@ public class UserController {
         ApiResponse response = userService.changePassword(token,dto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+    @PostMapping("/change-email")
+    public ResponseEntity<ApiResponse<Void>> changeEmailOTP(@RequestHeader("Authorization") String authHeader, @RequestBody ChangeEmailOTPRequestDTO dto){
+        if(authHeader==null||!authHeader.startsWith("Bearer ")){
+            throw new AppException("INVALID_TOKEN","Your token is outdated or missing.");
+        }
+        String token = authHeader.substring(7);
+        ApiResponse response = userService.getChangeEmailOTP(token,dto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    @PatchMapping("/change-email")
+    public ResponseEntity<ApiResponse<Void>> changeEmail(@RequestHeader("Authorization") String authHeader, @RequestBody ChangeEmailRequestDTO dto){
+        if(authHeader==null||!authHeader.startsWith("Bearer ")){
+            throw new AppException("INVALID_TOKEN","Your token is outdated or missing.");
+        }
+        String token = authHeader.substring(7);
+        ApiResponse response = userService.changeEmail(token,dto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
 }

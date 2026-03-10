@@ -46,4 +46,6 @@ public interface UserRepository extends CrudRepository<User, String> {
     @Query("SELECT * FROM users WHERE phone_number= :phone_number")
     Optional<User> findByPhoneNumber(@Param("phone_number")  String phoneNumber);
 
+    @Query("SELECT * FROM users WHERE email= :email")
+    Optional<User> findByEmail(@Param("email") String email);
 }

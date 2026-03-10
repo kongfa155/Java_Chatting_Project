@@ -6,6 +6,7 @@ package chattingapp.ui;
 
 import chattingapp.components.SideBarPanel;
 import chattingapp.models.User;
+import chattingapp.utils.SessionManager;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 
@@ -22,11 +23,15 @@ public class MainFrame extends javax.swing.JFrame {
     /**
      * Creates new form MainFrame
      */
-    public MainFrame(User user) {
-        this.currentUser = user;
+    public MainFrame() {
+        this.currentUser = SessionManager.getCurrentUser();
         initComponents();
         initFrame();
-        SideBarPanel newSideBar = new SideBarPanel(currentUser);
+        initData();
+        
+    }
+    private void initData(){
+        SideBarPanel newSideBar = new SideBarPanel();
         leftSplitPane.setLeftComponent(newSideBar);
         leftSplitPane.setDividerLocation(70);
         mainSplitPane.setDividerLocation(300);
@@ -36,7 +41,6 @@ public class MainFrame extends javax.swing.JFrame {
             chatPanel1.loadChat(data);
         });
     }
-
     private void initFrame() {
         //Set kích cỡ cho nó lên 3/4 màn hình
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
@@ -108,7 +112,7 @@ public class MainFrame extends javax.swing.JFrame {
             fakeUser.setDisplayName("CP Dev");
             fakeUser.setPhoneNumber("0987654321");
             fakeUser.setAvatarUrl("https://free.vector6.com/wp-content/uploads/2021/03/0000000556-chim-canh-cut-hoc-bai-tai-hinh-png-38-300x256.png");
-            new MainFrame(fakeUser).setVisible(true);
+            new MainFrame().setVisible(true);
         });
     }
 

@@ -4,6 +4,12 @@
  */
 package chattingapp.components;
 
+import chattingapp.dtos.FriendRequestResponseDTO;
+import chattingapp.services.FriendService;
+import chattingapp.services.UserService;
+import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
+
 /**
  *
  * @author CP
@@ -15,7 +21,8 @@ public class AddFriendPopupPanel extends javax.swing.JPanel {
      */
     public AddFriendPopupPanel() {
         initComponents();
-        txtSearch.putClientProperty("JTextField.placeholderText", "Nhập số điện thoại...");
+        txtSearch.putClientProperty("JTextField.placeholderText", "Nhập email...");
+        loadFriendRequests();
     }
 
     /**
@@ -51,6 +58,7 @@ public class AddFriendPopupPanel extends javax.swing.JPanel {
         SearchPanel.add(txtSearch, java.awt.BorderLayout.CENTER);
 
         txtFind.setText("🔍");
+        txtFind.addActionListener(this::txtFindActionPerformed);
         SearchPanel.add(txtFind, java.awt.BorderLayout.LINE_END);
 
         AddFriendTab.add(SearchPanel, java.awt.BorderLayout.PAGE_START);
@@ -75,6 +83,114 @@ public class AddFriendPopupPanel extends javax.swing.JPanel {
 
         add(jTabbedPane1, java.awt.BorderLayout.PAGE_START);
     }// </editor-fold>//GEN-END:initComponents
+private void loadFriendRequests() {
+
+        FriendService service = new FriendService();
+
+        service.getFriendRequests()
+                .thenAccept(list -> {
+                    System.out.println("Số request: " + list.size());
+
+                    for (FriendRequestResponseDTO dto : list) {
+                        System.out.println("Friend name: " + dto.getDisplayName());
+                    }
+                    SwingUtilities.invokeLater(() -> {
+
+                        ListRequestPanel.removeAll();
+
+                        for (FriendRequestResponseDTO dto : list) {
+
+                            FriendRequestItemPanel item
+                                    = new FriendRequestItemPanel(
+                                            dto.getFriendshipId(),
+                                            dto.getDisplayName()
+                                    );
+
+                            ListRequestPanel.add(item);
+                        }
+
+                        ListRequestPanel.revalidate();
+                        ListRequestPanel.repaint();
+
+                    });
+
+                })
+                .exceptionally(ex -> {
+
+                    ex.printStackTrace();
+                    return null;
+                });
+    }
+
+    private void searchUser() {
+
+        String email = txtSearch.getText().trim();
+
+        SwingUtilities.invokeLater(() -> {
+            ListFindPanel.removeAll();
+            ListFindPanel.revalidate();
+            ListFindPanel.repaint();
+        });
+
+        UserService userService = new UserService();
+
+        userService.searchUser(email)
+                .thenAccept(user -> {
+
+                    if (user == null) {
+
+                        SwingUtilities.invokeLater(() -> {
+
+                            ListFindPanel.removeAll();
+                            ListFindPanel.add(new JLabel("Không tìm thấy người dùng"));
+
+                            ListFindPanel.revalidate();
+                            ListFindPanel.repaint();
+                        });
+
+                        return;
+                    }
+
+                    SearchResultItemPanel item
+                            = new SearchResultItemPanel(
+                                    user.getDisplayName(),
+                                    user.getEmail(),
+                                    user.getEmail()
+                            );
+
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+
+                        ListFindPanel.removeAll();
+                        ListFindPanel.add(item);
+
+                        ListFindPanel.revalidate();
+                        ListFindPanel.repaint();
+
+                    });
+
+                })
+                .exceptionally(ex -> {
+
+                    ex.printStackTrace();
+
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+
+                        ListFindPanel.removeAll();
+                        ListFindPanel.add(new javax.swing.JLabel("Không tìm thấy người dùng"));
+
+                        ListFindPanel.revalidate();
+                        ListFindPanel.repaint();
+
+                    });
+
+                    return null;
+
+                });
+    }
+    private void txtFindActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtFindActionPerformed
+        // TODO add your handling code here:
+        searchUser();
+    }//GEN-LAST:event_txtFindActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

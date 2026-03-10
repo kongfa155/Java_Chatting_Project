@@ -1,28 +1,28 @@
-package chattingappbackend.dtos;
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package chattingapp.dtos;
 
-import chattingappbackend.models.FriendshipStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ *
+ * @author CP
+ */
 public class FriendRequestResponseDTO {
 
     private String friendshipId;
     private String userId;
+
+
     private String displayName;
+
     private String avatarUrl;
-    private FriendshipStatus status;
 
-    public FriendRequestResponseDTO(
-            String friendshipId,
-            String userId,
-            String displayName,
-            String avatarUrl,
-            FriendshipStatus status) {
+    private String status;
 
-        this.friendshipId = friendshipId;
-        this.userId = userId;
-        this.displayName = displayName;
-        this.avatarUrl = avatarUrl;
-        this.status = status;
+    public FriendRequestResponseDTO() {
     }
 
     public String getFriendshipId() {
@@ -57,13 +57,11 @@ public class FriendRequestResponseDTO {
         this.avatarUrl = avatarUrl;
     }
 
-    public FriendshipStatus getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(FriendshipStatus status) {
+    public void setStatus(String status) {
         this.status = status;
     }
-
-    public FriendRequestResponseDTO() {}
 }

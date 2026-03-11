@@ -70,7 +70,7 @@ public class UserService {
             throw new AppException("ACCOUNT_ALREADY_VERIFIED", "Account have already been verified");
         }
         String email = userRepository.findEmailByUsername(username).orElse(null);
-        boolean sent = otpService.sendOTP(email);
+        boolean sent = otpService.sendOTP(email, email);
         if (sent) {
             return ApiResponse.success("Sent OTP successfully", null);
         } else {
@@ -84,7 +84,7 @@ public class UserService {
             throw new AppException("ACCOUNT_ALREADY_VERIFIED", "Account have already been verified");
         }
         String email = userRepository.findEmailByUsername(requestDTO.getUsername()).orElse(null);
-        boolean verify = otpService.checkOTP(requestDTO.getOtp(), email);
+        boolean verify = otpService.checkOTP(email, requestDTO.getOtp(), email);
         if (verify) {
             userRepository.updateStatusByUsername(requestDTO.getUsername(), UserStatus.ACTIVATED);
             RegisterVerifyResponseDTO response = userRepository.findUserForVerification(requestDTO.getUsername()).orElseThrow(() -> new AppException("INVALID_USERNAME", "Input username is invalid."));
@@ -135,7 +135,7 @@ public class UserService {
             if(userRepository.existsByEmail(dto.getNewEmail())){
                 throw new AppException("EMAIL_EXISTS", "Email exists");
             }else{
-                otpService.sendOTP(dto.getNewEmail());
+                otpService.sendOTP(userId,dto.getNewEmail());
                 return ApiResponse.success("Sent OTP successfully", null);
             }
         }
@@ -144,7 +144,7 @@ public class UserService {
         String userId = jwtService.extractUserId(jwt);
         User user = userRepository.findByUserId(userId).orElseThrow(()-> new AppException("USER_NOT_EXISTS", "Can't find this user"));
 
-        boolean isMatch = otpService.checkOTP(dto.getOtp(), dto.getNewEmail());
+        boolean isMatch = otpService.checkOTP(userId, dto.getOtp(), dto.getNewEmail());
         if(!isMatch){
             throw new AppException("INVALID_OTP", "Input OTP is invalid");
         }else{

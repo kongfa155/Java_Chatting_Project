@@ -3,6 +3,7 @@ package chattingappbackend.external_services.otp_services;
 
 import chattingappbackend.exceptions.AppException;
 import chattingappbackend.models.OTPDetails;
+import chattingappbackend.services.JwtService;
 import com.resend.Resend;
 import com.resend.core.exception.ResendException;
 import com.resend.services.emails.model.CreateEmailOptions;
@@ -19,11 +20,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ResendService implements OTPService {
     Resend resend;
     OTPStorage otpStorage;
+    JwtService jwtService;
 
     @Autowired
-    public ResendService(Resend resend, OTPStorage otpStorage) {
+    public ResendService(Resend resend, OTPStorage otpStorage, JwtService jwtService) {
         this.resend = resend;
         this.otpStorage = otpStorage;
+        this.jwtService = jwtService;
+
     }
 
     public ResendService() {
@@ -38,11 +42,11 @@ public class ResendService implements OTPService {
     }
 
     @Override
-    public boolean sendOTP(String email) {
-        String otpCode = otpStorage.generateOTP(email);
+    public boolean sendOTP(String identifier, String target) {
+        String otpCode = otpStorage.generateOTP(identifier, target);
         CreateEmailOptions params = CreateEmailOptions.builder()
                 .from("JavaChattingApp <onboarding@nhhun2005.id.vn>")
-                .to(email)
+                .to(target)
                 .subject("[JavaChattingApp] - Email verification")
                 .html("<h1>Chào mừng đến với JavaChattingApp!</h1><h2>Mã OTP của bạn là: <b>" + otpCode + "</b> (Hết hạn sau 10 phút)</h2>")
                 
@@ -51,7 +55,7 @@ public class ResendService implements OTPService {
             CreateEmailResponse data = resend.emails().send(params);
             return true;
         }catch (ResendException e){
-            otpStorage.remove(email);
+            otpStorage.remove(identifier);
                 e.printStackTrace();
                 return false;
         }
@@ -59,14 +63,26 @@ public class ResendService implements OTPService {
     }
 
     @Override
-    public boolean checkOTP(String code, String email) {
-        OTPDetails details = otpStorage.get(email);
-        if(details==null|| details.isExpired()){
-            otpStorage.remove(email);
+    public boolean checkOTP(String identifier, String code, String email) {
+        OTPDetails details = otpStorage.get(identifier);
+        if (details == null) {
+            System.out.println("DEBUG: Không tìm thấy OTP cho user: " + identifier);
             return false;
         }
+        if (details.isExpired()) {
+            otpStorage.remove(identifier);
+            System.out.println("DEBUG: OTP đã hết hạn cho user: " + identifier);
+            return false;
+        }
+
+        if (!details.getTarget().equals(email)) {
+            System.err.println("WARNING: Đối soát Email thất bại! Target lưu: "
+                    + details.getTarget() + " nhưng input là: " + email);
+            return false;
+        }
+
         if (details.getCode().equals(code)) {
-            otpStorage.remove(email);
+            otpStorage.remove(identifier);
             return true;
         }
 

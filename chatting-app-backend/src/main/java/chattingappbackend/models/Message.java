@@ -4,6 +4,7 @@
  */
 package chattingappbackend.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -13,9 +14,12 @@ public class Message {
 
     //Properties
     @Id
+    @JsonProperty("message_id")
     private String messageId;
+    @JsonProperty("sender_id")
 
     private String senderId;
+    
     private String receiverId;
     private String content;
     private boolean isRead;

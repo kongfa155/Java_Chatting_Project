@@ -42,7 +42,9 @@ public interface UserRepository extends CrudRepository<User, String> {
     void updateEmailByUserId(@Param("userId") String userId, @Param("newEmail") String newEmail);
     @Query("SELECT user_id, username, display_name, gender, status, created_at FROM users WHERE username = :username")
     Optional<RegisterVerifyResponseDTO> findUserForVerification(@Param("username") String username);
-
+    @Modifying
+    @Query("UPDATE users SET display_name =:#{#u.displayName}, gender =:#{#u.gender}, avatar_url =:#{#u.avatarUrl} WHERE user_id =:userId")
+    void updateProfileByUserId(@Param("userId") String userId, @Param("u") User user);
     @Query("SELECT * FROM users WHERE phone_number= :phone_number")
     Optional<User> findByPhoneNumber(@Param("phone_number")  String phoneNumber);
 

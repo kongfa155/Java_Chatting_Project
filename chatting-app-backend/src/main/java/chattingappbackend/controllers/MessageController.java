@@ -14,11 +14,16 @@ public class MessageController {
     @Autowired
     private MessageService messageService;
 
-  @PostMapping
-public Message sendMessage(@RequestBody SendMessageRequestDTO request) {
+    @PostMapping("/send")
+    public Message sendMessage(@RequestBody SendMessageRequestDTO request) {
 
-    String senderId = "test-user"; // tạm thời
+        String senderId = "test-user";
 
-    return messageService.sendMessage(senderId, request);
-}
+        return messageService.sendMessage(senderId, request);
+    }
+
+    @GetMapping("/test")
+    public String test(){
+        return "chat controller ok";
+    }
 }

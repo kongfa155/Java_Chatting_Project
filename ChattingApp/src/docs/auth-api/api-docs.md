@@ -254,7 +254,7 @@ Error (400 Bad Request): Sai OTP
 }
 ```
 ### Đổi thông tin hiển thị
-+ Endpoint: /api/users/profile
++ Endpoint: /api/users/change-profile
 + Method: PATCH
 + Request body:
 ```json
@@ -275,11 +275,9 @@ Success (200 OK): Đổi thông tin hiển thị thành công
   "message": "Changed display information successfully",
   "data": {
     "user_id": "string",
-    "username": "string",
     "display_name": "string",
     "gender": "boolean",
-    "avatar_url": "string",
-    "status": "ACTIVATED"
+    "avatar_url": "string"
   }
 }
 ```

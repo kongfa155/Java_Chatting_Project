@@ -85,4 +85,12 @@ public class UserController {
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+    @PostMapping("/change-profile")
+    public ResponseEntity<ApiResponse<ChangeProfileResponseDTO>> changeProfile(@RequestHeader("Authorization") String authHeader, @RequestBody ChangeProfileRequestDTO dto){if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        throw new AppException("INVALID_TOKEN", "Your token is outdated or missing.");
+    }
+        String token = authHeader.substring(7);
+        ApiResponse response = userService.changeProfile(token, dto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

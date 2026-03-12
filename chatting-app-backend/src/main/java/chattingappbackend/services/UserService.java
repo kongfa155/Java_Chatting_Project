@@ -157,6 +157,21 @@ public class UserService {
 
         }
     }
+    public ApiResponse<ChangeProfileResponseDTO> changeProfile(String jwt, ChangeProfileRequestDTO dto){
+        String userId = jwtService.extractUserId(jwt);
+        User user = userRepository.findByUserId(userId).orElseThrow(()-> new AppException("USER_NOT_FOUND", "This user is not exists"));
+        boolean isMatch = passwordEncoder.matches(dto.getPassword(), user.getHashedPassword());
+        if(!isMatch){
+            throw new AppException("INVALID_CREDENTIALS", "Wrong password");
+        }else{
+            user.setDisplayName(dto.getDisplayName());
+            user.setGender(dto.isGender());
+            user.setAvatarUrl(dto.getAvatarURL());
+            userRepository.updateProfileByUserId(userId,user);
+            return ApiResponse.success("Change display information successfully", null);
+        }
+
+    }
 
     @Autowired
     public void setJwtService(JwtService jwtService) {
@@ -166,7 +181,7 @@ public class UserService {
     public ApiResponse<SearchDTO> findByEmail(String email) {
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new AppException("USER_NOT_FOUND", "Không tìm thấy người dùng"));
+                .orElseThrow(() -> new AppException("USER_NOT_FOUND", "This user is not exists"));
 
         SearchDTO dto = new SearchDTO();
         dto.setUserId(user.getUserId());
@@ -176,4 +191,5 @@ public class UserService {
 
         return ApiResponse.success("User found", dto);
     }
+
 }

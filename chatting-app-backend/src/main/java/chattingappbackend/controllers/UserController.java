@@ -93,4 +93,16 @@ public class UserController {
         ApiResponse response = userService.changeProfile(token, dto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+    @PostMapping("forgot-password")
+    public ResponseEntity<ApiResponse<Void>> forgotPasswordOTP(ForgotPasswordOTPRequestDTO dto){
+        ApiResponse response = userService.forgotPasswordOTP(dto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+
+    }
+    @PatchMapping("forgot-password")
+    public ResponseEntity<ApiResponse<Void>> forgotPasswordVerify(ForgotPasswordVerifyRequest dto){
+        ApiResponse response = userService.forgotPasswordVerify(dto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 }

@@ -291,7 +291,7 @@ Error (400 Bad Request): Sai mật khẩu
 ```
 ### Đổi mật khẩu qua quên mật khẩu
 #### Step 1: Nhận OTP reset mật khẩu
-+ Endpoint: /api/users/get-forget-password-otp
++ Endpoint: /api/users/forgot-password
 + Method: POST
 + Request body:
 ```json
@@ -320,7 +320,7 @@ Error (400 Bad Request): Tên đăng nhập không tồn tại
 
 
 #### Step 2: Xác thực OTP
-+ Endpoint: /api/users/forget-password
++ Endpoint: /api/users/forgot-password
 + Method: PATCH
 + Request body:
 ```json
@@ -337,14 +337,7 @@ Success (200 OK): Đổi mật khẩu thành công
 {
   "status": "success",
   "message": "Password reset successfully",
-  "data": {
-    "user_id": "string",
-    "username": "string",
-    "display_name": "string",
-    "avatar_url": "string",
-    "access_token": "string",
-    "expires_in": "int"
-  }
+  "data": null
 }
 ```
 Error (400 Bad Request): Tên đăng nhập không tồn tại

@@ -12,7 +12,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -172,6 +171,21 @@ public class UserService {
         }
 
     }
+    public ApiResponse<Void> forgotPasswordOTP(ForgotPasswordOTPRequestDTO dto){
+        User user = userRepository.findByUsername(dto.getUsername()).orElseThrow(()->new AppException("INVALID_USERNAME", "Input username is invalid"));
+        otpService.sendOTP(user.getUsername(),user.getEmail());
+        return ApiResponse.success("Sent OTP successfully", null);
+    }
+    public ApiResponse<Void> forgotPasswordVerify(ForgotPasswordVerifyRequest dto){
+        User user = userRepository.findByUsername(dto.getUsername()).orElseThrow(()->new AppException("INVALID_USERNAME", "Input username is invalid"));
+        boolean isMatch = otpService.checkOTP(user.getUsername(),dto.getOtp(), user.getEmail());
+        if(isMatch){
+            return ApiResponse.success("Changed password successfully", null);
+
+        }else{
+            throw new AppException("INVALID_OTP","Wrong otp");
+        }
+    }
 
     @Autowired
     public void setJwtService(JwtService jwtService) {
@@ -191,5 +205,6 @@ public class UserService {
 
         return ApiResponse.success("User found", dto);
     }
+
 
 }

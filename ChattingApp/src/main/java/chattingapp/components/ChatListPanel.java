@@ -7,7 +7,8 @@ package chattingapp.components;
 import chattingapp.models.ChatData;
 import chattingapp.models.Message;
 import chattingapp.models.User;
-
+import chattingapp.services.FriendService;
+import chattingapp.dtos.FriendLoadDTO;
 /**
  *
  * @author CP
@@ -23,7 +24,7 @@ public class ChatListPanel extends javax.swing.JPanel {
     public ChatListPanel() {
         initComponents();
         setupUI();
-        fakeData();
+        loadFriends();
     }
     //Hàm này sau này dùng để cập nhật lại list khi có tin nhắn mới
     public void receiveNewMessage(){};
@@ -47,6 +48,53 @@ public class ChatListPanel extends javax.swing.JPanel {
         );
 
         scrollPane.getVerticalScrollBar().putClientProperty("JScrollBar.showButtons", false);
+    }
+
+    private void loadFriends() {
+         listContainer.removeAll();
+
+    FriendService service = new FriendService();
+
+    service.getFriends().thenAccept(friends -> {
+
+        for (FriendLoadDTO f : friends) {
+
+            // Tạo user từ backend
+            User user = new User();
+            user.setDisplayName(f.getDisplayName());
+            user.setAvatarUrl(f.getAvatarUrl());
+
+            // Vì backend chưa có last message nên tạo tạm
+            Message msg = new Message();
+            msg.setContent("");
+            msg.setSentAt(java.time.LocalDateTime.now());
+
+            ChatData data = new ChatData(user, msg, 0);
+
+            ChatItemPanel item = new ChatItemPanel(data);
+
+            item.setChatItemClickListener(clickedData -> {
+
+                if (selectedItem != null) {
+                    selectedItem.setSelected(false);
+                }
+
+                item.setSelected(true);
+                selectedItem = item;
+
+                if (chatSelectionListener != null) {
+                    chatSelectionListener.onChatSelected(clickedData);
+                }
+
+            });
+
+            listContainer.add(item);
+        }
+
+        listContainer.revalidate();
+        listContainer.repaint();
+
+    });
     }
     //Đây là kênh đàm thoại cấp cao, dùng để cho các quản lý giao tiếp tới nhau
     public interface ChatSelectionListener {

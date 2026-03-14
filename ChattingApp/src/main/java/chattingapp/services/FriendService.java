@@ -4,6 +4,7 @@
  */
 package chattingapp.services;
 
+import chattingapp.dtos.FriendLoadDTO;
 import chattingapp.dtos.FriendRequestResponseDTO;
 import chattingapp.dtos.SendFriendDTO;
 import chattingapp.utils.SessionManager;
@@ -87,5 +88,18 @@ public class FriendService extends BaseService {
         return ApiClient.getClient()
                 .sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(response -> handleResponseList(response, FriendRequestResponseDTO.class));
+    }
+    // ======================
+    public CompletableFuture<List<FriendLoadDTO>> getFriends() {
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(ApiClient.getBaseUrl() + "/friendships/friends"))
+                .GET()
+                .header("Authorization", "Bearer " + SessionManager.getToken())
+                .build();
+
+        return ApiClient.getClient()
+                .sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenApply(response -> handleResponseList(response, FriendLoadDTO.class));
     }
 }

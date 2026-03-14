@@ -25,6 +25,7 @@ chattingapp\dtos\LoginRequetDTO.class
 chattingapp\dtos\RegisterResponseDTO.class
 chattingapp\dtos\RegisterOTPRequestDTO.class
 chattingapp\dtos\SearchDTO.class
+chattingapp\dtos\FriendLoadDTO.class
 chattingapp\components\ChatItemPanel$ChatItemClickListener.class
 chattingapp\components\AddFriendPopupPanel.class
 chattingapp\components\NotificationListPanel.class

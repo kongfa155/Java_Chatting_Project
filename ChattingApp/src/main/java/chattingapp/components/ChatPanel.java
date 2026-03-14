@@ -11,13 +11,14 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import chattingapp.models.ChatData;
 import chattingapp.models.Message;
-
+import chattingapp.services.MessageService;
+import chattingapp.utils.SessionManager;
 /**
  *
  * @author CP
  */
 public class ChatPanel extends javax.swing.JPanel {
-
+    private String currentChatUserId;
     /**
      * Creates new form ChatPanel
      */
@@ -47,43 +48,52 @@ public class ChatPanel extends javax.swing.JPanel {
         messageContainer.add(friendMsg);
     }
 
-    public void loadChat(ChatData data) {
+ public void loadChat(ChatData data) {
 
-        if (data == null) {
-            return;
-        }
-
-        // Set header
-        lblName.setText(data.getContact().getDisplayName());
-        lblStatus.setText("Online");
-
-        // Clear tin nhắn cũ
-        messageContainer.removeAll();
-        //Sau này chỗ này cần gọi hàm lấy tất cả tin nhắn giữa 2 người, kiểm tra xem ai là người gửi để biết set bong bong chat bên trái hay phải
-        // Fake load message list
-        for (int i = 0; i < 5; i++) {
-
-            MessageBubble bubble;
-
-            if (i % 2 == 0) {
-                bubble = new MessageBubble(
-                        "Message from " + data.getContact().getDisplayName(),
-                        false
-                );
-            } else {
-                bubble = new MessageBubble(
-                        "My reply " + i,
-                        true
-                );
-            }
-
-            messageContainer.add(bubble);
-        }
-
-        messageContainer.revalidate();
-        messageContainer.repaint();
+    if (data == null) {
+        return;
     }
+    currentChatUserId = data.getContact().getUserId();
+    lblName.setText(data.getContact().getDisplayName());
+    lblStatus.setText("Online");
+    System.out.println("LOAD CHAT CALLED");
 
+    MessageService messageService = new MessageService();
+
+    messageService.getConversation(data.getContact().getUserId())
+        .thenAccept(messages -> {
+
+            javax.swing.SwingUtilities.invokeLater(() -> {
+
+                messageContainer.removeAll();
+
+                for (Message msg : messages) {
+
+                    boolean isMine =
+                        msg.getSenderId().equals(
+                            SessionManager.getCurrentUser().getUserId()
+                        );
+
+                    MessageBubble bubble =
+                        new MessageBubble(msg.getContent(), isMine);
+
+                    messageContainer.add(bubble);
+                }
+
+                messageContainer.revalidate();
+                messageContainer.repaint();
+
+                // 👇 auto scroll xuống tin nhắn mới nhất
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    javax.swing.JScrollBar vertical =
+                    JScrollPane.getVerticalScrollBar();
+                    vertical.setValue(vertical.getMaximum());
+                });
+
+            });
+
+        });
+}
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -208,9 +218,31 @@ public class ChatPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_btnAttachActionPerformed
 
     private void btnSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendActionPerformed
-        // TODO add your handling code here:
-        String mess = txtMessage.getText();
-        sendMessage();
+          String text = txtMessage.getText().trim();
+
+    if(text.isEmpty()) return;
+
+    MessageService service = new MessageService();
+
+    service.sendMessage(currentChatUserId, text)
+        .thenAccept(msg -> {
+
+            javax.swing.SwingUtilities.invokeLater(() -> {
+
+                MessageBubble bubble =
+                    new MessageBubble(msg.getContent(), true);
+
+                messageContainer.add(bubble);
+                messageContainer.revalidate();
+                messageContainer.repaint();
+
+                txtMessage.setText("");
+
+                JScrollPane.getVerticalScrollBar()
+                           .setValue(JScrollPane.getVerticalScrollBar().getMaximum());
+            });
+
+        });
     }//GEN-LAST:event_btnSendActionPerformed
 
 

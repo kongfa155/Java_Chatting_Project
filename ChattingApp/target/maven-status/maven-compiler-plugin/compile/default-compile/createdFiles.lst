@@ -48,6 +48,7 @@ chattingapp\services\BaseService.class
 chattingapp\components\NotificationItemPanel.class
 chattingapp\models\User.class
 chattingapp\components\SideBarPanel$1.class
+chattingapp\services\MessageService.class
 chattingapp\models\NotificationType.class
 chattingapp\ui\LoginFrame.class
 chattingapp\components\NotificationItemPanel$1.class

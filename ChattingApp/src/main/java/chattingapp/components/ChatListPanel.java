@@ -51,51 +51,55 @@ public class ChatListPanel extends javax.swing.JPanel {
     }
 
     private void loadFriends() {
-         listContainer.removeAll();
 
     FriendService service = new FriendService();
 
     service.getFriends().thenAccept(friends -> {
 
-        for (FriendLoadDTO f : friends) {
+        javax.swing.SwingUtilities.invokeLater(() -> {
 
-            // Tạo user từ backend
-            User user = new User();
-            user.setDisplayName(f.getDisplayName());
-            user.setAvatarUrl(f.getAvatarUrl());
+            listContainer.removeAll();
 
-            // Vì backend chưa có last message nên tạo tạm
-            Message msg = new Message();
-            msg.setContent("");
-            msg.setSentAt(java.time.LocalDateTime.now());
+            for (FriendLoadDTO f : friends) {
 
-            ChatData data = new ChatData(user, msg, 0);
+                // Tạo user từ backend
+                User user = new User();
+                user.setUserId(f.getUserId());   // FIX LỖI
+                user.setDisplayName(f.getDisplayName());
+                user.setAvatarUrl(f.getAvatarUrl());
 
-            ChatItemPanel item = new ChatItemPanel(data);
+                // Backend chưa có last message nên fake tạm
+                Message msg = new Message();
+                msg.setContent("");
+                msg.setSentAt(java.time.LocalDateTime.now());
 
-            item.setChatItemClickListener(clickedData -> {
+                ChatData data = new ChatData(user, msg, 0);
 
-                if (selectedItem != null) {
-                    selectedItem.setSelected(false);
-                }
+                ChatItemPanel item = new ChatItemPanel(data);
 
-                item.setSelected(true);
-                selectedItem = item;
+                item.setChatItemClickListener(clickedData -> {
+                        System.out.println("CLICK FRIEND TRIGGERED");
+                    if (selectedItem != null) {
+                        selectedItem.setSelected(false);
+                    }
 
-                if (chatSelectionListener != null) {
-                    chatSelectionListener.onChatSelected(clickedData);
-                }
+                    item.setSelected(true);
+                    selectedItem = item;
 
-            });
+                    if (chatSelectionListener != null) {
+                        chatSelectionListener.onChatSelected(clickedData);
+                    }
+                });
 
-            listContainer.add(item);
-        }
+                listContainer.add(item);
+            }
 
-        listContainer.revalidate();
-        listContainer.repaint();
+            listContainer.revalidate();
+            listContainer.repaint();
+        });
 
     });
-    }
+}
     //Đây là kênh đàm thoại cấp cao, dùng để cho các quản lý giao tiếp tới nhau
     public interface ChatSelectionListener {
 

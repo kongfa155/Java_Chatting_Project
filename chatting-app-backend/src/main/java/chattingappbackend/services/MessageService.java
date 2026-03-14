@@ -51,19 +51,14 @@ public class MessageService {
     // GET CONVERSATION
     public ApiResponse<List<Message>> getConversation(String userA, String userB) {
 
-        List<Message> messages =
-                messageRepository.findBySenderIdAndReceiverIdOrSenderIdAndReceiverId(
-                        userA, userB,
-                        userB, userA
-                );
+            
+    List<Message> messages =
+            messageRepository.findConversation(userA, userB);
 
-        // bỏ message đã delete
-        messages.removeIf(Message::isDeleted);
+    // bỏ message đã delete
+    messages.removeIf(Message::isDeleted);
 
-        // sort theo thời gian
-        messages.sort(Comparator.comparing(Message::getSentAt));
-
-        return ApiResponse.success("Conversation fetched successfully", messages);
+    return ApiResponse.success("Conversation fetched successfully", messages);
     }
 
     // MARK MESSAGE AS READ

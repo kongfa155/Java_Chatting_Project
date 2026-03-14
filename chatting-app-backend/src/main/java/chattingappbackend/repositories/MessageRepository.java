@@ -2,17 +2,18 @@ package chattingappbackend.repositories;
 
 import chattingappbackend.models.Message;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface MessageRepository extends JpaRepository<Message, String> {
 
-    // Lấy toàn bộ conversation giữa 2 user
-    List<Message> findBySenderIdAndReceiverIdOrSenderIdAndReceiverId(
-            String sender1, String receiver1,
-            String sender2, String receiver2
-    );
+    @Query("""
+    SELECT m FROM Message m
+    WHERE (m.senderId = :userA AND m.receiverId = :userB)
+       OR (m.senderId = :userB AND m.receiverId = :userA)
+    ORDER BY m.sentAt
+    """)
+    List<Message> findConversation(String userA, String userB);
 
-    // Lấy tất cả tin nhắn chưa đọc của user
     List<Message> findByReceiverIdAndIsReadFalse(String receiverId);
-
 }

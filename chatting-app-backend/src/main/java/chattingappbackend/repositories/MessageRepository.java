@@ -6,7 +6,13 @@ import java.util.List;
 
 public interface MessageRepository extends JpaRepository<Message, String> {
 
-    List<Message> findBySenderIdAndReceiverId(String senderId, String receiverId);
+    // Lấy toàn bộ conversation giữa 2 user
+    List<Message> findBySenderIdAndReceiverIdOrSenderIdAndReceiverId(
+            String sender1, String receiver1,
+            String sender2, String receiver2
+    );
 
-    List<Message> findByReceiverIdAndSenderId(String receiverId, String senderId);
+    // Lấy tất cả tin nhắn chưa đọc của user
+    List<Message> findByReceiverIdAndIsReadFalse(String receiverId);
+
 }

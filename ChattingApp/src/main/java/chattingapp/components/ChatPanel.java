@@ -12,11 +12,16 @@ import javax.swing.JPanel;
 import chattingapp.models.ChatData;
 import chattingapp.models.Message;
 import chattingapp.models.MessageType;
+import chattingapp.services.ApiClient;
 import chattingapp.services.MessageService;
 import chattingapp.utils.SessionManager;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Image;
 import java.io.File;
+import java.net.MalformedURLException;
+import javax.swing.ImageIcon;
+import java.net.URL;
 
 /**
  *
@@ -123,18 +128,48 @@ public class ChatPanel extends javax.swing.JPanel {
 
                         messageContainer.removeAll();
 
-                        for (Message msg : messages) {
+                  for (Message msg : messages) {
+                           System.out.println(msg.getMessageType());
+                            System.out.println(msg.getFileUrl());
+                    boolean isMine =
+                            msg.getSenderId().equals(
+                                    SessionManager.getCurrentUser().getUserId()
+                            );
 
-                            boolean isMine
-                                    = msg.getSenderId().equals(
-                                            SessionManager.getCurrentUser().getUserId()
-                                    );
+                    if (msg.getFileUrl() != null) {
 
-                            MessageBubble bubble
-                                    = new MessageBubble(msg.getContent(), isMine);
+                        try {
 
-                            messageContainer.add(bubble);
+                            String imageUrl = ApiClient.getBaseUrl() + msg.getFileUrl();
+                            System.out.println(imageUrl);
+
+                            ImageIcon icon = new ImageIcon(new URL(imageUrl));
+                            Image img = icon.getImage().getScaledInstance(220, -1, Image.SCALE_SMOOTH);
+
+                            JLabel imageLabel = new JLabel(new ImageIcon(img));
+
+                            JPanel wrapper = new JPanel(new FlowLayout(
+                                    isMine ? FlowLayout.RIGHT : FlowLayout.LEFT
+                            ));
+
+                            wrapper.add(imageLabel);
+
+                            messageContainer.add(wrapper);
+
+                        } catch (MalformedURLException e) {
+                                System.out.println("Image load error: " + e.getMessage());
+
                         }
+
+                    } else {
+
+                        MessageBubble bubble =
+                                new MessageBubble(msg.getContent(), isMine);
+
+                        messageContainer.add(bubble);
+
+                    }
+                }
 
                         messageContainer.revalidate();
                         messageContainer.repaint();
@@ -149,6 +184,7 @@ public class ChatPanel extends javax.swing.JPanel {
                     });
 
                 });
+     
     }
 
     /**
@@ -281,31 +317,74 @@ public class ChatPanel extends javax.swing.JPanel {
 
         MessageService service = new MessageService();
 //        MiMi viết thêm hàm sendFile giúp cp nhé
-//    service.sendFile(currentChatUserId, file, type)
-//            .thenAccept(msg -> {
-//
-//                javax.swing.SwingUtilities.invokeLater(() -> {
-//
-//                    boolean isMine = true;
-//
-//                    MessageBubble bubble;
-//
-//                    if (type == chattingapp.models.MessageType.TEXT) {
-//                        bubble = new MessageBubble(msg.getContent(), isMine);
-//                    } else {
-//                        bubble = new MessageBubble(file.getName(), isMine);
-//                    }
-//
-//                    messageContainer.add(bubble);
-//                    messageContainer.revalidate();
-//                    messageContainer.repaint();
-//
-//                    JScrollPane.getVerticalScrollBar()
-//                            .setValue(JScrollPane.getVerticalScrollBar().getMaximum());
-//
-//                });
-//
-//            });
+
+      service.sendFile(currentChatUserId, file)
+.thenAccept(msg -> {
+
+    javax.swing.SwingUtilities.invokeLater(() -> {
+
+        MessageService messageService = new MessageService();
+
+        messageService.getConversation(currentChatUserId)
+            .thenAccept(messages -> {
+
+                javax.swing.SwingUtilities.invokeLater(() -> {
+
+                    messageContainer.removeAll();
+
+                    for (Message m : messages) {
+
+                        boolean isMine =
+                            m.getSenderId().equals(
+                                SessionManager.getCurrentUser().getUserId()
+                            );
+
+                        if (m.getMessageType() == MessageType.IMAGE) {
+
+                            try {
+
+                                String imageUrl = ApiClient.getBaseUrl() + m.getFileUrl();
+
+                                ImageIcon icon = new ImageIcon(new URL(imageUrl));
+                                Image img = icon.getImage()
+                                        .getScaledInstance(220, -1, Image.SCALE_SMOOTH);
+
+                                JLabel imageLabel =
+                                        new JLabel(new ImageIcon(img));
+
+                                JPanel wrapper =
+                                        new JPanel(new FlowLayout(
+                                            isMine ? FlowLayout.RIGHT : FlowLayout.LEFT
+                                        ));
+
+                                wrapper.add(imageLabel);
+
+                                messageContainer.add(wrapper);
+
+                            } catch (Exception e) {
+                                System.out.println(e.getMessage());
+                            }
+
+                        } else {
+
+                            MessageBubble bubble =
+                                    new MessageBubble(m.getContent(), isMine);
+
+                            messageContainer.add(bubble);
+                        }
+                    }
+
+                    messageContainer.revalidate();
+                    messageContainer.repaint();
+
+                });
+
+            });
+
+    });
+
+});
+        
     }//GEN-LAST:event_btnAttachActionPerformed
     private void toggleDrawer() {
 
@@ -316,18 +395,18 @@ public class ChatPanel extends javax.swing.JPanel {
         if (drawerOpen) {
             //Nữa MiMi viết cho tui hàm lấy toàn bộ chat mà không phải text của mình với bạn hiện tại tại chỗ này nhe
 
-            MessageService service = new MessageService();
+           MessageService service = new MessageService();
 
-//            service.(currentChatUserId)
-//                    .thenAccept(messages -> {
-//
-//                        javax.swing.SwingUtilities.invokeLater(() -> {
-//
-//                            fileDrawer.loadFiles(messages);
-//
-//                        });
-//
-//                    });
+            service.getConversation(currentChatUserId)
+                    .thenAccept(messages -> {
+
+                        javax.swing.SwingUtilities.invokeLater(() -> {
+
+                            fileDrawer.loadFiles(messages);
+
+                        });
+
+                    });
         }
 
         revalidate();

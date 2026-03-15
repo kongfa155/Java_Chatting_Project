@@ -10,10 +10,15 @@ import chattingappbackend.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.Files;
+import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class MessageService {
@@ -85,5 +90,37 @@ public class MessageService {
         messageRepository.save(message);
 
         return ApiResponse.success("Message deleted", null);
+    }
+        //SEND FILE
+
+
+    public Message sendFile(String senderId, String receiverId, MultipartFile file) throws IOException {
+
+            // tạo tên file random
+            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+
+            // tạo folder uploads nếu chưa có
+            Path uploadDir = Paths.get("uploads");
+            Files.createDirectories(uploadDir);
+
+            // đường dẫn file
+            Path filePath = uploadDir.resolve(fileName);
+
+            // lưu file
+            Files.copy(file.getInputStream(), filePath);
+
+            // tạo message
+            Message msg = new Message();
+            msg.setMessageId(UUID.randomUUID().toString());
+            msg.setSenderId(senderId);
+            msg.setReceiverId(receiverId);
+            msg.setMessageType(MessageType.FILE);
+            msg.setFileUrl("/uploads/" + fileName);
+            msg.setSentAt(LocalDateTime.now());
+            msg.setRead(false);
+            msg.setDeleted(false);
+
+            return messageRepository.save(msg);
+        
     }
 }

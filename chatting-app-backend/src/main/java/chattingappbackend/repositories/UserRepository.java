@@ -1,53 +1,79 @@
 package chattingappbackend.repositories;
 
-import java.util.Optional;
-
-import org.springframework.data.jdbc.repository.query.Modifying;
-import org.springframework.data.jdbc.repository.query.Query;
-import org.springframework.data.repository.CrudRepository;
+import chattingappbackend.dtos.user.register.RegisterVerifyResponseDTO;
+import chattingappbackend.models.User;
+import chattingappbackend.models.UserStatus;
+import jakarta.transaction.Transactional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import chattingappbackend.dtos.RegisterVerifyResponseDTO;
-import chattingappbackend.models.User;
-import chattingappbackend.models.UserStatus;
+import java.util.Optional;
 
 @Repository
-public interface UserRepository extends CrudRepository<User, String> {
-    @Query("SELECT * FROM users WHERE user_id = :userId")
-    Optional<User> findByUserId(@Param("userId") String userId);
-    @Query("SELECT * FROM users WHERE username = :username")
-    Optional<User> findByUsername(@Param("username") String username);
+public interface UserRepository extends JpaRepository<User, String> {
 
-    @Query("SELECT email FROM users WHERE username= :username")
+    // Hibernate tự hiểu: SELECT * FROM users WHERE user_id = ?
+    Optional<User> findByUserId(String userId);
+
+    // Hibernate tự hiểu: SELECT * FROM users WHERE username = ?
+    Optional<User> findByUsername(String username);
+
+    // SQL gốc: SELECT email FROM users WHERE username = ?
+    @Query("SELECT u.email FROM User u WHERE u.username = :username")
     Optional<String> findEmailByUsername(@Param("username") String username);
 
-    @Query("SELECT COUNT(*) > 0 FROM users WHERE email =:email")
-    boolean existsByEmail(@Param("email") String email);
-    @Query("SELECT status FROM users WHERE username = :username")
+    // Hibernate tự hiểu: SELECT COUNT(*) > 0 FROM users WHERE email = ?
+    boolean existsByEmail(String email);
+
+    // SQL gốc: SELECT status FROM users WHERE username = ?
+    @Query("SELECT u.status FROM User u WHERE u.username = :username")
     Optional<UserStatus> findStatusByUsername(@Param("username") String username);
 
-    @Modifying
-    @Query("INSERT INTO users (user_id, gender, username, email, display_name, avatar_url, password, status, created_at) " +
-            "VALUES (:#{#u.userId}, :#{#u.gender}, :#{#u.username}, :#{#u.email}, :#{#u.displayName}, :#{#u.avatarUrl}, :#{#u.hashedPassword}, :#{#u.status}, :#{#u.createdAt})")
-    void insertUser(@Param("u") User u);
-    @Modifying
-    @Query("UPDATE users SET status = :status WHERE username = :username")
-    void updateStatusByUsername(@Param("username") String username, @Param("status") UserStatus status);
-    @Modifying
-    @Query("UPDATE users SET password = :password WHERE user_id = :userId")
-    void updatePasswordByUserId(@Param("userId") String userId, @Param("password") String password);
-    @Modifying
-    @Query("UPDATE users SET email = :newEmail WHERE user_id = :userId")
-    void updateEmailByUserId(@Param("userId") String userId, @Param("newEmail") String newEmail);
-    @Query("SELECT user_id, username, display_name, gender, status, created_at FROM users WHERE username = :username")
-    Optional<RegisterVerifyResponseDTO> findUserForVerification(@Param("username") String username);
-    @Modifying
-    @Query("UPDATE users SET display_name =:#{#u.displayName}, gender =:#{#u.gender}, avatar_url =:#{#u.avatarUrl} WHERE user_id =:userId")
-    void updateProfileByUserId(@Param("userId") String userId, @Param("u") User user);
-    @Query("SELECT * FROM users WHERE phone_number= :phone_number")
-    Optional<User> findByPhoneNumber(@Param("phone_number")  String phoneNumber);
+    /**
+     * THAY THẾ insertUser:
+     * Trong JPA, không dùng @Query để INSERT.
+     * Bạn chỉ cần gọi userRepository.save(user) trong Service.
+     * Hibernate sẽ tự sinh lệnh INSERT.
+     */
 
-    @Query("SELECT * FROM users WHERE email= :email")
-    Optional<User> findByEmail(@Param("email") String email);
+    @Modifying
+    @Transactional
+    @Query("UPDATE User u SET u.status = :status WHERE u.username = :username")
+    void updateStatusByUsername(@Param("username") String username, @Param("status") UserStatus status);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE User u SET u.hashedPassword = :password WHERE u.userId = :userId")
+    void updatePasswordByUserId(@Param("userId") String userId, @Param("password") String password);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE User u SET u.email = :newEmail WHERE u.userId = :userId")
+    void updateEmailByUserId(@Param("userId") String userId, @Param("newEmail") String newEmail);
+
+    /**
+     * Lưu ý: Với findUserForVerification, vì bạn trả về một DTO (RegisterVerifyResponseDTO)
+     * không phải Entity, bạn nên dùng Projection hoặc Mapping thủ công ở Service.
+     * Nếu vẫn muốn dùng Query:
+     */
+    @Query("SELECT new chattingappbackend.dtos.user.register.RegisterVerifyResponseDTO(u.userId, u.username, u.displayName, u.gender, u.status, u.createdAt) " +
+            "FROM User u WHERE u.username = :username")
+    Optional<RegisterVerifyResponseDTO> findUserForVerification(@Param("username") String username);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE User u SET u.displayName = :displayName, " +
+            "u.gender = :gender, " +
+            "u.avatarUrl = :avatarUrl " +
+            "WHERE u.userId = :userId")
+    void updateProfileByUserId(@Param("userId") String userId,
+                               @Param("displayName") String displayName,
+                               @Param("gender") boolean gender,
+                               @Param("avatarUrl") String avatarUrl);
+
+    // Hibernate tự hiểu: SELECT * FROM users WHERE email = ?
+    Optional<User> findByEmail(String email);
 }

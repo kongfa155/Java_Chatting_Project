@@ -11,10 +11,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import chattingapp.models.ChatData;
 import chattingapp.models.Message;
+import chattingapp.models.MessageType;
 import chattingapp.services.MessageService;
 import chattingapp.utils.SessionManager;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.io.File;
 
 /**
  *
@@ -37,6 +39,19 @@ public class ChatPanel extends javax.swing.JPanel {
 
         chatContentPanel.add(fileDrawer, BorderLayout.EAST);
         showEmpty();
+    }
+
+    private File chooseFile() {
+
+        javax.swing.JFileChooser chooser = new javax.swing.JFileChooser();
+
+        int result = chooser.showOpenDialog(this);
+
+        if (result == javax.swing.JFileChooser.APPROVE_OPTION) {
+            return chooser.getSelectedFile();
+        }
+
+        return null;
     }
 
     private void showEmpty() {
@@ -68,6 +83,25 @@ public class ChatPanel extends javax.swing.JPanel {
                 = new MessageBubble("Hello bro", false);
 
         messageContainer.add(friendMsg);
+    }
+
+    private MessageType detectFileType(java.io.File file) {
+
+        String name = file.getName().toLowerCase();
+
+        if (name.endsWith(".png") || name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".gif")) {
+            return chattingapp.models.MessageType.IMAGE;
+        }
+
+        if (name.endsWith(".mp4") || name.endsWith(".mkv") || name.endsWith(".mov") || name.endsWith(".avi")) {
+            return chattingapp.models.MessageType.VIDEO;
+        }
+
+        if (name.endsWith(".mp3") || name.endsWith(".wav")) {
+            return chattingapp.models.MessageType.AUDIO;
+        }
+
+        return chattingapp.models.MessageType.FILE;
     }
 
     public void loadChat(ChatData data) {
@@ -136,12 +170,6 @@ public class ChatPanel extends javax.swing.JPanel {
         optionPanel = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         bottomWrapper = new javax.swing.JPanel();
-        drawerPanel = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(30, 0), new java.awt.Dimension(30, 0), new java.awt.Dimension(30, 32767));
-        jLabel2 = new javax.swing.JLabel();
-        filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(30, 0), new java.awt.Dimension(30, 0), new java.awt.Dimension(30, 32767));
-        jLabel3 = new javax.swing.JLabel();
         inputPanel = new javax.swing.JPanel();
         btnAttach = new javax.swing.JButton();
         ScrollMes = new javax.swing.JScrollPane();
@@ -153,10 +181,12 @@ public class ChatPanel extends javax.swing.JPanel {
         setName("ChatPanel"); // NOI18N
         setLayout(new java.awt.CardLayout());
 
+        emptyStatePanel.setBackground(new java.awt.Color(204, 255, 255));
         emptyStatePanel.setName("emptyStatePanel"); // NOI18N
         emptyStatePanel.setLayout(new java.awt.BorderLayout());
 
-        jLabel4.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel4.setBackground(new java.awt.Color(153, 255, 255));
+        jLabel4.setFont(new java.awt.Font("Segoe UI", 3, 18)); // NOI18N
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel4.setText("Chọn một đoạn chat để bắt đầu !!!");
         emptyStatePanel.add(jLabel4, java.awt.BorderLayout.CENTER);
@@ -201,24 +231,6 @@ public class ChatPanel extends javax.swing.JPanel {
         bottomWrapper.setBackground(new java.awt.Color(255, 255, 255));
         bottomWrapper.setLayout(new java.awt.BorderLayout());
 
-        drawerPanel.setBackground(new java.awt.Color(245, 245, 245));
-        drawerPanel.setBorder(javax.swing.BorderFactory.createMatteBorder(1, 0, 1, 0, new java.awt.Color(230, 230, 230)));
-        drawerPanel.setPreferredSize(new java.awt.Dimension(0, 80));
-        drawerPanel.setLayout(new javax.swing.BoxLayout(drawerPanel, javax.swing.BoxLayout.X_AXIS));
-
-        jLabel1.setText("Image");
-        drawerPanel.add(jLabel1);
-        drawerPanel.add(filler1);
-
-        jLabel2.setText("File");
-        drawerPanel.add(jLabel2);
-        drawerPanel.add(filler2);
-
-        jLabel3.setText("Video");
-        drawerPanel.add(jLabel3);
-
-        bottomWrapper.add(drawerPanel, java.awt.BorderLayout.NORTH);
-
         inputPanel.setBackground(new java.awt.Color(255, 255, 255));
         inputPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
         inputPanel.setPreferredSize(new java.awt.Dimension(0, 60));
@@ -259,8 +271,41 @@ public class ChatPanel extends javax.swing.JPanel {
 
     private void btnAttachActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAttachActionPerformed
         // TODO add your handling code here:
-        drawerPanel.setVisible(!drawerPanel.isVisible());
-        inputPanel.revalidate();
+        File file = chooseFile();
+
+        if (file == null) {
+            return;
+        }
+
+        MessageType type = detectFileType(file);
+
+        MessageService service = new MessageService();
+//        MiMi viết thêm hàm sendFile giúp cp nhé
+//    service.sendFile(currentChatUserId, file, type)
+//            .thenAccept(msg -> {
+//
+//                javax.swing.SwingUtilities.invokeLater(() -> {
+//
+//                    boolean isMine = true;
+//
+//                    MessageBubble bubble;
+//
+//                    if (type == chattingapp.models.MessageType.TEXT) {
+//                        bubble = new MessageBubble(msg.getContent(), isMine);
+//                    } else {
+//                        bubble = new MessageBubble(file.getName(), isMine);
+//                    }
+//
+//                    messageContainer.add(bubble);
+//                    messageContainer.revalidate();
+//                    messageContainer.repaint();
+//
+//                    JScrollPane.getVerticalScrollBar()
+//                            .setValue(JScrollPane.getVerticalScrollBar().getMaximum());
+//
+//                });
+//
+//            });
     }//GEN-LAST:event_btnAttachActionPerformed
     private void toggleDrawer() {
 
@@ -331,16 +376,10 @@ public class ChatPanel extends javax.swing.JPanel {
     private javax.swing.JButton btnAttach;
     private javax.swing.JButton btnSend;
     private javax.swing.JPanel chatContentPanel;
-    private javax.swing.JPanel drawerPanel;
     private javax.swing.JPanel emptyStatePanel;
-    private javax.swing.Box.Filler filler1;
-    private javax.swing.Box.Filler filler2;
     private javax.swing.JPanel headerPanel;
     private javax.swing.JPanel inputPanel;
     private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel lblName;
     private javax.swing.JLabel lblStatus;

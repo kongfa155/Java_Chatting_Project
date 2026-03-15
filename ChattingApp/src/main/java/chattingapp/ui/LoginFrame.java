@@ -9,6 +9,8 @@ import chattingapp.dtos.RegisterOTPRequestDTO;
 import chattingapp.models.User;
 import chattingapp.services.UserService;
 import chattingapp.utils.SessionManager;
+import java.awt.Image;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 /**
@@ -24,6 +26,13 @@ public class LoginFrame extends javax.swing.JFrame {
      */
     public LoginFrame() {
         initComponents();
+        ImageIcon icon = new ImageIcon(
+                getClass().getResource("/images/logo.png")
+        );
+
+        Image img = icon.getImage().getScaledInstance(350,100, Image.SCALE_SMOOTH);
+
+        lblLogo.setIcon(new ImageIcon(img));
         //Set vị trí ban đầu ở giữa
         this.setLocationRelativeTo(null);
         //Cập nhật text hiển thị khi chưa nhập input cho số điện thoại và mật khẩu
@@ -57,7 +66,7 @@ public class LoginFrame extends javax.swing.JFrame {
         btnVerify = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         PanelLogo = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
+        lblLogo = new javax.swing.JLabel();
         PanelInfo = new javax.swing.JPanel();
         txtUsername = new javax.swing.JTextField();
         txtPassword = new javax.swing.JPasswordField();
@@ -68,7 +77,6 @@ public class LoginFrame extends javax.swing.JFrame {
 
         quenMKDialog.setMinimumSize(new java.awt.Dimension(400, 500));
         quenMKDialog.setModal(true);
-        quenMKDialog.getContentPane().setLayout(new java.awt.BorderLayout());
 
         ForgotPanel.setMinimumSize(new java.awt.Dimension(400, 500));
         ForgotPanel.setPreferredSize(new java.awt.Dimension(400, 500));
@@ -155,7 +163,6 @@ public class LoginFrame extends javax.swing.JFrame {
         setTitle("Đăng nhập");
         setMinimumSize(new java.awt.Dimension(400, 500));
         setResizable(false);
-        getContentPane().setLayout(new java.awt.BorderLayout());
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setBorder(javax.swing.BorderFactory.createEmptyBorder(30, 30, 30, 30));
@@ -163,8 +170,10 @@ public class LoginFrame extends javax.swing.JFrame {
         jPanel1.setPreferredSize(new java.awt.Dimension(400, 500));
         jPanel1.setLayout(new java.awt.GridBagLayout());
 
-        jLabel1.setBackground(new java.awt.Color(255, 255, 255));
-        jLabel1.setText("ICON");
+        PanelLogo.setBackground(new java.awt.Color(255, 255, 255));
+        PanelLogo.setMaximumSize(new java.awt.Dimension(366, 780));
+
+        lblLogo.setBackground(new java.awt.Color(255, 255, 255));
 
         javax.swing.GroupLayout PanelLogoLayout = new javax.swing.GroupLayout(PanelLogo);
         PanelLogo.setLayout(PanelLogoLayout);
@@ -172,14 +181,14 @@ public class LoginFrame extends javax.swing.JFrame {
             PanelLogoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(PanelLogoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 354, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 354, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         PanelLogoLayout.setVerticalGroup(
             PanelLogoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(PanelLogoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 73, Short.MAX_VALUE)
+                .addComponent(lblLogo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -335,14 +344,13 @@ public class LoginFrame extends javax.swing.JFrame {
                 .thenAccept(response -> {
                     // Đăng nhập thành công (Backend trả về ACTIVATED)
                     javax.swing.SwingUtilities.invokeLater(() -> {
-                        
+
                         User user = new User();
                         user.setUserId(response.getUserId());
                         user.setUsername(response.getUsername());
                         user.setDisplayName(response.getDisplayName());
                         //Set mặc định nếu chưa có
                         user.setAvatarUrl("https://i.pinimg.com/736x/bc/43/98/bc439871417621836a0eeea768d60944.jpg");
-                        
 
                         SessionManager.setSession(response.getAccessToken(), user);
                         new MainFrame().setVisible(true);
@@ -414,10 +422,10 @@ public class LoginFrame extends javax.swing.JFrame {
     private javax.swing.JButton btnGetOTP;
     private javax.swing.JButton btnLogin;
     private javax.swing.JButton btnVerify;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JLabel lblLogo;
     private javax.swing.JLabel quenMK;
     private javax.swing.JDialog quenMKDialog;
     private javax.swing.JLabel taoTK;

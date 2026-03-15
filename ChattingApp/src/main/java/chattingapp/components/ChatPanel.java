@@ -11,6 +11,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import chattingapp.models.ChatData;
 import chattingapp.models.Message;
+import chattingapp.models.MessageType;
+import chattingapp.services.MessageService;
+import chattingapp.utils.SessionManager;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.io.File;
 
 /**
  *
@@ -18,12 +24,44 @@ import chattingapp.models.Message;
  */
 public class ChatPanel extends javax.swing.JPanel {
 
+    private String currentChatUserId;
+    private FileDrawerPanel fileDrawer;
+    private boolean drawerOpen = false;
+
     /**
      * Creates new form ChatPanel
      */
     public ChatPanel() {
         initComponents();
         ScrollMes.putClientProperty("JTextField.placeholderText", "Type a message...");
+        fileDrawer = new FileDrawerPanel();
+        fileDrawer.setVisible(false);
+
+        chatContentPanel.add(fileDrawer, BorderLayout.EAST);
+        showEmpty();
+    }
+
+    private File chooseFile() {
+
+        javax.swing.JFileChooser chooser = new javax.swing.JFileChooser();
+
+        int result = chooser.showOpenDialog(this);
+
+        if (result == javax.swing.JFileChooser.APPROVE_OPTION) {
+            return chooser.getSelectedFile();
+        }
+
+        return null;
+    }
+
+    private void showEmpty() {
+        CardLayout cl = (CardLayout) getLayout();
+        cl.show(this, "card2");
+    }
+
+    private void showChat() {
+        CardLayout cl = (CardLayout) getLayout();
+        cl.show(this, "card3");
     }
 
     private void sendMessage() {
@@ -47,41 +85,70 @@ public class ChatPanel extends javax.swing.JPanel {
         messageContainer.add(friendMsg);
     }
 
-    public void loadChat(ChatData data) {
+    private MessageType detectFileType(java.io.File file) {
 
+        String name = file.getName().toLowerCase();
+
+        if (name.endsWith(".png") || name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".gif")) {
+            return chattingapp.models.MessageType.IMAGE;
+        }
+
+        if (name.endsWith(".mp4") || name.endsWith(".mkv") || name.endsWith(".mov") || name.endsWith(".avi")) {
+            return chattingapp.models.MessageType.VIDEO;
+        }
+
+        if (name.endsWith(".mp3") || name.endsWith(".wav")) {
+            return chattingapp.models.MessageType.AUDIO;
+        }
+
+        return chattingapp.models.MessageType.FILE;
+    }
+
+    public void loadChat(ChatData data) {
+        showChat();
         if (data == null) {
             return;
         }
-
-        // Set header
+        currentChatUserId = data.getContact().getUserId();
         lblName.setText(data.getContact().getDisplayName());
         lblStatus.setText("Online");
+        System.out.println("LOAD CHAT CALLED");
 
-        // Clear tin nhắn cũ
-        messageContainer.removeAll();
-        //Sau này chỗ này cần gọi hàm lấy tất cả tin nhắn giữa 2 người, kiểm tra xem ai là người gửi để biết set bong bong chat bên trái hay phải
-        // Fake load message list
-        for (int i = 0; i < 5; i++) {
+        MessageService messageService = new MessageService();
 
-            MessageBubble bubble;
+        messageService.getConversation(data.getContact().getUserId())
+                .thenAccept(messages -> {
 
-            if (i % 2 == 0) {
-                bubble = new MessageBubble(
-                        "Message from " + data.getContact().getDisplayName(),
-                        false
-                );
-            } else {
-                bubble = new MessageBubble(
-                        "My reply " + i,
-                        true
-                );
-            }
+                    javax.swing.SwingUtilities.invokeLater(() -> {
 
-            messageContainer.add(bubble);
-        }
+                        messageContainer.removeAll();
 
-        messageContainer.revalidate();
-        messageContainer.repaint();
+                        for (Message msg : messages) {
+
+                            boolean isMine
+                                    = msg.getSenderId().equals(
+                                            SessionManager.getCurrentUser().getUserId()
+                                    );
+
+                            MessageBubble bubble
+                                    = new MessageBubble(msg.getContent(), isMine);
+
+                            messageContainer.add(bubble);
+                        }
+
+                        messageContainer.revalidate();
+                        messageContainer.repaint();
+
+                        // 👇 auto scroll xuống tin nhắn mới nhất
+                        javax.swing.SwingUtilities.invokeLater(() -> {
+                            javax.swing.JScrollBar vertical
+                                    = JScrollPane.getVerticalScrollBar();
+                            vertical.setValue(vertical.getMaximum());
+                        });
+
+                    });
+
+                });
     }
 
     /**
@@ -93,6 +160,9 @@ public class ChatPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        emptyStatePanel = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        chatContentPanel = new javax.swing.JPanel();
         headerPanel = new javax.swing.JPanel();
         textWrapper = new javax.swing.JPanel();
         lblName = new javax.swing.JLabel();
@@ -100,10 +170,6 @@ public class ChatPanel extends javax.swing.JPanel {
         optionPanel = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         bottomWrapper = new javax.swing.JPanel();
-        drawerPanel = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
         inputPanel = new javax.swing.JPanel();
         btnAttach = new javax.swing.JButton();
         ScrollMes = new javax.swing.JScrollPane();
@@ -112,7 +178,22 @@ public class ChatPanel extends javax.swing.JPanel {
         JScrollPane = new javax.swing.JScrollPane();
         messageContainer = new javax.swing.JPanel();
 
-        setLayout(new java.awt.BorderLayout());
+        setName("ChatPanel"); // NOI18N
+        setLayout(new java.awt.CardLayout());
+
+        emptyStatePanel.setBackground(new java.awt.Color(204, 255, 255));
+        emptyStatePanel.setName("emptyStatePanel"); // NOI18N
+        emptyStatePanel.setLayout(new java.awt.BorderLayout());
+
+        jLabel4.setBackground(new java.awt.Color(153, 255, 255));
+        jLabel4.setFont(new java.awt.Font("Segoe UI", 3, 18)); // NOI18N
+        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel4.setText("Chọn một đoạn chat để bắt đầu !!!");
+        emptyStatePanel.add(jLabel4, java.awt.BorderLayout.CENTER);
+
+        add(emptyStatePanel, "card2");
+
+        chatContentPanel.setLayout(new java.awt.BorderLayout());
 
         headerPanel.setBackground(new java.awt.Color(255, 255, 255));
         headerPanel.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(230, 230, 230)));
@@ -140,30 +221,15 @@ public class ChatPanel extends javax.swing.JPanel {
         jButton1.setText("...");
         jButton1.setFocusable(false);
         jButton1.setPreferredSize(new java.awt.Dimension(45, 40));
+        jButton1.addActionListener(this::jButton1ActionPerformed);
         optionPanel.add(jButton1, java.awt.BorderLayout.CENTER);
 
         headerPanel.add(optionPanel, java.awt.BorderLayout.EAST);
 
-        add(headerPanel, java.awt.BorderLayout.NORTH);
+        chatContentPanel.add(headerPanel, java.awt.BorderLayout.NORTH);
 
         bottomWrapper.setBackground(new java.awt.Color(255, 255, 255));
         bottomWrapper.setLayout(new java.awt.BorderLayout());
-
-        drawerPanel.setBackground(new java.awt.Color(245, 245, 245));
-        drawerPanel.setBorder(javax.swing.BorderFactory.createMatteBorder(1, 0, 1, 0, new java.awt.Color(230, 230, 230)));
-        drawerPanel.setPreferredSize(new java.awt.Dimension(0, 80));
-        drawerPanel.setLayout(new javax.swing.BoxLayout(drawerPanel, javax.swing.BoxLayout.X_AXIS));
-
-        jLabel1.setText("Image");
-        drawerPanel.add(jLabel1);
-
-        jLabel2.setText("File");
-        drawerPanel.add(jLabel2);
-
-        jLabel3.setText("Video");
-        drawerPanel.add(jLabel3);
-
-        bottomWrapper.add(drawerPanel, java.awt.BorderLayout.NORTH);
 
         inputPanel.setBackground(new java.awt.Color(255, 255, 255));
         inputPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -188,7 +254,7 @@ public class ChatPanel extends javax.swing.JPanel {
 
         bottomWrapper.add(inputPanel, java.awt.BorderLayout.CENTER);
 
-        add(bottomWrapper, java.awt.BorderLayout.SOUTH);
+        chatContentPanel.add(bottomWrapper, java.awt.BorderLayout.SOUTH);
 
         JScrollPane.setBackground(new java.awt.Color(255, 255, 255));
         JScrollPane.setBorder(null);
@@ -198,20 +264,109 @@ public class ChatPanel extends javax.swing.JPanel {
         messageContainer.setLayout(new javax.swing.BoxLayout(messageContainer, javax.swing.BoxLayout.Y_AXIS));
         JScrollPane.setViewportView(messageContainer);
 
-        add(JScrollPane, java.awt.BorderLayout.CENTER);
+        chatContentPanel.add(JScrollPane, java.awt.BorderLayout.CENTER);
+
+        add(chatContentPanel, "card3");
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAttachActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAttachActionPerformed
         // TODO add your handling code here:
-        drawerPanel.setVisible(!drawerPanel.isVisible());
-        inputPanel.revalidate();
-    }//GEN-LAST:event_btnAttachActionPerformed
+        File file = chooseFile();
 
+        if (file == null) {
+            return;
+        }
+
+        MessageType type = detectFileType(file);
+
+        MessageService service = new MessageService();
+//        MiMi viết thêm hàm sendFile giúp cp nhé
+//    service.sendFile(currentChatUserId, file, type)
+//            .thenAccept(msg -> {
+//
+//                javax.swing.SwingUtilities.invokeLater(() -> {
+//
+//                    boolean isMine = true;
+//
+//                    MessageBubble bubble;
+//
+//                    if (type == chattingapp.models.MessageType.TEXT) {
+//                        bubble = new MessageBubble(msg.getContent(), isMine);
+//                    } else {
+//                        bubble = new MessageBubble(file.getName(), isMine);
+//                    }
+//
+//                    messageContainer.add(bubble);
+//                    messageContainer.revalidate();
+//                    messageContainer.repaint();
+//
+//                    JScrollPane.getVerticalScrollBar()
+//                            .setValue(JScrollPane.getVerticalScrollBar().getMaximum());
+//
+//                });
+//
+//            });
+    }//GEN-LAST:event_btnAttachActionPerformed
+    private void toggleDrawer() {
+
+        drawerOpen = !drawerOpen;
+
+        fileDrawer.setVisible(drawerOpen);
+
+        if (drawerOpen) {
+            //Nữa MiMi viết cho tui hàm lấy toàn bộ chat mà không phải text của mình với bạn hiện tại tại chỗ này nhe
+
+            MessageService service = new MessageService();
+
+//            service.(currentChatUserId)
+//                    .thenAccept(messages -> {
+//
+//                        javax.swing.SwingUtilities.invokeLater(() -> {
+//
+//                            fileDrawer.loadFiles(messages);
+//
+//                        });
+//
+//                    });
+        }
+
+        revalidate();
+        repaint();
+    }
     private void btnSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendActionPerformed
-        // TODO add your handling code here:
-        String mess = txtMessage.getText();
-        sendMessage();
+        String text = txtMessage.getText().trim();
+
+        if (text.isEmpty()) {
+            return;
+        }
+
+        MessageService service = new MessageService();
+
+        service.sendMessage(currentChatUserId, text)
+                .thenAccept(msg -> {
+
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+
+                        MessageBubble bubble
+                                = new MessageBubble(msg.getContent(), true);
+
+                        messageContainer.add(bubble);
+                        messageContainer.revalidate();
+                        messageContainer.repaint();
+
+                        txtMessage.setText("");
+
+                        JScrollPane.getVerticalScrollBar()
+                                .setValue(JScrollPane.getVerticalScrollBar().getMaximum());
+                    });
+
+                });
     }//GEN-LAST:event_btnSendActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        toggleDrawer();
+    }//GEN-LAST:event_jButton1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -220,13 +375,12 @@ public class ChatPanel extends javax.swing.JPanel {
     private javax.swing.JPanel bottomWrapper;
     private javax.swing.JButton btnAttach;
     private javax.swing.JButton btnSend;
-    private javax.swing.JPanel drawerPanel;
+    private javax.swing.JPanel chatContentPanel;
+    private javax.swing.JPanel emptyStatePanel;
     private javax.swing.JPanel headerPanel;
     private javax.swing.JPanel inputPanel;
     private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel lblName;
     private javax.swing.JLabel lblStatus;
     private javax.swing.JPanel messageContainer;

@@ -2,6 +2,8 @@ D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\components\AddFriendP
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\components\ChatItemPanel.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\components\ChatListPanel.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\components\ChatPanel.java
+D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\components\FileDrawerPanel.java
+D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\components\FileItemPanel.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\components\FriendRequestItemPanel.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\components\MessageBubble.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\components\NotificationItemPanel.java
@@ -9,6 +11,7 @@ D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\components\Notificati
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\components\SearchResultItemPanel.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\components\SideBarPanel.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\config\ThemeManager.java
+D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\dtos\FriendLoadDTO.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\dtos\FriendRequestResponseDTO.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\dtos\LoginRequetDTO.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\dtos\LoginResponseDTO.java
@@ -34,6 +37,7 @@ D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\responses\ApiResponse
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\services\ApiClient.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\services\BaseService.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\services\FriendService.java
+D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\services\MessageService.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\services\UserService.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\ui\EditProfileDialog.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\ui\LoginFrame.java

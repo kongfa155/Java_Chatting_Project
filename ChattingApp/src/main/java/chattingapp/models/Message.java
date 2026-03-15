@@ -5,7 +5,7 @@
 package chattingapp.models;
 
 import java.time.LocalDateTime;
-
+import com.google.gson.annotations.SerializedName;
 /**
  *
  * @author CP
@@ -13,7 +13,9 @@ import java.time.LocalDateTime;
 public class Message {
     
     //Properties
+    @SerializedName("message_id")
     private String messageId;
+    @SerializedName("sender_id")
     private String senderId;
     private String receiverId;
     private String content;
@@ -57,7 +59,14 @@ public class Message {
     public void setSenderId(String senderId) {
         this.senderId = senderId;
     }
+    
+    public void setSender_id(String sender_id) {
+    this.senderId = sender_id;
+    }
 
+    public void setMessage_id(String message_id) {
+    this.messageId = message_id;
+    }
     public String getReceiverId() {
         return receiverId;
     }

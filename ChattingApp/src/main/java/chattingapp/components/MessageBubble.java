@@ -16,28 +16,26 @@ import javax.swing.JLabel;
 public class MessageBubble extends javax.swing.JPanel {
 
     public MessageBubble(String text, boolean isMine) {
+        initComponents();
+        bubblePanel.putClientProperty("FlatLaf.style", "arc:20");
+        lblMessage.setText("<html><div style='max-width:220px'>" + text + "</div></html>");
 
-        setLayout(new FlowLayout(
-            isMine ? FlowLayout.RIGHT : FlowLayout.LEFT
-        ));
-        setOpaque(false);
+        if (isMine) {
 
-        JLabel lbl = new JLabel("<html>" + text + "</html>");
-        lbl.setOpaque(true);
-        lbl.setBorder(
-            BorderFactory.createEmptyBorder(8,12,8,12)
-        );
+            setLayout(new FlowLayout(FlowLayout.RIGHT));
 
-        if(isMine){
-            lbl.setBackground(new Color(0,122,255));
-            lbl.setForeground(Color.WHITE);
-        }else{
-            lbl.setBackground(new Color(240,240,240));
-            lbl.setForeground(Color.BLACK);
+            bubblePanel.setBackground(new Color(0, 122, 255));
+            lblMessage.setForeground(Color.WHITE);
+
+        } else {
+
+            setLayout(new FlowLayout(FlowLayout.LEFT));
+
+            bubblePanel.setBackground(new Color(240, 240, 240));
+            lblMessage.setForeground(Color.BLACK);
         }
-
-        add(lbl);
     }
+
     /**
      * Creates new form MessageBubble
      */
@@ -54,19 +52,27 @@ public class MessageBubble extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
+        bubblePanel = new javax.swing.JPanel();
+        lblMessage = new javax.swing.JLabel();
+
+        setBackground(new java.awt.Color(255, 255, 255));
+
+        bubblePanel.setBackground(new java.awt.Color(255, 255, 255));
+        bubblePanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(8, 12, 8, 12));
+        bubblePanel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        bubblePanel.setLayout(new java.awt.BorderLayout());
+
+        lblMessage.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lblMessage.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        lblMessage.setText("jLabel1");
+        bubblePanel.add(lblMessage, java.awt.BorderLayout.CENTER);
+
+        add(bubblePanel);
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel bubblePanel;
+    private javax.swing.JLabel lblMessage;
     // End of variables declaration//GEN-END:variables
 }

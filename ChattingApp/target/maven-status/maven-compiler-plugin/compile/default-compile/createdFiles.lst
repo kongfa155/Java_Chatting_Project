@@ -20,11 +20,14 @@ chattingapp\ui\MainFrame.class
 chattingapp\utils\AvatarUtil.class
 chattingapp\utils\SessionManager.class
 chattingapp\components\ChatListPanel$ChatSelectionListener.class
+chattingapp\components\FileItemPanel.class
 chattingapp\components\ChatListPanel.class
 chattingapp\dtos\LoginRequetDTO.class
 chattingapp\dtos\RegisterResponseDTO.class
+chattingapp\components\FileDrawerPanel.class
 chattingapp\dtos\RegisterOTPRequestDTO.class
 chattingapp\dtos\SearchDTO.class
+chattingapp\dtos\FriendLoadDTO.class
 chattingapp\components\ChatItemPanel$ChatItemClickListener.class
 chattingapp\components\AddFriendPopupPanel.class
 chattingapp\components\NotificationListPanel.class
@@ -47,6 +50,7 @@ chattingapp\services\BaseService.class
 chattingapp\components\NotificationItemPanel.class
 chattingapp\models\User.class
 chattingapp\components\SideBarPanel$1.class
+chattingapp\services\MessageService.class
 chattingapp\models\NotificationType.class
 chattingapp\ui\LoginFrame.class
 chattingapp\components\NotificationItemPanel$1.class

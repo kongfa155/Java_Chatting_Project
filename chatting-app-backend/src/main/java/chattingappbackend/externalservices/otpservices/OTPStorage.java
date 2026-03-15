@@ -1,4 +1,4 @@
-package chattingappbackend.external_services.otp_services;
+package chattingappbackend.externalservices.otpservices;
 
 import chattingappbackend.models.OTPDetails;
 import org.springframework.scheduling.annotation.Scheduled;

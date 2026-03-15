@@ -1,4 +1,4 @@
-package chattingappbackend.external_services.otp_services;
+package chattingappbackend.externalservices.otpservices;
 
 public interface OTPService {
     public boolean sendOTP(String identifier, String target);

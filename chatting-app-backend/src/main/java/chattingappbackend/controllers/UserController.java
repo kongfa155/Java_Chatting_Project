@@ -12,6 +12,7 @@ import chattingappbackend.dtos.user.login.LoginRequetDTO;
 import chattingappbackend.dtos.user.login.LoginResponseDTO;
 import chattingappbackend.dtos.user.register.*;
 import chattingappbackend.exceptions.AppException;
+import chattingappbackend.utils.JwtUtil;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,22 +27,22 @@ import chattingappbackend.services.UserService;
 public class UserController {
 
     private final UserService userService;
+    private final JwtUtil jwtUtil;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, JwtUtil jwtUtil) {
         this.userService = userService;
+        this.jwtUtil = jwtUtil;
     }
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<RegisterResponseDTO>> register(@Valid @RequestBody RegisterRequestDTO user) {
-        // Fix: Định nghĩa rõ Generic type <RegisterResponseDTO>
         ApiResponse<RegisterResponseDTO> response = userService.register(user);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PostMapping("/get-register-otp")
     public ResponseEntity<ApiResponse<Void>> sendRegisterOTP(@Valid @RequestBody RegisterOTPRequestDTO dto) {
-        // Fix: Truy cập dto.username() (chuẩn Record) và thêm Generic <Void>
         ApiResponse<Void> response = userService.sendRegisterOTP(dto.username());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -54,21 +55,15 @@ public class UserController {
 
     @PostMapping("/change-email")
     public ResponseEntity<ApiResponse<Void>> changeEmailOTP(@RequestHeader("Authorization") String authHeader, @Valid @RequestBody ChangeEmailOTPRequestDTO dto){
-        if(authHeader == null || !authHeader.startsWith("Bearer ")){
-            throw new AppException("INVALID_TOKEN","Your token is outdated or missing.");
-        }
-        String token = authHeader.substring(7);
-        ApiResponse<Void> response = userService.getChangeEmailOTP(token, dto);
+        String userId = jwtUtil.getUserIdFromJwt(authHeader);
+        ApiResponse<Void> response = userService.getChangeEmailOTP(userId, dto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PatchMapping("/change-email")
     public ResponseEntity<ApiResponse<Void>> changeEmail(@RequestHeader("Authorization") String authHeader, @Valid @RequestBody ChangeEmailRequestDTO dto){
-        if(authHeader == null || !authHeader.startsWith("Bearer ")){
-            throw new AppException("INVALID_TOKEN","Your token is outdated or missing.");
-        }
-        String token = authHeader.substring(7);
-        ApiResponse<Void> response = userService.changeEmail(token, dto);
+        String userId = jwtUtil.getUserIdFromJwt(authHeader);
+        ApiResponse<Void> response = userService.changeEmail(userId, dto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -80,40 +75,34 @@ public class UserController {
 
     @PostMapping("/change-password")
     public ResponseEntity<ApiResponse<Void>> changePassword(@RequestHeader("Authorization") String authHeader, @Valid @RequestBody ChangePasswordRequestDTO dto) {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new AppException("INVALID_TOKEN", "Your token is outdated or missing.");
-        }
-        String token = authHeader.substring(7);
-        ApiResponse<Void> response = userService.changePassword(token, dto);
+        String userId = jwtUtil.getUserIdFromJwt(authHeader);
+        ApiResponse<Void> response = userService.changePassword(userId, dto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/search")
     public ResponseEntity<ApiResponse<SearchDTO>> searchUser(@RequestParam String email) {
-        // Fix: Thay <?> bằng <SearchDTO> cho tường minh
         ApiResponse<SearchDTO> response = userService.findByEmail(email);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/change-profile")
     public ResponseEntity<ApiResponse<ChangeProfileResponseDTO>> changeProfile(@RequestHeader("Authorization") String authHeader, @Valid @RequestBody ChangeProfileRequestDTO dto){
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new AppException("INVALID_TOKEN", "Your token is outdated or missing.");
-        }
-        String token = authHeader.substring(7);
-        ApiResponse<ChangeProfileResponseDTO> response = userService.changeProfile(token, dto);
+        String userId = jwtUtil.getUserIdFromJwt(authHeader);
+        ApiResponse<ChangeProfileResponseDTO> response = userService.changeProfile(userId, dto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("/forgot-password") // Fix: Thêm dấu '/' cho chuẩn REST
+    @PostMapping("/forgot-password")
     public ResponseEntity<ApiResponse<Void>> forgotPasswordOTP(@Valid @RequestBody ForgotPasswordOTPRequestDTO dto){
         ApiResponse<Void> response = userService.forgotPasswordOTP(dto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PatchMapping("/forgot-password") // Fix: Thêm dấu '/' cho chuẩn REST
+    @PatchMapping("/forgot-password")
     public ResponseEntity<ApiResponse<Void>> forgotPasswordVerify(@Valid @RequestBody ForgotPasswordVerifyRequest dto){
         ApiResponse<Void> response = userService.forgotPasswordVerify(dto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
 }

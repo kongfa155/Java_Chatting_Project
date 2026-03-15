@@ -4,6 +4,7 @@
  */
 package chattingappbackend.utils;
 
+import chattingappbackend.exceptions.AppException;
 import chattingappbackend.services.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +25,19 @@ public class JwtUtil {
         String header = request.getHeader("Authorization");
 
         if (header == null || !header.startsWith("Bearer ")) {
-            throw new RuntimeException("Invalid token");
+            throw new AppException("UNAUTHORIZED","You will need to login for this feature");
         }
 
         String token = header.substring(7);
+
+        return jwtService.extractUserId(token);
+    }
+    public String getUserIdFromJwt(String jwt){
+        if (jwt == null || !jwt.startsWith("Bearer ")) {
+            throw new AppException("UNAUTHORIZED","You will need to login for this feature");
+        }
+
+        String token = jwt.substring(7);
 
         return jwtService.extractUserId(token);
     }

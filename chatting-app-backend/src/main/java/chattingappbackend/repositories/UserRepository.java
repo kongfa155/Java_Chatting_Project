@@ -27,7 +27,7 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     // Hibernate tự hiểu: SELECT COUNT(*) > 0 FROM users WHERE email = ?
     boolean existsByEmail(String email);
-
+    boolean existsByUsername(String username);
     // SQL gốc: SELECT status FROM users WHERE username = ?
     @Query("SELECT u.status FROM User u WHERE u.username = :username")
     Optional<UserStatus> findStatusByUsername(@Param("username") String username);
@@ -40,17 +40,14 @@ public interface UserRepository extends JpaRepository<User, String> {
      */
 
     @Modifying
-    @Transactional
     @Query("UPDATE User u SET u.status = :status WHERE u.username = :username")
     void updateStatusByUsername(@Param("username") String username, @Param("status") UserStatus status);
 
     @Modifying
-    @Transactional
     @Query("UPDATE User u SET u.hashedPassword = :password WHERE u.userId = :userId")
     void updatePasswordByUserId(@Param("userId") String userId, @Param("password") String password);
 
     @Modifying
-    @Transactional
     @Query("UPDATE User u SET u.email = :newEmail WHERE u.userId = :userId")
     void updateEmailByUserId(@Param("userId") String userId, @Param("newEmail") String newEmail);
 
@@ -64,7 +61,6 @@ public interface UserRepository extends JpaRepository<User, String> {
     Optional<RegisterVerifyResponseDTO> findUserForVerification(@Param("username") String username);
 
     @Modifying
-    @Transactional
     @Query("UPDATE User u SET u.displayName = :displayName, " +
             "u.gender = :gender, " +
             "u.avatarUrl = :avatarUrl " +

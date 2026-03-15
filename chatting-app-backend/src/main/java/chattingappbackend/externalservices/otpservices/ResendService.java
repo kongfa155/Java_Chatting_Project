@@ -1,7 +1,6 @@
-package chattingappbackend.external_services.otp_services;
+package chattingappbackend.externalservices.otpservices;
 
 
-import chattingappbackend.exceptions.AppException;
 import chattingappbackend.models.OTPDetails;
 import chattingappbackend.services.JwtService;
 import com.resend.Resend;
@@ -11,9 +10,6 @@ import com.resend.services.emails.model.CreateEmailResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Primary
 @Service

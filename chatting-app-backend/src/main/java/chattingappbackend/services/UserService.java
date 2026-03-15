@@ -15,11 +15,12 @@ import chattingappbackend.dtos.user.register.RegisterResponseDTO;
 import chattingappbackend.dtos.user.register.RegisterVerifyRequestDTO;
 import chattingappbackend.dtos.user.register.RegisterVerifyResponseDTO;
 import chattingappbackend.exceptions.AppException;
-import chattingappbackend.external_services.otp_services.OTPService;
+import chattingappbackend.externalservices.otpservices.OTPService;
 import chattingappbackend.models.User;
 import chattingappbackend.models.UserStatus;
 import chattingappbackend.repositories.UserRepository;
 import chattingappbackend.responses.ApiResponse;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -31,9 +32,14 @@ import java.util.UUID;
 public class UserService {
 
     private UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    @Autowired
+    private final BCryptPasswordEncoder passwordEncoder;
     private OTPService otpService;
     private JwtService jwtService;
+
+    public UserService(BCryptPasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public OTPService getOtpService() {
         return otpService;
@@ -49,8 +55,9 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    @Transactional
     public ApiResponse<RegisterResponseDTO> register(RegisterRequestDTO requestDTO) {
-        if (userRepository.findByUsername(requestDTO.username()).isPresent()) {
+        if (userRepository.existsByUsername(requestDTO.username())) {
             throw new AppException("USERNAME_EXISTS", "Input username have been used, please use another username.");
         }
         if (userRepository.existsByEmail(requestDTO.email())) {
@@ -73,44 +80,35 @@ public class UserService {
     }
 
     public ApiResponse<Void> sendRegisterOTP(String username) {
-        if (userRepository.findByUsername(username).isEmpty()) {
-            throw new AppException("INVALID_USERNAME", "Input username is invalid.");
-        }
-        UserStatus currentStatus = userRepository.findStatusByUsername(username)
-                .orElse(null);
-        if (currentStatus != UserStatus.UNVERIFIED) {
+        User user = userRepository.findByUsername(username).orElseThrow(()-> new AppException("INVALID_USERNAME", "Input username is invalid."));
+        if (user.getStatus() != UserStatus.UNVERIFIED) {
             throw new AppException("ACCOUNT_ALREADY_VERIFIED", "Account have already been verified");
         }
-        String email = userRepository.findEmailByUsername(username).orElse(null);
-        boolean sent = otpService.sendOTP(email, email);
+        boolean sent = otpService.sendOTP(user.getEmail(), user.getEmail());
         if (sent) {
             return ApiResponse.success("Sent OTP successfully", null);
         } else {
             throw new AppException("SEND_OTP_FAILED", "Could not send OTP");
         }
     }
-
+    @Transactional
     public ApiResponse<RegisterVerifyResponseDTO> verifyRegister(RegisterVerifyRequestDTO requestDTO) {
-        UserStatus userStatus = userRepository.findStatusByUsername(requestDTO.username()).orElseThrow(() -> new AppException("INVALID_USERNAME", "Input username is invalid."));
-        if (userStatus != UserStatus.UNVERIFIED) {
+        User user = userRepository.findByUsername(requestDTO.username()).orElseThrow(()-> new AppException("INVALID_USERNAME", "Input username is invalid."));
+        if (user.getStatus() != UserStatus.UNVERIFIED) {
             throw new AppException("ACCOUNT_ALREADY_VERIFIED", "Account have already been verified");
         }
-        String email = userRepository.findEmailByUsername(requestDTO.username()).orElse(null);
-        boolean verify = otpService.checkOTP(email, requestDTO.otp(), email);
+        boolean verify = otpService.checkOTP(user.getEmail(), requestDTO.otp(), user.getEmail());
         if (verify) {
-            userRepository.updateStatusByUsername(requestDTO.username(), UserStatus.ACTIVATED);
-            RegisterVerifyResponseDTO dbData = userRepository.findUserForVerification(requestDTO.username()).orElseThrow(() -> new AppException("INVALID_USERNAME", "Input username is invalid."));
-
-            // Khởi tạo Record mới để gán Token (Logic của bạn được giữ nguyên)
+           user.setStatus(UserStatus.ACTIVATED);
             RegisterVerifyResponseDTO response = new RegisterVerifyResponseDTO(
-                    jwtService.generateToken(dbData.username(), dbData.userId()),
+                    jwtService.generateToken(user.getUsername(), user.getUserId()),
                     ((int) JwtService.EXPIRATION_TIME) / 1000,
-                    dbData.userId(),
-                    dbData.username(),
-                    dbData.displayName(),
-                    dbData.gender(),
-                    dbData.status(),
-                    dbData.createdAt()
+                    user.getUserId(),
+                    user.getUsername(),
+                    user.getDisplayName(),
+                    user.getGender(),
+                    user.getStatus(),
+                    user.getCreatedAt()
             );
             return ApiResponse.success("Account verified successfully", response);
 
@@ -132,14 +130,13 @@ public class UserService {
             throw new AppException("INVALID_CREDENTIALS", "Wrong username or password.");
         }
     }
+    @Transactional
+    public ApiResponse<Void> changePassword(String userId, ChangePasswordRequestDTO dto) {
 
-    public ApiResponse<Void> changePassword(String jwt, ChangePasswordRequestDTO dto) {
-        String userIdFromJWT = jwtService.extractUserId(jwt);
-
-        User user = userRepository.findByUserId(userIdFromJWT).orElseThrow(() -> new AppException("USER_NOT_EXISTS", "Can't find this user"));
+        User user = userRepository.findByUserId(userId).orElseThrow(() -> new AppException("USER_NOT_EXISTS", "Can't find this user"));
         boolean isMatch = passwordEncoder.matches(dto.oldPassword(), user.getHashedPassword());
         if (isMatch) {
-            userRepository.updatePasswordByUserId(userIdFromJWT, passwordEncoder.encode(dto.newPassword()));
+            user.setHashedPassword(passwordEncoder.encode(dto.newPassword()));
             return ApiResponse.success("Changed password successfully", null);
         } else {
             throw new AppException("WRONG_OLD_PASSWORD", "Wrong old password.");
@@ -147,41 +144,37 @@ public class UserService {
 
     }
 
-    public ApiResponse<Void> getChangeEmailOTP(String jwt, ChangeEmailOTPRequestDTO dto){
-        String userId = jwtService.extractUserId(jwt);
+    public ApiResponse<Void> getChangeEmailOTP(String userId, ChangeEmailOTPRequestDTO dto){
         User user = userRepository.findByUserId(userId).orElseThrow(()-> new AppException("USER_NOT_EXISTS", "Can't find this user"));
-        boolean isMatch = passwordEncoder.matches(dto.password(), user.getHashedPassword());
-        if(!isMatch){
+        if (!passwordEncoder.matches(dto.password(), user.getHashedPassword())) {
             throw new AppException("INVALID_CREDENTIALS", "Wrong password");
-        }else{
-            if(userRepository.existsByEmail(dto.newEmail())){
-                throw new AppException("EMAIL_EXISTS", "Email exists");
-            }else{
-                otpService.sendOTP(userId, dto.newEmail());
-                return ApiResponse.success("Sent OTP successfully", null);
-            }
         }
-    }
+        if (userRepository.existsByEmail(dto.newEmail())) {
+            throw new AppException("EMAIL_EXISTS", "Email exists");
+        }
 
-    public ApiResponse<Void> changeEmail(String jwt, ChangeEmailRequestDTO dto){
-        String userId = jwtService.extractUserId(jwt);
+        otpService.sendOTP(userId, dto.newEmail());
+        return ApiResponse.success("Sent OTP successfully", null);
+    }
+    @Transactional
+    public ApiResponse<Void> changeEmail(String userId, ChangeEmailRequestDTO dto){
         User user = userRepository.findByUserId(userId).orElseThrow(()-> new AppException("USER_NOT_EXISTS", "Can't find this user"));
 
         boolean isMatch = otpService.checkOTP(userId, dto.otp(), dto.newEmail());
         if(!isMatch){
             throw new AppException("INVALID_OTP", "Input OTP is invalid");
-        }else{
-            if(userRepository.existsByEmail(dto.newEmail())){
-                throw new AppException("EMAIL_EXISTS", "Email exists");
-            }else{
-                userRepository.updateEmailByUserId(userId, dto.newEmail());
-                return ApiResponse.success("Changed email successfully", null);
-            }
         }
+        if(userRepository.existsByEmail(dto.newEmail())){
+            throw new AppException("EMAIL_EXISTS", "Email exists");
+        }
+        user.setEmail(dto.newEmail());
+        return ApiResponse.success("Changed email successfully", null);
+
+
     }
 
-    public ApiResponse<ChangeProfileResponseDTO> changeProfile(String jwt, ChangeProfileRequestDTO dto){
-        String userId = jwtService.extractUserId(jwt);
+    @Transactional
+    public ApiResponse<ChangeProfileResponseDTO> changeProfile(String userId, ChangeProfileRequestDTO dto){
         User user = userRepository.findByUserId(userId).orElseThrow(()-> new AppException("USER_NOT_FOUND", "This user is not exists"));
         boolean isMatch = passwordEncoder.matches(dto.password(), user.getHashedPassword());
         if(!isMatch){
@@ -190,10 +183,6 @@ public class UserService {
             user.setDisplayName(dto.displayName());
             user.setGender(dto.gender());
             user.setAvatarUrl(dto.avatarUrl());
-
-            // Lỗi 4 arguments đã được fix ở đây:
-            userRepository.updateProfileByUserId(userId, user.getDisplayName(), user.getGender(), user.getAvatarUrl());
-
             return ApiResponse.success("Change display information successfully", null);
         }
     }
@@ -204,10 +193,12 @@ public class UserService {
         return ApiResponse.success("Sent OTP successfully", null);
     }
 
+    @Transactional
     public ApiResponse<Void> forgotPasswordVerify(ForgotPasswordVerifyRequest dto){
         User user = userRepository.findByUsername(dto.username()).orElseThrow(()->new AppException("INVALID_USERNAME", "Input username is invalid"));
         boolean isMatch = otpService.checkOTP(user.getUsername(), dto.otp(), user.getEmail());
         if(isMatch){
+            user.setHashedPassword(passwordEncoder.encode(dto.newPassword()));
             return ApiResponse.success("Changed password successfully", null);
         }else{
             throw new AppException("INVALID_OTP","Wrong otp");

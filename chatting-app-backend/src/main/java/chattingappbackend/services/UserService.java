@@ -84,7 +84,8 @@ public class UserService {
         if (user.getStatus() != UserStatus.UNVERIFIED) {
             throw new AppException("ACCOUNT_ALREADY_VERIFIED", "Account have already been verified");
         }
-        boolean sent = otpService.sendOTP(user.getEmail(), user.getEmail());
+        String otpKey = "REGISTER_"+user.getEmail();
+        boolean sent = otpService.sendOTP(otpKey, user.getEmail());
         if (sent) {
             return ApiResponse.success("Sent OTP successfully", null);
         } else {
@@ -97,7 +98,8 @@ public class UserService {
         if (user.getStatus() != UserStatus.UNVERIFIED) {
             throw new AppException("ACCOUNT_ALREADY_VERIFIED", "Account have already been verified");
         }
-        boolean verify = otpService.checkOTP(user.getEmail(), requestDTO.otp(), user.getEmail());
+        String otpKey = "REGISTER_"+user.getEmail();
+        boolean verify = otpService.checkOTP(otpKey, requestDTO.otp(), user.getEmail());
         if (verify) {
            user.setStatus(UserStatus.ACTIVATED);
             RegisterVerifyResponseDTO response = new RegisterVerifyResponseDTO(
@@ -152,15 +154,16 @@ public class UserService {
         if (userRepository.existsByEmail(dto.newEmail())) {
             throw new AppException("EMAIL_EXISTS", "Email exists");
         }
+        String otpKey = "CHANGE_EMAIL_" +userId +"_"+dto.newEmail();
 
-        otpService.sendOTP(userId, dto.newEmail());
+        otpService.sendOTP(otpKey, dto.newEmail());
         return ApiResponse.success("Sent OTP successfully", null);
     }
     @Transactional
     public ApiResponse<Void> changeEmail(String userId, ChangeEmailRequestDTO dto){
         User user = userRepository.findByUserId(userId).orElseThrow(()-> new AppException("USER_NOT_EXISTS", "Can't find this user"));
-
-        boolean isMatch = otpService.checkOTP(userId, dto.otp(), dto.newEmail());
+        String otpKey = "CHANGE_EMAIL_" + userId + "_" + dto.newEmail();
+        boolean isMatch = otpService.checkOTP(otpKey, dto.otp(), dto.newEmail());
         if(!isMatch){
             throw new AppException("INVALID_OTP", "Input OTP is invalid");
         }

@@ -182,24 +182,26 @@ public class UserService {
         boolean isMatch = passwordEncoder.matches(dto.password(), user.getHashedPassword());
         if(!isMatch){
             throw new AppException("INVALID_CREDENTIALS", "Wrong password");
-        }else{
-            user.setDisplayName(dto.displayName());
-            user.setGender(dto.gender());
-            user.setAvatarUrl(dto.avatarUrl());
-            return ApiResponse.success("Change display information successfully", null);
         }
+        user.setDisplayName(dto.displayName());
+        user.setGender(dto.gender());
+        user.setAvatarUrl(dto.avatarUrl());
+        return ApiResponse.success("Change display information successfully", null);
+
     }
 
     public ApiResponse<Void> forgotPasswordOTP(ForgotPasswordOTPRequestDTO dto){
         User user = userRepository.findByUsername(dto.username()).orElseThrow(()->new AppException("INVALID_USERNAME", "Input username is invalid"));
-        otpService.sendOTP(user.getUsername(),user.getEmail());
+        String otpKey = "FORGOT_PASSWORD_"+user.getUserId();
+        otpService.sendOTP(otpKey,user.getEmail());
         return ApiResponse.success("Sent OTP successfully", null);
     }
 
     @Transactional
     public ApiResponse<Void> forgotPasswordVerify(ForgotPasswordVerifyRequest dto){
         User user = userRepository.findByUsername(dto.username()).orElseThrow(()->new AppException("INVALID_USERNAME", "Input username is invalid"));
-        boolean isMatch = otpService.checkOTP(user.getUsername(), dto.otp(), user.getEmail());
+        String otpKey = "FORGOT_PASSWORD_"+user.getUserId();
+        boolean isMatch = otpService.checkOTP(otpKey, dto.otp(), user.getEmail());
         if(isMatch){
             user.setHashedPassword(passwordEncoder.encode(dto.newPassword()));
             return ApiResponse.success("Changed password successfully", null);

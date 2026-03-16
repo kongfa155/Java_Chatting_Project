@@ -4,11 +4,15 @@
  */
 package chattingapp.ui;
 
+import chattingapp.dtos.user.changeprofile.ChangeProfileRequestDTO;
 import chattingapp.models.User;
+import chattingapp.services.UserService;
 import chattingapp.utils.AvatarUtil;
 import chattingapp.utils.SessionManager;
 import java.awt.Event;
+import java.util.Arrays;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -29,15 +33,21 @@ public class EditProfileDialog extends javax.swing.JDialog {
     }
 
 private void loadUser() {
-    currentUser = SessionManager.getCurrentUser();
-
+currentUser = SessionManager.getCurrentUser();
     if (currentUser == null) return;
 
-    txtUsername.setText(currentUser.getUsername());
     txtDisplayname.setText(currentUser.getDisplayName());
     txtURLAvatar.setText(currentUser.getAvatarUrl());
 
-    previewAvatar(currentUser.getAvatarUrl());
+    // Fix NPE: Kiểm tra null trước khi set. Mặc định là Male (true) nếu null.
+    boolean gender = (currentUser.getGender() != null) ? currentUser.getGender() : true;
+    rdMale.setSelected(gender);
+    rdFemale.setSelected(!gender);
+String avatarUrlWithCacheBuster = currentUser.getAvatarUrl();
+    if (avatarUrlWithCacheBuster != null && avatarUrlWithCacheBuster.startsWith("http")) {
+        avatarUrlWithCacheBuster += (avatarUrlWithCacheBuster.contains("?") ? "&" : "?") + "t=" + System.currentTimeMillis();
+    }
+    previewAvatar(avatarUrlWithCacheBuster);
 }
 
 
@@ -60,9 +70,12 @@ private void loadUser() {
         jLabel2 = new javax.swing.JLabel();
         txtDisplayname = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
-        txtUsername = new javax.swing.JTextField();
         txtURLAvatar = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
+        rdMale = new javax.swing.JRadioButton();
+        rdFemale = new javax.swing.JRadioButton();
+        jLabel6 = new javax.swing.JLabel();
+        txtPassword = new javax.swing.JPasswordField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -96,14 +109,24 @@ private void loadUser() {
 
         txtDisplayname.setEditable(false);
 
-        jLabel3.setText("Tên đăng nhập");
-
-        txtUsername.setEditable(false);
+        jLabel3.setText("Giới tính");
 
         txtURLAvatar.setEditable(false);
         txtURLAvatar.addActionListener(this::txtURLAvatarActionPerformed);
 
         jLabel5.setText("Link ảnh Avatar");
+
+        rdMale.setText("Nam");
+        rdMale.setEnabled(false);
+        rdMale.addActionListener(this::rdMaleActionPerformed);
+
+        rdFemale.setEnabled(false);
+        rdFemale.setLabel("Nữ");
+        rdFemale.addActionListener(this::rdFemaleActionPerformed);
+
+        jLabel6.setText("Xác thực mật khẩu");
+
+        txtPassword.setEnabled(false);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -112,27 +135,32 @@ private void loadUser() {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(149, 149, 149)
+                        .addComponent(lblAvatar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel5)
                             .addComponent(jLabel2)
-                            .addComponent(jLabel3))
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel6))
                         .addGap(18, 18, 18)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtDisplayname, javax.swing.GroupLayout.PREFERRED_SIZE, 247, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtURLAvatar, javax.swing.GroupLayout.PREFERRED_SIZE, 247, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtUsername, javax.swing.GroupLayout.PREFERRED_SIZE, 247, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(149, 149, 149)
-                        .addComponent(lblAvatar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(28, Short.MAX_VALUE))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(txtDisplayname, javax.swing.GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE)
+                            .addComponent(txtURLAvatar, javax.swing.GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(rdMale)
+                                .addGap(18, 18, 18)
+                                .addComponent(rdFemale))
+                            .addComponent(txtPassword))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(29, 29, 29)
                 .addComponent(lblAvatar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(51, 51, 51)
+                .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtURLAvatar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5))
@@ -143,9 +171,16 @@ private void loadUser() {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(txtUsername, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(51, Short.MAX_VALUE))
+                    .addComponent(rdMale)
+                    .addComponent(rdFemale))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel6)
+                    .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(52, Short.MAX_VALUE))
         );
+
+        jLabel6.getAccessibleContext().setAccessibleName("Xác thực mật khẩu");
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
@@ -168,7 +203,9 @@ private void loadUser() {
         // TODO add your handling code here:
         txtURLAvatar.setEditable(true);
         txtDisplayname.setEditable(true);
-        txtUsername.setEditable(true);
+        rdMale.setEnabled(true);
+        rdFemale.setEnabled(true);
+        txtPassword.setEnabled(true);
     }//GEN-LAST:event_btnEditActionPerformed
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
@@ -180,9 +217,52 @@ private void loadUser() {
         // TODO add your handling code here:
         String url = txtURLAvatar.getText();
         String displayName = txtDisplayname.getText();
-        String username = txtUsername.getText();
-        //Lưu vào csdl
+        boolean gender = rdMale.isSelected();
+        char[] password = txtPassword.getPassword();
+        btnSave.setEnabled(false);
+    btnCancel.setEnabled(false);
+        
+        if(url.isEmpty()||displayName.isEmpty()||password.length<=0){
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ tất cả các trường!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+//Lưu vào csdl
+        
+        ChangeProfileRequestDTO dto = new ChangeProfileRequestDTO(new String(password),displayName,gender,url);
+        UserService userService = new UserService();
+        userService.changeProfile(dto)
+        .thenAccept(v -> {
+            // 3. Cập nhật Session khi thành công
+            User user = SessionManager.getCurrentUser();
+            user.setAvatarUrl(url);
+            user.setDisplayName(displayName);
+            user.setGender(gender);
+            
+            // Nếu bạn có Token mới thì set, nếu không dùng lại token cũ
+            SessionManager.setSession(SessionManager.getToken(), user);
 
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                JOptionPane.showMessageDialog(this, "Cập nhật thông tin thành công!");
+                
+                // Xóa password khỏi memory sau khi dùng
+                java.util.Arrays.fill(password, '0');
+                
+                this.dispose(); // CHỈ ĐÓNG KHI THÀNH CÔNG
+            });
+        })
+        .exceptionally(ex -> {
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                // Sử dụng hàm unwrap exception đã học ở các bước trước
+                Throwable cause = (ex instanceof java.util.concurrent.CompletionException) ? ex.getCause() : ex;
+                
+                JOptionPane.showMessageDialog(this, "Lỗi: " + cause.getMessage(), "Cập nhật thất bại", JOptionPane.ERROR_MESSAGE);
+                
+                // Mở lại nút để người dùng sửa lỗi
+                btnSave.setEnabled(true);
+                btnCancel.setEnabled(true);
+            });
+            return null;
+        });
         //Đóng thằng này lại
         this.dispose();
     }//GEN-LAST:event_btnSaveActionPerformed
@@ -192,6 +272,16 @@ private void loadUser() {
         //Nhấn enter để xem preview ảnh trước
         previewAvatar(txtURLAvatar.getText());
     }//GEN-LAST:event_txtURLAvatarActionPerformed
+
+    private void rdMaleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdMaleActionPerformed
+        rdMale.setSelected(true);
+        rdFemale.setSelected(false);
+    }//GEN-LAST:event_rdMaleActionPerformed
+
+    private void rdFemaleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdFemaleActionPerformed
+        rdFemale.setSelected(true);
+        rdMale.setSelected(false);
+    }//GEN-LAST:event_rdFemaleActionPerformed
 
     /**
      * @param args the command line arguments
@@ -204,12 +294,15 @@ private void loadUser() {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JLabel lblAvatar;
     private javax.swing.JLabel lblHeader;
+    private javax.swing.JRadioButton rdFemale;
+    private javax.swing.JRadioButton rdMale;
     private javax.swing.JTextField txtDisplayname;
+    private javax.swing.JPasswordField txtPassword;
     private javax.swing.JTextField txtURLAvatar;
-    private javax.swing.JTextField txtUsername;
     // End of variables declaration//GEN-END:variables
 }

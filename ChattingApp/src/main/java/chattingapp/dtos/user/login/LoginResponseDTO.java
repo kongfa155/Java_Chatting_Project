@@ -2,6 +2,7 @@ package chattingapp.dtos.user.login;
 
 import chattingapp.models.UserStatus;
 import com.google.gson.annotations.SerializedName;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -29,5 +30,12 @@ public record LoginResponseDTO(
         @NotNull
         UserStatus status,
         @SerializedName("created_at")
-        Instant createdAt
+        Instant createdAt,
+        @NotNull
+        @Email
+        @SerializedName("email")
+        String email,
+        @NotNull
+        @SerializedName("avatar_url")
+        String avatarUrl
 ) {}

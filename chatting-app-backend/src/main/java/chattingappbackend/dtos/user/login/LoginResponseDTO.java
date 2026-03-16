@@ -2,6 +2,7 @@ package chattingappbackend.dtos.user.login;
 
 import chattingappbackend.models.UserStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
@@ -34,5 +35,12 @@ public record LoginResponseDTO(
         UserStatus status,
 
         @JsonProperty("created_at")
-        Instant createdAt
+        Instant createdAt,
+        @NotNull
+        @JsonProperty("email")
+        @Email
+        String email,
+        @NotNull
+        @JsonProperty("avatar_url")
+        String avatarUrl
 ) {}

@@ -4,6 +4,7 @@
  */
 package chattingapp.ui;
 
+import chattingapp.dtos.user.forgotpassword.ForgotPasswordOTPRequestDTO;
 import chattingapp.dtos.user.login.LoginRequetDTO;
 import chattingapp.dtos.user.register.RegisterOTPRequestDTO;
 import chattingapp.models.User;
@@ -40,7 +41,7 @@ public class LoginFrame extends javax.swing.JFrame {
         txtPassword.putClientProperty("JTextField.placeholderText", "Mật khẩu");
 
         //Set trước cho Dialog
-        txtPhone.putClientProperty("JTextField.placeholderText", "Nhập số điện thoại...");
+        txtForgotPasswordUsername.putClientProperty("JTextField.placeholderText", "Nhập số điện thoại...");
         txtOTP.putClientProperty("JTextField.placeholderText", "XX.XX.XX");
     }
 
@@ -56,9 +57,9 @@ public class LoginFrame extends javax.swing.JFrame {
 
         quenMKDialog = new javax.swing.JDialog();
         ForgotPanel = new javax.swing.JPanel();
-        PhonePanel = new javax.swing.JPanel();
+        UsernamePanel = new javax.swing.JPanel();
         btnGetOTP = new javax.swing.JButton();
-        txtPhone = new javax.swing.JTextField();
+        txtForgotPasswordUsername = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         OTPPanel = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
@@ -86,38 +87,39 @@ public class LoginFrame extends javax.swing.JFrame {
         btnGetOTP.addActionListener(this::btnGetOTPActionPerformed);
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 2, 18)); // NOI18N
-        jLabel2.setText("Vui lòng nhập số điện thoại để nhận mã xác thực");
+        jLabel2.setText("Nhập tên đăng nhập của bạn");
 
-        javax.swing.GroupLayout PhonePanelLayout = new javax.swing.GroupLayout(PhonePanel);
-        PhonePanel.setLayout(PhonePanelLayout);
-        PhonePanelLayout.setHorizontalGroup(
-            PhonePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(PhonePanelLayout.createSequentialGroup()
-                .addGroup(PhonePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(PhonePanelLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel2))
-                    .addGroup(PhonePanelLayout.createSequentialGroup()
+        javax.swing.GroupLayout UsernamePanelLayout = new javax.swing.GroupLayout(UsernamePanel);
+        UsernamePanel.setLayout(UsernamePanelLayout);
+        UsernamePanelLayout.setHorizontalGroup(
+            UsernamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(UsernamePanelLayout.createSequentialGroup()
+                .addGroup(UsernamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(UsernamePanelLayout.createSequentialGroup()
                         .addGap(94, 94, 94)
                         .addComponent(btnGetOTP, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(PhonePanelLayout.createSequentialGroup()
-                        .addGap(40, 40, 40)
-                        .addComponent(txtPhone, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(13, Short.MAX_VALUE))
+                    .addGroup(UsernamePanelLayout.createSequentialGroup()
+                        .addGap(69, 69, 69)
+                        .addComponent(jLabel2)))
+                .addContainerGap(78, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, UsernamePanelLayout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(txtForgotPasswordUsername, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(49, 49, 49))
         );
-        PhonePanelLayout.setVerticalGroup(
-            PhonePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(PhonePanelLayout.createSequentialGroup()
-                .addGap(69, 69, 69)
-                .addComponent(jLabel2)
-                .addGap(50, 50, 50)
-                .addComponent(txtPhone, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+        UsernamePanelLayout.setVerticalGroup(
+            UsernamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(UsernamePanelLayout.createSequentialGroup()
+                .addGap(67, 67, 67)
+                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(30, 30, 30)
+                .addComponent(txtForgotPasswordUsername, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnGetOTP, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(242, Short.MAX_VALUE))
+                .addContainerGap(245, Short.MAX_VALUE))
         );
 
-        ForgotPanel.add(PhonePanel, "card2");
+        ForgotPanel.add(UsernamePanel, "card2");
 
         jLabel4.setFont(new java.awt.Font("Segoe UI", 2, 18)); // NOI18N
         jLabel4.setText("Vui lòng nhập mã xác thực");
@@ -304,14 +306,34 @@ public class LoginFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_taoTKMouseClicked
 
     private void btnGetOTPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGetOTPActionPerformed
-        // TODO add your handling code here:
-        String SDT = txtPhone.getText();
-        if (SDT.length() != 10 && SDT.length() != 11) {
-            JOptionPane.showMessageDialog(this, "Số điện thoại không hợp lệ", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        java.awt.CardLayout card = (java.awt.CardLayout) ForgotPanel.getLayout();
-        card.next(ForgotPanel);
+String username = txtForgotPasswordUsername.getText().trim();
+
+    if (username.isEmpty()) {
+        JOptionPane.showMessageDialog(quenMKDialog, "Vui lòng nhập tên đăng nhập!");
+        return;
+    }
+
+    btnGetOTP.setEnabled(false);
+    btnGetOTP.setText("Đang gửi...");
+
+    new UserService().forgotPasswordOTP(new ForgotPasswordOTPRequestDTO(username))
+        .thenAccept(v -> {
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                JOptionPane.showMessageDialog(quenMKDialog, "Mã xác thực đã được gửi đến Email của bạn.");
+                // Chuyển sang Card nhập OTP và mật khẩu mới
+                java.awt.CardLayout card = (java.awt.CardLayout) ForgotPanel.getLayout();
+                card.show(ForgotPanel, "card3"); 
+            });
+        })
+        .exceptionally(ex -> {
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                Throwable cause = (ex instanceof java.util.concurrent.CompletionException) ? ex.getCause() : ex;
+                JOptionPane.showMessageDialog(quenMKDialog, "Lỗi: " + cause.getMessage(), "Thất bại", JOptionPane.ERROR_MESSAGE);
+                btnGetOTP.setEnabled(true);
+                btnGetOTP.setText("Nhận mã xác thực");
+            });
+            return null;
+        });
     }//GEN-LAST:event_btnGetOTPActionPerformed
 
     private void quenMKMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_quenMKMouseClicked
@@ -340,21 +362,24 @@ public class LoginFrame extends javax.swing.JFrame {
     btnLogin.setEnabled(false);
     UserService userService = new UserService();
 
-    userService.login(new LoginRequetDTO(username, password))
-        .thenAccept(response -> {
-            // Chạy trong Event Dispatch Thread của Swing để cập nhật UI
-            javax.swing.SwingUtilities.invokeLater(() -> {
-                User user = new User();
-                user.setUserId(response.userId());
-                user.setUsername(response.username());
-                user.setDisplayName(response.displayName());
-                user.setAvatarUrl("https://i.pinimg.com/736x/bc/43/98/bc439871417621836a0eeea768d60944.jpg");
+userService.login(new LoginRequetDTO(username, password))
+    .thenAccept(response -> {
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            User user = new User();
+            user.setUserId(response.userId());
+            user.setUsername(response.username());
+            user.setDisplayName(response.displayName());
+            
+            // FIX: Lấy dữ liệu thực từ response thay vì gán cứng
+            user.setAvatarUrl(response.avatarUrl()); 
+            user.setGender(response.gender());
+            user.setEmail(response.email()); // Nếu có email để dùng cho UpdateEmailDialog
 
-                SessionManager.setSession(response.accessToken(), user);
-                new MainFrame().setVisible(true);
-                this.dispose();
-            });
-        })
+            SessionManager.setSession(response.accessToken(), user);
+            new MainFrame().setVisible(true);
+            this.dispose();
+        });
+    })
         .exceptionally(ex -> {
             javax.swing.SwingUtilities.invokeLater(() -> {
                 // 1. Gỡ lớp vỏ CompletionException để lấy nguyên nhân gốc
@@ -429,7 +454,7 @@ public class LoginFrame extends javax.swing.JFrame {
     private javax.swing.JPanel PanelButton;
     private javax.swing.JPanel PanelInfo;
     private javax.swing.JPanel PanelLogo;
-    private javax.swing.JPanel PhonePanel;
+    private javax.swing.JPanel UsernamePanel;
     private javax.swing.JButton btnGetOTP;
     private javax.swing.JButton btnLogin;
     private javax.swing.JButton btnVerify;
@@ -440,9 +465,9 @@ public class LoginFrame extends javax.swing.JFrame {
     private javax.swing.JLabel quenMK;
     private javax.swing.JDialog quenMKDialog;
     private javax.swing.JLabel taoTK;
+    private javax.swing.JTextField txtForgotPasswordUsername;
     private javax.swing.JTextField txtOTP;
     private javax.swing.JPasswordField txtPassword;
-    private javax.swing.JTextField txtPhone;
     private javax.swing.JTextField txtUsername;
     // End of variables declaration//GEN-END:variables
 }

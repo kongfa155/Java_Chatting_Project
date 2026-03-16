@@ -4,7 +4,9 @@
  */
 package chattingapp.ui;
 
+import chattingapp.dtos.user.changepassword.ChangePasswordRequestDTO;
 import chattingapp.models.User;
+import chattingapp.services.UserService;
 import chattingapp.utils.SessionManager;
 import javax.swing.JOptionPane;
 
@@ -135,24 +137,77 @@ public class UpdatePasswordDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_btnCancelPhoneActionPerformed
 
     private void btnSavePhoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSavePhoneActionPerformed
-        // TODO add your handling code here:
-        String newPass = new String(txtNewPass.getPassword()).trim();
-        String crrPass = new String(txtCurrentPass.getPassword()).trim();
-        String confirmPass = new String(txtConfirmPass.getPassword()).trim();
+                                          
+    // 1. Lấy dữ liệu và trim
+    String crrPass = new String(txtCurrentPass.getPassword());
+    String newPass = new String(txtNewPass.getPassword());
+    String confirmPass = new String(txtConfirmPass.getPassword());
+    
+    // 2. Validate cơ bản (Cực kỳ quan trọng để giảm tải cho Server)
+    if (crrPass.isEmpty() || newPass.isEmpty() || confirmPass.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
 
-        //Kiểm tra trống
-        if (newPass.isEmpty() || crrPass.isEmpty() || confirmPass.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin", "Lỗi", JOptionPane.ERROR_MESSAGE);
-        }
-        //Kiểm tra pass hiện tại có giống không
+    if (newPass.equals(crrPass)) {
+        JOptionPane.showMessageDialog(this, "Mật khẩu mới không được trùng mật khẩu cũ", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
 
-        //Kiếm tra Pass confirm có giống không
-        if (!newPass.equals(confirmPass)) {
-            JOptionPane.showMessageDialog(this, "Mật khẩu xác thực không khớp", "Lỗi", JOptionPane.ERROR_MESSAGE);
-        }
-        //Gọi OTP và mở qua trang validate 
-//        OTPFrame otp = new OTPFrame();
-//        otp.setVisible(true);
+    if (!newPass.equals(confirmPass)) {
+        JOptionPane.showMessageDialog(this, "Mật khẩu xác nhận không khớp", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    
+    // Tiêu chuẩn Enterprise: Kiểm tra độ mạnh mật khẩu tối thiểu (ví dụ > 6 ký tự)
+    if (newPass.length() < 6) {
+        JOptionPane.showMessageDialog(this, "Mật khẩu phải có ít nhất 6 ký tự", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    // 3. Vô hiệu hóa nút để tránh gửi trùng lặp (Double Submission)
+    btnSavePhone.setEnabled(false);
+
+    // 4. Chuẩn bị DTO và gọi Service
+    ChangePasswordRequestDTO dto = new ChangePasswordRequestDTO(crrPass, newPass);
+    
+    
+    UserService userService = new UserService();
+    userService.changePassword(dto)
+        .thenAccept(v -> {
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                JOptionPane.showMessageDialog(this, "Cập nhật mật khẩu thành công! Vui lòng đăng nhập lại.");
+                
+                // Tiêu chuẩn ngân hàng: Logout sau khi đổi mật khẩu để đảm bảo an toàn session
+                SessionManager.clearSession(); 
+                this.dispose();
+                java.awt.Window[] windows = java.awt.Window.getWindows();
+            for (java.awt.Window window : windows) {
+                window.dispose();
+            }
+            
+            // 3. Mở lại màn hình Login
+            new LoginFrame().setVisible(true);
+                // Mở lại trang đăng nhập (Nếu có logic này trong app của bạn)
+                // new LoginFrame().setVisible(true);
+            });
+        })
+        .exceptionally(ex -> {
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                // Sử dụng cơ chế unwrap exception từ BaseService
+                Throwable cause = (ex instanceof java.util.concurrent.CompletionException) ? ex.getCause() : ex;
+                
+                JOptionPane.showMessageDialog(this, "Lỗi: " + cause.getMessage(), "Thất bại", JOptionPane.ERROR_MESSAGE);
+                btnSavePhone.setEnabled(true);
+            });
+            return null;
+        })
+        .thenRun(() -> {
+            // Xóa sạch password khỏi memory sau khi xử lý xong
+            java.util.Arrays.fill(txtCurrentPass.getPassword(), '0');
+            java.util.Arrays.fill(txtNewPass.getPassword(), '0');
+            java.util.Arrays.fill(txtConfirmPass.getPassword(), '0');
+        });
     }//GEN-LAST:event_btnSavePhoneActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -29,11 +29,21 @@ public class UpdateEmailDialog extends javax.swing.JDialog {
     }
 
     private void loadUser() {
-        currentUser = SessionManager.getCurrentUser();
+// Đảm bảo lấy đúng User từ Session
+    currentUser = SessionManager.getCurrentUser();
 
-        if (currentUser != null) {
-            txtCurrentEmail.setText(currentUser.getEmail());
-        }
+    if (currentUser != null) {
+        System.out.println("DEBUG: Email hiện tại là: " + currentUser.getEmail()); // Check trong console
+        
+        // Cập nhật text cho TextField
+        txtCurrentEmail.setText(currentUser.getEmail());
+        
+        // Đảm bảo UI cập nhật lại
+        txtCurrentEmail.revalidate();
+        txtCurrentEmail.repaint();
+    } else {
+        System.out.println("DEBUG: currentUser bị NULL");
+    }
     }
 
     /**

@@ -120,7 +120,7 @@ String otp = txtOTP.getText().trim();
 
         } else if (type.equals("CHANGE_EMAIL")) {
             String token = SessionManager.getToken();
-            userService.verifyChangeEmail(new ChangeEmailRequestDTO(otp, emailOrUsername))
+            userService.verifyChangeEmail(new ChangeEmailRequestDTO(emailOrUsername, otp))
                     .thenAccept(v -> {
                         javax.swing.SwingUtilities.invokeLater(() -> {
                             JOptionPane.showMessageDialog(this, "Đổi Email thành công!");

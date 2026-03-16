@@ -126,7 +126,7 @@ public class UserService {
         }
         boolean isMatch = passwordEncoder.matches(requestDTO.password(), user.getHashedPassword());
         if (isMatch) {
-            LoginResponseDTO response = new LoginResponseDTO(jwtService.generateToken(user.getUsername(), user.getUserId()), (((int) JwtService.EXPIRATION_TIME) / 1000), user.getUserId(), user.getUsername(), user.getDisplayName(), user.getGender(), user.getStatus(), user.getCreatedAt());
+            LoginResponseDTO response = new LoginResponseDTO(jwtService.generateToken(user.getUsername(), user.getUserId()), (((int) JwtService.EXPIRATION_TIME) / 1000), user.getUserId(), user.getUsername(), user.getDisplayName(), user.getGender(), user.getStatus(), user.getCreatedAt(), user.getEmail(), user.getAvatarUrl());
             return ApiResponse.success("Login successfully", response);
         } else {
             throw new AppException("INVALID_CREDENTIALS", "Wrong username or password.");

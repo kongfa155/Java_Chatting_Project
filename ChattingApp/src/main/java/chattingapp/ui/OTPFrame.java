@@ -4,9 +4,12 @@
  */
 package chattingapp.ui;
 
-import chattingapp.dtos.RegisterOTPRequestDTO;
-import chattingapp.dtos.RegisterVerifyRequestDTO;
+import chattingapp.dtos.user.changeemail.ChangeEmailRequestDTO;
+import chattingapp.dtos.user.register.RegisterOTPRequestDTO;
+import chattingapp.dtos.user.register.RegisterVerifyRequestDTO;
+import chattingapp.models.User;
 import chattingapp.services.UserService;
+import chattingapp.utils.SessionManager;
 import javax.swing.JOptionPane;
 
 /**
@@ -14,18 +17,23 @@ import javax.swing.JOptionPane;
  * @author CP
  */
 public class OTPFrame extends javax.swing.JFrame {
+    private String emailOrUsername;
     private String username;
+    private String type; // Biến quyết định luồng API
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(OTPFrame.class.getName());
 
     /**
      * Creates new form OTPVerify
      */
-    public OTPFrame(String email, String username) {
-        this.username= username;
+    public OTPFrame(String emailOrUsername, String username, String type) {
+        this.emailOrUsername = emailOrUsername;
+        this.username = username;
+        this.type = type;
+
         initComponents();
         lblNoti.setText("<html><center>"
                 + "Vui lòng nhập mã xác thực<br>"
-                + "Chúng tôi đã gửi mã đến <b>" + email + "</b>"
+                + "Chúng tôi đã gửi mã đến <b>" + emailOrUsername + "</b>"
                 + "</center></html>");
 
         txtOTP.putClientProperty("JTextField.placeholderText", "XX.XX.XX");
@@ -90,42 +98,67 @@ public class OTPFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnVerifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerifyActionPerformed
-       String otp = txtOTP.getText().trim();
-    btnVerify.setEnabled(false);
-    
-    new UserService().verifyRegister(new RegisterVerifyRequestDTO(username, otp))
-        .thenAccept(response -> {
-            javax.swing.SwingUtilities.invokeLater(() -> {
-                JOptionPane.showMessageDialog(this, "Xác thực thành công!");
-                new LoginFrame().setVisible(true);
-                this.dispose();
-            });
-        })
-        .exceptionally(ex -> {
-            javax.swing.SwingUtilities.invokeLater(() -> {
-                JOptionPane.showMessageDialog(this, "Lỗi: " + (ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage()));
-                btnVerify.setEnabled(true);
-            });
-            return null;
-        });
-    }//GEN-LAST:event_btnVerifyActionPerformed
+String otp = txtOTP.getText().trim();
+        if (otp.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập OTP");
+            return;
+        }
 
+        btnVerify.setEnabled(false);
+        UserService userService = new UserService();
+
+        if (type.equals("REGISTER")) {
+            userService.verifyRegister(new RegisterVerifyRequestDTO(username, otp))
+                    .thenAccept(response -> {
+                        javax.swing.SwingUtilities.invokeLater(() -> {
+                            JOptionPane.showMessageDialog(this, "Xác thực thành công!");
+                            new LoginFrame().setVisible(true);
+                            this.dispose();
+                        });
+                    })
+                    .exceptionally(ex -> handleOTPError(ex));
+
+        } else if (type.equals("CHANGE_EMAIL")) {
+            String token = SessionManager.getToken();
+            userService.verifyChangeEmail(new ChangeEmailRequestDTO(otp, emailOrUsername))
+                    .thenAccept(v -> {
+                        javax.swing.SwingUtilities.invokeLater(() -> {
+                            JOptionPane.showMessageDialog(this, "Đổi Email thành công!");
+                            User current = SessionManager.getCurrentUser();
+                            current.setEmail(emailOrUsername);
+                            this.dispose();
+                        });
+                    })
+                    .exceptionally(ex -> handleOTPError(ex));
+        }
+    }//GEN-LAST:event_btnVerifyActionPerformed
+    private Void handleOTPError(Throwable ex) {
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            String msg = (ex.getCause() != null) ? ex.getCause().getMessage() : ex.getMessage();
+            JOptionPane.showMessageDialog(this, "Lỗi: " + msg, "Xác thực thất bại", JOptionPane.ERROR_MESSAGE);
+            btnVerify.setEnabled(true);
+        });
+        return null;
+    }
     private void btnReSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReSendActionPerformed
         btnReSend.setEnabled(false);
-    
-    new UserService().getRegisterOTP(new RegisterOTPRequestDTO(username))
-        .thenAccept(v -> {
-            javax.swing.SwingUtilities.invokeLater(() -> {
-                JOptionPane.showMessageDialog(this, "Mã OTP mới đã được gửi!");
-                btnReSend.setEnabled(true);
-            });
-        })
-        .exceptionally(ex -> {
-            javax.swing.SwingUtilities.invokeLater(() -> {
-                btnReSend.setEnabled(true);
-            });
-            return null;
-        });
+
+        if (type.equals("REGISTER")) {
+            new UserService().getRegisterOTP(new RegisterOTPRequestDTO(username))
+                    .thenAccept(v -> {
+                        javax.swing.SwingUtilities.invokeLater(() -> {
+                            JOptionPane.showMessageDialog(this, "Mã OTP mới đã được gửi!");
+                            btnReSend.setEnabled(true);
+                        });
+                    })
+                    .exceptionally(ex -> {
+                        javax.swing.SwingUtilities.invokeLater(() -> {
+                            btnReSend.setEnabled(true);
+                        });
+                        return null;
+                    });
+        }
+        // Thêm các nhánh logic gửi lại OTP cho CHANGE_EMAIL nếu cần
     }//GEN-LAST:event_btnReSendActionPerformed
 
     /**

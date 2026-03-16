@@ -4,6 +4,7 @@
  */
 package chattingapp.ui;
 
+import chattingapp.dtos.user.changeemail.ChangeEmailOTPRequestDTO;
 import chattingapp.models.User;
 import chattingapp.services.UserService;
 import chattingapp.utils.SessionManager;
@@ -31,7 +32,7 @@ public class UpdateEmailDialog extends javax.swing.JDialog {
         currentUser = SessionManager.getCurrentUser();
 
         if (currentUser != null) {
-            txtCurrentEmail.setText(currentUser.getPhoneNumber());
+            txtCurrentEmail.setText(currentUser.getEmail());
         }
     }
 
@@ -137,35 +138,45 @@ public class UpdateEmailDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_btnCancelEmailActionPerformed
 
     private void btnSaveEmailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveEmailActionPerformed
-        String newPhone = txtNewEmail.getText().trim();
+        String newEmail = txtNewEmail.getText().trim();
 
         // 1. Validate trống
-        if (newPhone.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập số điện thoại mới");
+        if (newEmail.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập email mới");
             return;
         }
 
-        // 2. Validate định dạng số điện thoại
-        if (!newPhone.matches("\\d{10}") && !newPhone.matches("\\d{11}")) {
-            JOptionPane.showMessageDialog(this, "Số điện thoại không hợp lệ (phải có 10 hoặc 11 chữ số)", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        // 2. Validate định dạng Email (Regex cơ bản)
+        if (!newEmail.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+            JOptionPane.showMessageDialog(this, "Định dạng email không hợp lệ", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
-        // 3. Vô hiệu hóa nút để tránh spam
+        // 3. Kiểm tra xem có đổi sang email cũ không
+        if (newEmail.equals(currentUser.getEmail())) {
+            JOptionPane.showMessageDialog(this, "Email mới không được trùng email hiện tại", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        // 4. Vô hiệu hóa nút để tránh spam
         btnSaveEmail.setEnabled(false);
-
-        // 4. Gọi Service gửi OTP (Backend của bạn dùng username để tìm user và gửi OTP)
+        // 5. Gọi Service gửi OTP
         UserService userService = new UserService();
-        userService.getRegisterOTP(new chattingapp.dtos.RegisterOTPRequestDTO(currentUser.getUsername()))
+        // Tạo một JPasswordField để nhập password (hoặc JOptionPane)
+        javax.swing.JPasswordField pwd = new javax.swing.JPasswordField(10);
+        int action = JOptionPane.showConfirmDialog(this, pwd,"Nhập mật khẩu hiện tại để xác nhận",JOptionPane.OK_CANCEL_OPTION);
+        if(action != JOptionPane.OK_OPTION) {
+             btnSaveEmail.setEnabled(true);
+             return;
+        }
+        String password = new String(pwd.getPassword());
+        String token = SessionManager.getToken();
+        ChangeEmailOTPRequestDTO dto = new ChangeEmailOTPRequestDTO(password, newEmail);
+        userService.getChangeEmailOTP(dto)
                 .thenAccept(v -> {
                     javax.swing.SwingUtilities.invokeLater(() -> {
-                        JOptionPane.showMessageDialog(this, "Mã xác thực đã được gửi đến số điện thoại mới!");
+                        JOptionPane.showMessageDialog(this, "Mã xác thực đã được gửi đến email mới!");
 
-                        // TRUYỀN ĐỦ 2 THAM SỐ:
-                        // Thao số 1: newPhone (để hiện lên lblNoti của OTPFrame)
-                        // Tham số 2: username (để OTPFrame có cái mà gọi verifyRegister)
-                        OTPFrame otp = new OTPFrame(newPhone, currentUser.getUsername());
-
+                        // Mở form OTP, truyền TYPE là CHANGE_EMAIL để OTPFrame biết đường gọi API verify
+                        OTPFrame otp = new OTPFrame(newEmail, currentUser.getUsername(), "CHANGE_EMAIL");
                         otp.setVisible(true);
                         this.dispose();
                     });
@@ -173,7 +184,7 @@ public class UpdateEmailDialog extends javax.swing.JDialog {
                 .exceptionally(ex -> {
                     javax.swing.SwingUtilities.invokeLater(() -> {
                         String msg = (ex.getCause() != null) ? ex.getCause().getMessage() : ex.getMessage();
-                        JOptionPane.showMessageDialog(this, "Lỗi gửi OTP: " + msg, "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(this, "Lỗi: " + msg, "Thất bại", JOptionPane.ERROR_MESSAGE);
                         btnSaveEmail.setEnabled(true);
                     });
                     return null;

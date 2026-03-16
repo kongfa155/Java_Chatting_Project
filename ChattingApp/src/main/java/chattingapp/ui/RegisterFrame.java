@@ -4,9 +4,10 @@
  */
 package chattingapp.ui;
 
-import chattingapp.dtos.RegisterOTPRequestDTO;
+import chattingapp.dtos.user.register.RegisterOTPRequestDTO;
+import chattingapp.dtos.user.register.RegisterRequestDTO;
 import chattingapp.services.UserService;
-import chattingapp.dtos.RegisterRequestDTO;
+
 import javax.swing.JOptionPane;
 
 /**
@@ -217,13 +218,13 @@ public class RegisterFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_dangNhapMouseClicked
 
     private void btnRegActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegActionPerformed
-        // Lấy dữ liệu từ các Field
+// Lấy dữ liệu từ các Field
         String username = txtUsername.getText().trim();
         String displayName = txtDisplayName.getText().trim();
         String email = txtEmail.getText().trim();
         String password = new String(txtPassword.getPassword());
         Boolean gender = radNam.isSelected();
-        RegisterRequestDTO dto = new RegisterRequestDTO(gender, username, email, displayName, "chuacourl", password);
+        RegisterRequestDTO dto = new RegisterRequestDTO(username, password, email, displayName, gender, "chuacourl");
         //Validate trống 
         if (username.isEmpty() || displayName.isEmpty() || email.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ tất cả các trường!", "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -244,7 +245,7 @@ userService.register(dto)
         // Bước 1 thành công: Đăng ký User xong.
         // Bước 2: Tạo DTO để lấy OTP tự động. 
         // Lưu ý: Dùng username từ dto ban đầu để gọi service.
-        RegisterOTPRequestDTO otpDto = new RegisterOTPRequestDTO(dto.getUsername());
+        RegisterOTPRequestDTO otpDto = new RegisterOTPRequestDTO(dto.username());
         
         return userService.getRegisterOTP(otpDto); 
     })
@@ -256,19 +257,24 @@ userService.register(dto)
                     "Thông báo",
                     JOptionPane.INFORMATION_MESSAGE);
 
-            // Chuyển sang màn hình OTP
-            OTPFrame otpFrame = new OTPFrame(dto.getEmail(), dto.getUsername());
+            // ĐÃ THÊM THAM SỐ "REGISTER" Ở ĐÂY ĐỂ KHÔNG BỊ LỖI COMPILER NỮA
+            OTPFrame otpFrame = new OTPFrame(dto.email(), dto.username(), "REGISTER");
     otpFrame.setVisible(true);
     this.dispose();
         });
     })
     .exceptionally(ex -> {
-        // Xử lý lỗi cho cả toàn bộ quy trình (lỗi ở bước 1 hoặc bước 2 đều nhảy vào đây)
+        // FIX: Xử lý ngoại lệ an toàn, chặn văng chữ "null"
         javax.swing.SwingUtilities.invokeLater(() -> {
-            String errorMsg = ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage();
+            String errorMsg = "Lỗi kết nối hoặc máy chủ sập";
+            if (ex.getCause() != null && ex.getCause().getMessage() != null && !ex.getCause().getMessage().equals("null")) {
+                errorMsg = ex.getCause().getMessage();
+            } else if (ex.getMessage() != null && !ex.getMessage().equals("null")) {
+                errorMsg = ex.getMessage();
+            }
             
             JOptionPane.showMessageDialog(this,
-                    "Lỗi: " + errorMsg,
+                    errorMsg,
                     "Đăng ký thất bại",
                     JOptionPane.ERROR_MESSAGE);
 

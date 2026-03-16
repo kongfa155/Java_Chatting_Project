@@ -41,4 +41,13 @@ public class SessionManager {
     public static String getUserId() {
         return currentUser != null ? currentUser.getUserId() : null;
     }
+    public static void updateCurrentUser(User user) {
+        if (currentUser != null) {
+            currentUser.setDisplayName(user.getDisplayName());
+            currentUser.setAvatarUrl(user.getAvatarUrl());
+            currentUser.setGender(user.getGender());
+            currentUser.setEmail(user.getEmail());
+            // Cập nhật các trường cần thiết khác
+        }
+    }
 }

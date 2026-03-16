@@ -110,7 +110,7 @@ public class MainFrame extends javax.swing.JFrame {
             fakeUser.setUserId("U01");
             fakeUser.setUsername("cp123");
             fakeUser.setDisplayName("CP Dev");
-            fakeUser.setPhoneNumber("0987654321");
+            fakeUser.setEmail("test@gmail.com");
             fakeUser.setAvatarUrl("https://free.vector6.com/wp-content/uploads/2021/03/0000000556-chim-canh-cut-hoc-bai-tai-hinh-png-38-300x256.png");
             new MainFrame().setVisible(true);
         });

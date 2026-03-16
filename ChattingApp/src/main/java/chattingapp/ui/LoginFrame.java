@@ -4,8 +4,8 @@
  */
 package chattingapp.ui;
 
-import chattingapp.dtos.LoginRequetDTO;
-import chattingapp.dtos.RegisterOTPRequestDTO;
+import chattingapp.dtos.user.login.LoginRequetDTO;
+import chattingapp.dtos.user.register.RegisterOTPRequestDTO;
 import chattingapp.models.User;
 import chattingapp.services.UserService;
 import chattingapp.utils.SessionManager;
@@ -328,63 +328,74 @@ public class LoginFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_btnVerifyActionPerformed
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
-        // TODO add your handling code here:
-        String username = txtUsername.getText();
-        char[] passwordChars = txtPassword.getPassword();
-        //Tạm thời convert sang String trước mặc dù nó không bảo mật
-        String password = new String(passwordChars);
-        if (username.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        btnLogin.setEnabled(false);
-        UserService userService = new UserService();
+       String username = txtUsername.getText().trim();
+    char[] passwordChars = txtPassword.getPassword();
+    String password = new String(passwordChars);
 
-        userService.login(new LoginRequetDTO(username, password))
-                .thenAccept(response -> {
-                    // Đăng nhập thành công (Backend trả về ACTIVATED)
-                    javax.swing.SwingUtilities.invokeLater(() -> {
+    if (username.isEmpty() || password.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
 
-                        User user = new User();
-                        user.setUserId(response.getUserId());
-                        user.setUsername(response.getUsername());
-                        user.setDisplayName(response.getDisplayName());
-                        //Set mặc định nếu chưa có
-                        user.setAvatarUrl("https://i.pinimg.com/736x/bc/43/98/bc439871417621836a0eeea768d60944.jpg");
+    btnLogin.setEnabled(false);
+    UserService userService = new UserService();
 
-                        SessionManager.setSession(response.getAccessToken(), user);
-                        new MainFrame().setVisible(true);
-                        this.dispose();
-                    });
-                })
-                .exceptionally(ex -> {
-                    javax.swing.SwingUtilities.invokeLater(() -> {
-                        String errorMsg = ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage();
+    userService.login(new LoginRequetDTO(username, password))
+        .thenAccept(response -> {
+            // Chạy trong Event Dispatch Thread của Swing để cập nhật UI
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                User user = new User();
+                user.setUserId(response.userId());
+                user.setUsername(response.username());
+                user.setDisplayName(response.displayName());
+                user.setAvatarUrl("https://i.pinimg.com/736x/bc/43/98/bc439871417621836a0eeea768d60944.jpg");
 
-                        if (errorMsg.contains("ACCOUNT_IS_NOT_ACTIVATED")) {
-                            int choice = JOptionPane.showConfirmDialog(this,
-                                    "Tài khoản chưa kích hoạt. Bạn có muốn nhận mã OTP để xác thực ngay không?",
-                                    "Thông báo", JOptionPane.YES_NO_OPTION);
+                SessionManager.setSession(response.accessToken(), user);
+                new MainFrame().setVisible(true);
+                this.dispose();
+            });
+        })
+        .exceptionally(ex -> {
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                // 1. Gỡ lớp vỏ CompletionException để lấy nguyên nhân gốc
+                Throwable cause = (ex instanceof java.util.concurrent.CompletionException) ? ex.getCause() : ex;
+                
+                // 2. Kiểm tra nếu là AppException (Lỗi nghiệp vụ từ Backend)
+                if (cause instanceof chattingapp.exceptions.AppException appEx) {
+                    String errorCode = appEx.getErrorCode();
 
-                            if (choice == JOptionPane.YES_OPTION) {
-                                // Gọi API lấy OTP rồi mới chuyển Frame
-                                userService.getRegisterOTP(new RegisterOTPRequestDTO(username))
-                                        .thenAccept(v -> {
-                                            javax.swing.SwingUtilities.invokeLater(() -> {
-                                                // Ở đây ta dùng chính username cho cả 2 tham số 
-                                                // hoặc nếu bạn có email từ backend thì truyền vào
-                                                new OTPFrame(username, username).setVisible(true);
-                                                this.dispose();
-                                            });
-                                        });
-                            }
-                        } else {
-                            JOptionPane.showMessageDialog(this, "Lỗi: " + errorMsg, "Đăng nhập thất bại", JOptionPane.ERROR_MESSAGE);
+                    // 3. So sánh dựa trên Error Code (Chính xác tuyệt đối)
+                    if ("ACCOUNT_IS_NOT_ACTIVATED".equals(errorCode)) {
+                        int choice = JOptionPane.showConfirmDialog(this,
+                                "Tài khoản chưa kích hoạt. Bạn có muốn nhận mã OTP để xác thực ngay không?",
+                                "Xác thực tài khoản", JOptionPane.YES_NO_OPTION);
+
+                        if (choice == JOptionPane.YES_OPTION) {
+                            userService.getRegisterOTP(new RegisterOTPRequestDTO(username))
+                                .thenAccept(v -> {
+                                    javax.swing.SwingUtilities.invokeLater(() -> {
+                                        new OTPFrame(username, username, "REGISTER").setVisible(true);
+                                        this.dispose();
+                                    });
+                                })
+                                .exceptionally(otpEx -> {
+                                    javax.swing.SwingUtilities.invokeLater(() -> 
+                                        JOptionPane.showMessageDialog(this, "Lỗi gửi OTP: " + otpEx.getMessage()));
+                                    return null;
+                                });
                         }
-                        btnLogin.setEnabled(true);
-                    });
-                    return null;
-                });
+                    } else {
+                        // Các lỗi nghiệp vụ khác (Sai pass, User không tồn tại, v.v.)
+                        JOptionPane.showMessageDialog(this, appEx.getMessage(), "Đăng nhập thất bại", JOptionPane.ERROR_MESSAGE);
+                    }
+                } else {
+                    // Lỗi hệ thống (Mạng, Server sập, Parse JSON lỗi)
+                    JOptionPane.showMessageDialog(this, "Lỗi kết nối: " + cause.getMessage(), "Lỗi hệ thống", JOptionPane.ERROR_MESSAGE);
+                }
+                btnLogin.setEnabled(true);
+            });
+            return null;
+        });
     }//GEN-LAST:event_btnLoginActionPerformed
 
     /**

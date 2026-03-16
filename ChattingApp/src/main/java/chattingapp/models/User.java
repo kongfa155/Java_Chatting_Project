@@ -4,7 +4,6 @@
  */
 package chattingapp.models;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.Instant;
 
@@ -13,35 +12,26 @@ import java.time.Instant;
  * @author CP
  */
 public class User {
-    @JsonProperty("user_id")
     private String userId;
-    @JsonProperty("gender")
     private Boolean gender;
-    @JsonProperty("username")
     private String username;
-    @JsonProperty("phone_number")
-    private String phoneNumber;
-    @JsonProperty("display_name")
+    private String email;
     private String displayName;
-    @JsonProperty("avatar_url")
     private String avatarUrl;
-    @JsonProperty("password")
     private String hashedPassword;
-    @JsonProperty("status")
     private UserStatus status;
-    @JsonProperty("created_at")
     private Instant createdAt;
 
     public User() {
     }
 
-    public User(String userId, Boolean gender, String username, String phoneNumber,
+    public User(String userId, Boolean gender, String username, String email,
                 String displayName, String avatarUrl, String hashedPassword,
                 UserStatus status, Instant createdAt) {
         this.userId = userId;
         this.gender = gender;
         this.username = username;
-        this.phoneNumber = phoneNumber;
+        this.email = email;
         this.displayName = displayName;
         this.avatarUrl = avatarUrl;
         this.hashedPassword = hashedPassword;
@@ -73,12 +63,12 @@ public class User {
         this.username = username;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
+    public String getEmail() {
+        return email;
     }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getDisplayName() {

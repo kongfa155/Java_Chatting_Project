@@ -4,7 +4,6 @@
  */
 package chattingapp.dtos;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  *

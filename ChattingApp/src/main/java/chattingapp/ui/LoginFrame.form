@@ -155,14 +155,8 @@
               </Layout>
               <SubComponents>
                 <Component class="javax.swing.JPasswordField" name="jNewPassword">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="jPasswordField1"/>
-                  </Properties>
                 </Component>
                 <Component class="javax.swing.JPasswordField" name="jNewPasswordConfirm">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="jPasswordField1"/>
-                  </Properties>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jLabel1">
                   <Properties>
@@ -246,6 +240,9 @@
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JTextField" name="txtOTP">
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtOTPActionPerformed"/>
+                  </Events>
                 </Component>
                 <Component class="javax.swing.JButton" name="btnVerify">
                   <Properties>

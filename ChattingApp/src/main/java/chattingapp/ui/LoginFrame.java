@@ -5,6 +5,7 @@
 package chattingapp.ui;
 
 import chattingapp.dtos.user.forgotpassword.ForgotPasswordOTPRequestDTO;
+import chattingapp.dtos.user.forgotpassword.ForgotPasswordVerifyRequest;
 import chattingapp.dtos.user.login.LoginRequetDTO;
 import chattingapp.dtos.user.register.RegisterOTPRequestDTO;
 import chattingapp.models.User;
@@ -129,10 +130,6 @@ public class LoginFrame extends javax.swing.JFrame {
 
         ForgotPanel.add(UsernamePanel, "card2");
 
-        jNewPassword.setText("jPasswordField1");
-
-        jNewPasswordConfirm.setText("jPasswordField1");
-
         jLabel1.setText("Nhập mật khẩu mới");
 
         jLabel3.setText("Xác nhận mật khẩu mới");
@@ -188,6 +185,8 @@ public class LoginFrame extends javax.swing.JFrame {
 
         jLabel4.setFont(new java.awt.Font("Segoe UI", 2, 18)); // NOI18N
         jLabel4.setText("Vui lòng nhập mã xác thực");
+
+        txtOTP.addActionListener(this::txtOTPActionPerformed);
 
         btnVerify.setText("Xác thực");
         btnVerify.addActionListener(this::btnVerifyActionPerformed);
@@ -384,11 +383,16 @@ public class LoginFrame extends javax.swing.JFrame {
         new UserService().forgotPasswordOTP(new ForgotPasswordOTPRequestDTO(username))
                 .thenAccept(v -> {
                     javax.swing.SwingUtilities.invokeLater(() -> {
-                        JOptionPane.showMessageDialog(quenMKDialog, "Mã xác thực đã được gửi đến Email của bạn.");
-                        // Chuyển sang Card nhập mật khẩu mới
-                        java.awt.CardLayout card = (java.awt.CardLayout) ForgotPanel.getLayout();
-                        card.show(ForgotPanel, "card4");
-                    });
+                JOptionPane.showMessageDialog(quenMKDialog, "Mã xác thực đã được gửi! Vui lòng kiểm tra email.");
+                // Khóa username lại để tránh người dùng sửa lung tung ở bước sau
+                txtForgotPasswordUsername.setEditable(false);
+                
+                // Chuyển sang card3 để nhập mã OTP
+                CardLayout card = (CardLayout) ForgotPanel.getLayout();
+                card.show(ForgotPanel, "card3"); 
+                btnGetOTP.setEnabled(true);
+                btnGetOTP.setText("Nhận mã xác thực");
+            });
                 })
                 .exceptionally(ex -> {
                     javax.swing.SwingUtilities.invokeLater(() -> {
@@ -409,9 +413,15 @@ public class LoginFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_quenMKMouseClicked
 
     private void btnVerifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerifyActionPerformed
-        String OTP = txtOTP.getText();
+        String otp = txtOTP.getText();
         //Kiểm tra OTP ở đây
-
+        if (otp.isEmpty() || otp.length() != 6) {
+        JOptionPane.showMessageDialog(quenMKDialog, "Vui lòng nhập đúng mã OTP (6 ký tự)!");
+        return;
+    }
+        CardLayout card = (CardLayout) ForgotPanel.getLayout();
+    card.show(ForgotPanel, "card4");
+    
     }//GEN-LAST:event_btnVerifyActionPerformed
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
@@ -489,26 +499,87 @@ public class LoginFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_btnLoginActionPerformed
 
     private void btnConfirmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfirmActionPerformed
-        // TODO add your handling code here:
-        char[] passwordChars = jNewPassword.getPassword();
-        String newPassword = new String(passwordChars);
+String username = txtForgotPasswordUsername.getText().trim();
+    String otp = txtOTP.getText().trim();
+    
+    char[] passChars = jNewPassword.getPassword();
+    char[] confirmChars = jNewPasswordConfirm.getPassword();
+    
+    String newPassword = new String(passChars);
+    String confirmPassword = new String(confirmChars);
 
-        char[] confirmChars = jNewPasswordConfirm.getPassword();
-        String confirmPassword = new String(confirmChars);
-        if (newPassword.isEmpty() || confirmPassword.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ mật khẩu!");
-            return;
-        }
+    // 1. Validation mật khẩu tại Client
+    if (newPassword.isEmpty() || confirmPassword.isEmpty()) {
+        JOptionPane.showMessageDialog(quenMKDialog, "Vui lòng nhập đầy đủ mật khẩu mới!");
+        return;
+    }
 
-        if (!newPassword.equals(confirmPassword)) {
-            JOptionPane.showMessageDialog(this, "Mật khẩu xác nhận không khớp!");
-            return;
-        }
-        JOptionPane.showMessageDialog(this, "Mật khẩu hợp lệ. Vui lòng nhập OTP để xác thực.");
+    if (!newPassword.equals(confirmPassword)) {
+        JOptionPane.showMessageDialog(quenMKDialog, "Mật khẩu xác nhận không khớp!");
+        return;
+    }
 
-        CardLayout card = (CardLayout) ForgotPanel.getLayout();
-        card.show(ForgotPanel, "card3"); // chuyển sang OTP
+    // Vô hiệu hóa nút để tránh double-click
+    btnConfirm.setEnabled(false);
+    btnConfirm.setText("Đang thực hiện...");
+
+    // 2. Gọi API xác thực cuối cùng
+    UserService userService = new UserService();
+    ForgotPasswordVerifyRequest dto = new ForgotPasswordVerifyRequest(username, otp, newPassword);
+
+    userService.forgotPasswordVerify(dto)
+        .thenAccept(v -> {
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                JOptionPane.showMessageDialog(quenMKDialog, "Đặt lại mật khẩu thành công!");
+                
+                // Security: Xóa sạch mảng char nhạy cảm
+                java.util.Arrays.fill(passChars, '0');
+                java.util.Arrays.fill(confirmChars, '0');
+                
+                // Đóng Dialog và quay về Login
+                quenMKDialog.dispose();
+                txtUsername.setText(username);
+                txtPassword.requestFocus();
+            });
+        })
+        .exceptionally(ex -> {
+            javax.swing.SwingUtilities.invokeLater(() -> {
+           Throwable cause = (ex instanceof java.util.concurrent.CompletionException) ? ex.getCause() : ex;
+                
+                // KIỂM TRA BẰNG APPEXCEPTION VÀ ERRORCODE
+                if (cause instanceof chattingapp.exceptions.AppException appEx) {
+                    String code = appEx.getErrorCode();
+                    String msg = appEx.getMessage();
+
+                    // Log ra để bạn debug xem Code thật sự Backend trả về là gì
+                    System.out.println("DEBUG - ErrorCode: " + code);
+
+                    // Kiểm tra nếu lỗi liên quan đến OTP
+                    if ("INVALID_OTP".equals(code) || "WRONG_OTP".equals(code) || msg.toUpperCase().contains("OTP")) {
+                        JOptionPane.showMessageDialog(quenMKDialog, "Mã xác thực không chính xác. Vui lòng nhập lại!", "Lỗi OTP", JOptionPane.ERROR_MESSAGE);
+                        
+                        // CHUYỂN VỀ CARD 3
+                        CardLayout card = (CardLayout) ForgotPanel.getLayout();
+                        card.show(ForgotPanel, "card3");
+                        
+                        txtOTP.setText("");
+                        txtOTP.requestFocus();
+                    } else {
+                        JOptionPane.showMessageDialog(quenMKDialog, "Lỗi: " + msg, "Thất bại", JOptionPane.ERROR_MESSAGE);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(quenMKDialog, "Lỗi kết nối: " + cause.getMessage());
+                }
+                
+                btnConfirm.setEnabled(true);
+            });
+            return null;
+        });
     }//GEN-LAST:event_btnConfirmActionPerformed
+
+    private void txtOTPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtOTPActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtOTPActionPerformed
 
     /**
      * @param args the command line arguments

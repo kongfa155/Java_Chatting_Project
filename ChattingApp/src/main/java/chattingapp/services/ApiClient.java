@@ -7,6 +7,7 @@ public class ApiClient {
 
     private static HttpClient client;
     private static final String BASE_URL = "http://localhost:8080/api";
+    private static final String FILE_BASE = "http://localhost:8080";
 
     public static HttpClient getClient(){
         if(client==null){
@@ -18,5 +19,8 @@ public class ApiClient {
     }
     public static String getBaseUrl(){
         return BASE_URL;
+    }
+    public static String getFileUrl(String path) {
+    return FILE_BASE + path;
     }
 }

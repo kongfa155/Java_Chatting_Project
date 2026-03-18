@@ -92,12 +92,44 @@ public class MessageService {
         return ApiResponse.success("Message deleted", null);
     }
         //SEND FILE
+        private MessageType detectFileType(String ext) {
 
+        String name = ext.toLowerCase();
+
+        if (name.equals(".png") || name.equals(".jpg") || name.equals(".jpeg")) {
+            return MessageType.IMAGE;
+        }
+
+        if (name.equals(".mp4")) {
+            return MessageType.VIDEO;
+        }
+
+        if (name.equals(".mp3") || name.equals(".wav")) {
+            return MessageType.AUDIO;
+        }
+
+        if (name.equals(".pdf")
+            || name.equals(".docx")
+            || name.equals(".xlsx")
+            || name.equals(".pptx")) {
+            return MessageType.FILE;
+        }
+
+        return MessageType.FILE;
+    }
 
     public Message sendFile(String senderId, String receiverId, MultipartFile file) throws IOException {
 
             // tạo tên file random
-            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+            String originalName = file.getOriginalFilename();
+            String extension = "";
+
+            if (originalName != null && originalName.contains(".")) {
+                extension = originalName.substring(originalName.lastIndexOf("."));
+            }
+
+            // filename sạch (không dính tiếng Việt)
+            String fileName = UUID.randomUUID() + extension;
 
             // tạo folder uploads nếu chưa có
             Path uploadDir = Paths.get("uploads");
@@ -114,7 +146,13 @@ public class MessageService {
             msg.setMessageId(UUID.randomUUID().toString());
             msg.setSenderId(senderId);
             msg.setReceiverId(receiverId);
-            msg.setMessageType(MessageType.FILE);
+            // set type đúng
+            msg.setMessageType(detectFileType(extension));
+
+            // lưu tên file để FE hiển thị
+            msg.setContent(file.getOriginalFilename());
+
+            // url file
             msg.setFileUrl("/uploads/" + fileName);
             msg.setSentAt(LocalDateTime.now());
             msg.setRead(false);

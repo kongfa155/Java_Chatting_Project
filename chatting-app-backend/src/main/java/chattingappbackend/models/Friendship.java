@@ -1,38 +1,35 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package chattingappbackend.models;
 
 import java.time.LocalDateTime;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-/**
- *
- * @author CP
- */
-@Table("friendships")
+@Entity
+@Table(name = "friendships")
 public class Friendship {
 
-    //Properties
     @Id
-    @JsonProperty("friendship_id")
+    @Column(name = "friendship_id")
     private String friendshipId;
-    @JsonProperty("user_id")
+
+    @Column(name = "user_id")
     private String userId;
-    @JsonProperty("friend_id")
+
+    @Column(name = "friend_id")
     private String friendId;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
     private FriendshipStatus status;
-    
-    @JsonProperty("created_at")
+
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    //Contruster
     public Friendship() {
     }
 
@@ -44,7 +41,8 @@ public class Friendship {
         this.createdAt = createdAt;
     }
 
-    // Getters & Setters
+    // getters & setters
+
     public String getFriendshipId() {
         return friendshipId;
     }
@@ -84,4 +82,5 @@ public class Friendship {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+    
 }

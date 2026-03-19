@@ -1,45 +1,47 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package chattingappbackend.models;
 
 import java.time.LocalDateTime;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Table;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- *
- * @author CP
- */
-@Table("notifications")
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "notifications")
 public class Notification {
 
-    //Properties
     @Id
+    @Column(name = "notification_id")
     @JsonProperty("notification_id")
     private String notificationId;
 
+    @Column(name = "user_id")
     @JsonProperty("user_id")
     private String userId;
 
     private String content;
 
+    @Column(name = "is_read")
     @JsonProperty("is_read")
     private boolean isRead;
 
+    @Column(name = "is_deleted")
     @JsonProperty("is_deleted")
     private boolean isDeleted;
 
+    @Column(name = "created_at")
     @JsonProperty("created_at")
     private LocalDateTime createdAt;
 
+    @Enumerated(EnumType.STRING)
     private NotificationType type;
 
-    //Contruster
+    // Constructor
     public Notification() {
     }
 
@@ -111,5 +113,4 @@ public class Notification {
     public void setType(NotificationType type) {
         this.type = type;
     }
-
 }

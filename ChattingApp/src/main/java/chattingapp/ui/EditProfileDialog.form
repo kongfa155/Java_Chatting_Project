@@ -215,9 +215,6 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="X&#xe1;c th&#x1ef1;c m&#x1ead;t kh&#x1ea9;u"/>
           </Properties>
-          <AccessibilityProperties>
-            <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="X&#xe1;c th&#x1ef1;c m&#x1ead;t kh&#x1ea9;u"/>
-          </AccessibilityProperties>
         </Component>
         <Component class="javax.swing.JPasswordField" name="txtPassword">
           <Properties>

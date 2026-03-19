@@ -218,70 +218,38 @@ public class RegisterFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_dangNhapMouseClicked
 
     private void btnRegActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegActionPerformed
-// Lấy dữ liệu từ các Field
-        String username = txtUsername.getText().trim();
-        String displayName = txtDisplayName.getText().trim();
-        String email = txtEmail.getText().trim();
-        String password = new String(txtPassword.getPassword());
-        Boolean gender = radNam.isSelected();
-        RegisterRequestDTO dto = new RegisterRequestDTO(username, password, email, displayName, gender, "chuacourl");
-        //Validate trống 
-        if (username.isEmpty() || displayName.isEmpty() || email.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ tất cả các trường!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+String username = txtUsername.getText().trim();
+    String displayName = txtDisplayName.getText().trim();
+    String email = txtEmail.getText().trim();
+    String password = new String(txtPassword.getPassword());
+    Boolean gender = radNam.isSelected();
 
-        //Validate tên tài khoản (nếu cần)
-        //Validate mật khẩu (Tạm thời chỉ cần > 6 kí tự
+    if (username.isEmpty() || displayName.isEmpty() || email.isEmpty() || password.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ tất cả các trường!");
+        return;
+    }
 
-        //Rồi làm gì với dữ liệu thì làm nhé
-        UserService userService = new UserService();
-        btnReg.setEnabled(false);
+    btnReg.setEnabled(false);
+    btnReg.setText("Đang xử lý...");
 
-        btnReg.setEnabled(false); // Vô hiệu hóa nút để tránh gửi trùng
+    UserService userService = new UserService();
+    RegisterRequestDTO dto = new RegisterRequestDTO(username, password, email, displayName, gender, "");
 
-userService.register(dto)
-    .thenCompose(regResponse -> {
-        // Bước 1 thành công: Đăng ký User xong.
-        // Bước 2: Tạo DTO để lấy OTP tự động. 
-        // Lưu ý: Dùng username từ dto ban đầu để gọi service.
-        RegisterOTPRequestDTO otpDto = new RegisterOTPRequestDTO(dto.username());
-        
-        return userService.getRegisterOTP(otpDto); 
-    })
-    .thenAccept(otpResponse -> {
-        // Cả 2 bước Đăng ký và Gửi OTP đều thành công
-        javax.swing.SwingUtilities.invokeLater(() -> {
-            JOptionPane.showMessageDialog(this,
-                    "Đăng ký thành công! Mã OTP đã được gửi đến email của bạn.",
-                    "Thông báo",
-                    JOptionPane.INFORMATION_MESSAGE);
-
-            // ĐÃ THÊM THAM SỐ "REGISTER" Ở ĐÂY ĐỂ KHÔNG BỊ LỖI COMPILER NỮA
-            OTPFrame otpFrame = new OTPFrame(dto.email(), dto.username(), "REGISTER");
-    otpFrame.setVisible(true);
-    this.dispose();
+    userService.register(dto)
+        .thenCompose(regRes -> userService.getRegisterOTP(new chattingapp.dtos.user.register.RegisterOTPRequestDTO(username)))
+        .thenAccept(otpRes -> javax.swing.SwingUtilities.invokeLater(() -> {
+            JOptionPane.showMessageDialog(this, "Đăng ký thành công! Vui lòng kiểm tra mã OTP trong Email.");
+            new OTPFrame(email, username, "REGISTER").setVisible(true);
+            this.dispose();
+        }))
+        .exceptionally(ex -> {
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                chattingapp.utils.GlobalErrorHandler.handle(this, ex);
+                btnReg.setEnabled(true);
+                btnReg.setText("Đăng ký");
+            });
+            return null;
         });
-    })
-    .exceptionally(ex -> {
-        // FIX: Xử lý ngoại lệ an toàn, chặn văng chữ "null"
-        javax.swing.SwingUtilities.invokeLater(() -> {
-            String errorMsg = "Lỗi kết nối hoặc máy chủ sập";
-            if (ex.getCause() != null && ex.getCause().getMessage() != null && !ex.getCause().getMessage().equals("null")) {
-                errorMsg = ex.getCause().getMessage();
-            } else if (ex.getMessage() != null && !ex.getMessage().equals("null")) {
-                errorMsg = ex.getMessage();
-            }
-            
-            JOptionPane.showMessageDialog(this,
-                    errorMsg,
-                    "Đăng ký thất bại",
-                    JOptionPane.ERROR_MESSAGE);
-
-            btnReg.setEnabled(true);
-        });
-        return null;
-    });
     }//GEN-LAST:event_btnRegActionPerformed
 
     private void txtEmailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtEmailActionPerformed

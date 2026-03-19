@@ -214,57 +214,65 @@ String avatarUrlWithCacheBuster = currentUser.getAvatarUrl();
     }//GEN-LAST:event_btnCancelActionPerformed
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-        // TODO add your handling code here:
-        String url = txtURLAvatar.getText();
-        String displayName = txtDisplayname.getText();
+        // 1. Lấy dữ liệu từ UI
+        String url = txtURLAvatar.getText().trim();
+        String displayName = txtDisplayname.getText().trim();
         boolean gender = rdMale.isSelected();
-        char[] password = txtPassword.getPassword();
-        btnSave.setEnabled(false);
-    btnCancel.setEnabled(false);
+        char[] passwordChars = txtPassword.getPassword();
         
-        if(url.isEmpty()||displayName.isEmpty()||password.length<=0){
+        // 2. Client-side Validation
+        if (url.isEmpty() || displayName.isEmpty() || passwordChars.length == 0) {
             JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ tất cả các trường!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
-//Lưu vào csdl
-        
-        ChangeProfileRequestDTO dto = new ChangeProfileRequestDTO(new String(password),displayName,gender,url);
-        UserService userService = new UserService();
-        userService.changeProfile(dto)
-        .thenAccept(v -> {
-            // 3. Cập nhật Session khi thành công
-            User user = SessionManager.getCurrentUser();
-            user.setAvatarUrl(url);
-            user.setDisplayName(displayName);
-            user.setGender(gender);
-            
-            // Nếu bạn có Token mới thì set, nếu không dùng lại token cũ
-            SessionManager.setSession(SessionManager.getToken(), user);
 
-            javax.swing.SwingUtilities.invokeLater(() -> {
-                JOptionPane.showMessageDialog(this, "Cập nhật thông tin thành công!");
-                
-                // Xóa password khỏi memory sau khi dùng
-                java.util.Arrays.fill(password, '0');
-                
-                this.dispose(); // CHỈ ĐÓNG KHI THÀNH CÔNG
+        // 3. Chống spam: Vô hiệu hóa các nút điều khiển
+        btnSave.setEnabled(false);
+        btnCancel.setEnabled(false);
+        btnEdit.setEnabled(false);
+
+        // 4. Gọi Service cập nhật thông tin
+        String password = new String(passwordChars);
+        chattingapp.dtos.user.changeprofile.ChangeProfileRequestDTO dto = 
+                new chattingapp.dtos.user.changeprofile.ChangeProfileRequestDTO(password, displayName, gender, url);
+        
+        new chattingapp.services.UserService().changeProfile(dto)
+            .thenAccept(v -> {
+                // 5. Cập nhật Session khi thành công
+                User user = SessionManager.getCurrentUser();
+                if (user != null) {
+                    user.setAvatarUrl(url);
+                    user.setDisplayName(displayName);
+                    user.setGender(gender);
+                    SessionManager.setSession(SessionManager.getToken(), user);
+                }
+
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    JOptionPane.showMessageDialog(this, "Cập nhật thông tin thành công!");
+                    // Xóa password khỏi memory (Security Best Practice)
+                    java.util.Arrays.fill(passwordChars, '0');
+                    this.dispose(); // CHỈ ĐÓNG KHI THÀNH CÔNG
+                });
+            })
+            .exceptionally(ex -> {
+                // 6. Xử lý lỗi và khôi phục trạng thái UI
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    // Sử dụng GlobalErrorHandler dùng chung đã xây dựng
+                    chattingapp.utils.GlobalErrorHandler.handle(this, ex);
+                    
+                    // Mở lại nút để người dùng sửa lỗi
+                    btnSave.setEnabled(true);
+                    btnCancel.setEnabled(true);
+                    btnEdit.setEnabled(true);
+                    
+                    // Clear password để user nhập lại
+                    txtPassword.setText("");
+                    txtPassword.requestFocus();
+                });
+                return null;
             });
-        })
-        .exceptionally(ex -> {
-            javax.swing.SwingUtilities.invokeLater(() -> {
-                // Sử dụng hàm unwrap exception đã học ở các bước trước
-                Throwable cause = (ex instanceof java.util.concurrent.CompletionException) ? ex.getCause() : ex;
-                
-                JOptionPane.showMessageDialog(this, "Lỗi: " + cause.getMessage(), "Cập nhật thất bại", JOptionPane.ERROR_MESSAGE);
-                
-                // Mở lại nút để người dùng sửa lỗi
-                btnSave.setEnabled(true);
-                btnCancel.setEnabled(true);
-            });
-            return null;
-        });
-        //Đóng thằng này lại
-        this.dispose();
+            
+        // TUYỆT ĐỐI KHÔNG gọi this.dispose() ở đây vì code chạy Async
     }//GEN-LAST:event_btnSaveActionPerformed
 
     private void txtURLAvatarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtURLAvatarActionPerformed

@@ -148,57 +148,65 @@ public class UpdateEmailDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_btnCancelEmailActionPerformed
 
     private void btnSaveEmailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveEmailActionPerformed
-        String newEmail = txtNewEmail.getText().trim();
+       String newEmail = txtNewEmail.getText().trim();
 
-        // 1. Validate trống
-        if (newEmail.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập email mới");
-            return;
-        }
+    // 1. Validate dữ liệu đầu vào (Client-side)
+    if (newEmail.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Vui lòng nhập email mới");
+        return; // Nút vẫn đang Enabled, user có thể nhập lại
+    }
 
-        // 2. Validate định dạng Email (Regex cơ bản)
-        if (!newEmail.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-            JOptionPane.showMessageDialog(this, "Định dạng email không hợp lệ", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        // 3. Kiểm tra xem có đổi sang email cũ không
-        if (newEmail.equals(currentUser.getEmail())) {
-            JOptionPane.showMessageDialog(this, "Email mới không được trùng email hiện tại", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        // 4. Vô hiệu hóa nút để tránh spam
-        btnSaveEmail.setEnabled(false);
-        // 5. Gọi Service gửi OTP
-        UserService userService = new UserService();
-        // Tạo một JPasswordField để nhập password (hoặc JOptionPane)
-        javax.swing.JPasswordField pwd = new javax.swing.JPasswordField(10);
-        int action = JOptionPane.showConfirmDialog(this, pwd,"Nhập mật khẩu hiện tại để xác nhận",JOptionPane.OK_CANCEL_OPTION);
-        if(action != JOptionPane.OK_OPTION) {
-             btnSaveEmail.setEnabled(true);
-             return;
-        }
-        String password = new String(pwd.getPassword());
-        String token = SessionManager.getToken();
-        ChangeEmailOTPRequestDTO dto = new ChangeEmailOTPRequestDTO(password, newEmail);
-        userService.getChangeEmailOTP(dto)
-                .thenAccept(v -> {
-                    javax.swing.SwingUtilities.invokeLater(() -> {
-                        JOptionPane.showMessageDialog(this, "Mã xác thực đã được gửi đến email mới!");
+    if (!newEmail.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+        JOptionPane.showMessageDialog(this, "Định dạng email không hợp lệ", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
 
-                        // Mở form OTP, truyền TYPE là CHANGE_EMAIL để OTPFrame biết đường gọi API verify
-                        OTPFrame otp = new OTPFrame(newEmail, currentUser.getUsername(), "CHANGE_EMAIL");
-                        otp.setVisible(true);
-                        this.dispose();
-                    });
-                })
-                .exceptionally(ex -> {
-                    javax.swing.SwingUtilities.invokeLater(() -> {
-                        String msg = (ex.getCause() != null) ? ex.getCause().getMessage() : ex.getMessage();
-                        JOptionPane.showMessageDialog(this, "Lỗi: " + msg, "Thất bại", JOptionPane.ERROR_MESSAGE);
-                        btnSaveEmail.setEnabled(true);
-                    });
-                    return null;
-                });
+    if (newEmail.equals(currentUser.getEmail())) {
+        JOptionPane.showMessageDialog(this, "Email mới không được trùng email hiện tại", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    // 2. Xác thực mật khẩu trước khi gọi API
+    javax.swing.JPasswordField pwd = new javax.swing.JPasswordField(10);
+    int action = JOptionPane.showConfirmDialog(this, pwd, "Nhập mật khẩu hiện tại để xác nhận", JOptionPane.OK_CANCEL_OPTION);
+    
+    if (action != JOptionPane.OK_OPTION) {
+        return; // User hủy, nút vẫn Enabled
+    }
+
+    String password = new String(pwd.getPassword());
+    if (password.isBlank()) {
+        JOptionPane.showMessageDialog(this, "Mật khẩu không được để trống");
+        return;
+    }
+
+    // 3. Chống spam: Disable nút và bắt đầu gọi Service
+    btnSaveEmail.setEnabled(false);
+    btnSaveEmail.setText("Đang gửi...");
+
+    chattingapp.dtos.user.changeemail.ChangeEmailOTPRequestDTO dto = 
+            new chattingapp.dtos.user.changeemail.ChangeEmailOTPRequestDTO(password, newEmail);
+
+    new chattingapp.services.UserService().getChangeEmailOTP(dto)
+        .thenAccept(v -> {
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                JOptionPane.showMessageDialog(this, "Mã xác thực đã được gửi đến email mới!");
+                // Mở form OTP
+                chattingapp.ui.OTPFrame otpFrame = new chattingapp.ui.OTPFrame(newEmail, currentUser.getUsername(), "CHANGE_EMAIL");
+                otpFrame.setVisible(true);
+                this.dispose();
+            });
+        })
+        .exceptionally(ex -> {
+            // 4. QUAN TRỌNG: Xử lý lỗi và ENABLE lại nút bấm để user sửa thông tin
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                btnSaveEmail.setEnabled(true);
+                btnSaveEmail.setText("Lưu");
+                // Sử dụng GlobalErrorHandler đã xây dựng để thông báo lỗi chuyên nghiệp
+                chattingapp.utils.GlobalErrorHandler.handle(this, ex);
+            });
+            return null;
+        });
     }//GEN-LAST:event_btnSaveEmailActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

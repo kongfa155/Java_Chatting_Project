@@ -9,8 +9,10 @@ import chattingapp.dtos.user.register.RegisterOTPRequestDTO;
 import chattingapp.dtos.user.register.RegisterVerifyRequestDTO;
 import chattingapp.models.User;
 import chattingapp.services.UserService;
+import chattingapp.utils.GlobalErrorHandler;
 import chattingapp.utils.SessionManager;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -25,6 +27,17 @@ public class OTPFrame extends javax.swing.JFrame {
     /**
      * Creates new form OTPVerify
      */
+    private Void handleAuthError(Throwable ex) {
+    javax.swing.SwingUtilities.invokeLater(() -> {
+        // Kích hoạt lại nút bấm để user thử lại
+        btnVerify.setEnabled(true);
+        btnVerify.setText("Xác thực");
+        
+        // Sử dụng Handler dùng chung để dịch mã lỗi (INVALID_OTP, v.v.)
+        chattingapp.utils.GlobalErrorHandler.handle(this, ex);
+    });
+    return null;
+}
     public OTPFrame(String emailOrUsername, String username, String type) {
         this.emailOrUsername = emailOrUsername;
         this.username = username;
@@ -98,39 +111,48 @@ public class OTPFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnVerifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerifyActionPerformed
-String otp = txtOTP.getText().trim();
-        if (otp.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập OTP");
-            return;
-        }
 
-        btnVerify.setEnabled(false);
-        UserService userService = new UserService();
+  String otp = txtOTP.getText().trim();
 
-        if (type.equals("REGISTER")) {
-            userService.verifyRegister(new RegisterVerifyRequestDTO(username, otp))
-                    .thenAccept(response -> {
-                        javax.swing.SwingUtilities.invokeLater(() -> {
-                            JOptionPane.showMessageDialog(this, "Xác thực thành công!");
-                            new LoginFrame().setVisible(true);
-                            this.dispose();
-                        });
-                    })
-                    .exceptionally(ex -> handleOTPError(ex));
+    // 1. Client-side Validation (Chặn đứng lỗi 400 DTO invalid từ đầu)
+    if (otp.isEmpty() || !otp.matches("\\d{6}")) {
+        JOptionPane.showMessageDialog(this, "Vui lòng nhập đúng mã OTP gồm 6 chữ số!");
+        return;
+    }
 
-        } else if (type.equals("CHANGE_EMAIL")) {
-            String token = SessionManager.getToken();
-            userService.verifyChangeEmail(new ChangeEmailRequestDTO(emailOrUsername, otp))
-                    .thenAccept(v -> {
-                        javax.swing.SwingUtilities.invokeLater(() -> {
-                            JOptionPane.showMessageDialog(this, "Đổi Email thành công!");
-                            User current = SessionManager.getCurrentUser();
-                            current.setEmail(emailOrUsername);
-                            this.dispose();
-                        });
-                    })
-                    .exceptionally(ex -> handleOTPError(ex));
-        }
+    // 2. Chống spam: Vô hiệu hóa nút và bắt đầu xử lý
+    btnVerify.setEnabled(false);
+    btnVerify.setText("Đang xác thực...");
+
+    UserService userService = new UserService();
+
+    // 3. Phân luồng dựa trên biến 'type' (REGISTER hoặc CHANGE_EMAIL)
+    if ("REGISTER".equalsIgnoreCase(type)) {
+        // LUỒNG ĐĂNG KÝ
+        userService.verifyRegister(new chattingapp.dtos.user.register.RegisterVerifyRequestDTO(username, otp))
+            .thenAccept(response -> {
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    JOptionPane.showMessageDialog(this, "Xác thực tài khoản thành công! Bạn có thể đăng nhập ngay.");
+                    new LoginFrame().setVisible(true);
+                    this.dispose();
+                });
+            })
+            .exceptionally(ex -> handleAuthError(ex));
+
+    } else if ("CHANGE_EMAIL".equalsIgnoreCase(type)) {
+        // LUỒNG ĐỔI EMAIL (Cần lấy emailOrUsername từ biến của Frame)
+        userService.verifyChangeEmail(new chattingapp.dtos.user.changeemail.ChangeEmailRequestDTO(emailOrUsername, otp))
+            .thenAccept(v -> {
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    JOptionPane.showMessageDialog(this, "Đổi Email thành công!");
+                    // Cập nhật lại Session cục bộ
+                    User current = SessionManager.getCurrentUser();
+                    if (current != null) current.setEmail(emailOrUsername);
+                    this.dispose();
+                });
+            })
+            .exceptionally(ex -> handleAuthError(ex));
+    }
     }//GEN-LAST:event_btnVerifyActionPerformed
     private Void handleOTPError(Throwable ex) {
         javax.swing.SwingUtilities.invokeLater(() -> {
@@ -140,6 +162,7 @@ String otp = txtOTP.getText().trim();
         });
         return null;
     }
+    
     private void btnReSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReSendActionPerformed
         btnReSend.setEnabled(false);
 

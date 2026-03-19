@@ -13,9 +13,10 @@ import java.util.Map;
 public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiResponse<Void>> handleRuntimeException(RuntimeException ex){
-        ApiResponse<Void> response = new ApiResponse<>("error", "Invalid request", "SYSTEM_ERROR", null);
-        return ResponseEntity.badRequest().body(response);
-
+        // Log lỗi thực tế ra console backend để debug
+        ex.printStackTrace();
+        ApiResponse<Void> response = ApiResponse.error("INTERNAL_SERVER_ERROR", "Máy chủ gặp sự cố xử lý.");
+        return ResponseEntity.status(500).body(response);
     }
     @ExceptionHandler(AppException.class)
     public ResponseEntity<ApiResponse<Void>> handleAppException(AppException ex){

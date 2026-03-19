@@ -21,7 +21,7 @@ public class StompClientService {
     public void connect(MessageListener listener) {
 
     String userId = SessionManager.getUserId();
-
+    System.out.println("🔥 WS START userId = " + userId);
     if (userId == null) {
         System.out.println("❌ WS NOT CONNECT: userId null");
         return;
@@ -47,7 +47,7 @@ public class StompClientService {
             public void afterConnected(StompSession session, StompHeaders headers) {
 
                 System.out.println("✅ WS CONNECTED");
-
+                System.out.println("📡 SUBSCRIBE: /topic/messages/" + userId);
                 session.subscribe("/topic/messages/" + userId, new StompFrameHandler() {
 
                     @Override
@@ -63,6 +63,12 @@ public class StompClientService {
                         System.out.println("📥 WS RECEIVE: " + msg.getContent());
 
                         listener.onMessage(msg);
+                        System.out.println("📥 WS RECEIVE from: " 
+    + msg.getSenderId() 
+    + " -> " 
+    + msg.getReceiverId()
+    + " | content: " 
+    + msg.getContent());
                     }
                 });
             }

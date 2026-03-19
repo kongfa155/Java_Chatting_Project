@@ -35,6 +35,17 @@
             <artifactId>resend-java</artifactId>
             <version>4.12.0</version>
         </dependency>
+        <!-- Source: https://mvnrepository.com/artifact/org.springframework/spring-websocket -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-websocket</artifactId>
+            <version>7.0.6</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>

@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,7 +26,9 @@ public class MessageService {
 
     @Autowired
     private MessageRepository messageRepository;
-
+    
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
     // SEND MESSAGE
     public ApiResponse<Message> sendMessage(String senderId, SendMessageRequestDTO request) {
 
@@ -50,9 +53,44 @@ public class MessageService {
 
         Message saved = messageRepository.save(message);
 
-        return ApiResponse.success("Message sent successfully", saved);
-    }
+        // 🚀 push cho receiver
+        messagingTemplate.convertAndSend(
+                "/topic/messages/" + saved.getReceiverId(),
+                saved
+        );
 
+        // 🚀 push cho chính sender
+        messagingTemplate.convertAndSend(
+                "/topic/messages/" + saved.getSenderId(),
+                saved
+        );
+
+return ApiResponse.success("Message sent successfully", saved);
+    }
+    
+    public void saveFromSocket(Message message) {
+
+        message.setMessageId(UUID.randomUUID().toString());
+        message.setSentAt(LocalDateTime.now());
+        message.setRead(false);
+        message.setDeleted(false);
+
+        Message saved = messageRepository.save(message);
+
+        // 🚀 push realtime cho người nhận
+        // 🚀 receiver
+            messagingTemplate.convertAndSend(
+                    "/topic/messages/" + saved.getReceiverId(),
+                    saved
+            );
+
+            // 🚀 sender (để UI nó cũng nhận realtime)
+            messagingTemplate.convertAndSend(
+                    "/topic/messages/" + saved.getSenderId(),
+                    saved
+            );
+    }
+    
     // GET CONVERSATION
     public ApiResponse<List<Message>> getConversation(String userA, String userB) {
 
@@ -158,7 +196,20 @@ public class MessageService {
             msg.setRead(false);
             msg.setDeleted(false);
 
-            return messageRepository.save(msg);
-        
+            Message saved = messageRepository.save(msg);
+
+            // 🚀 push realtime
+            messagingTemplate.convertAndSend(
+                    "/topic/messages/" + receiverId,
+                    saved
+            );
+
+            messagingTemplate.convertAndSend(
+                    "/topic/messages/" + senderId,
+                    saved
+            );
+
+            return saved;
+
     }
 }

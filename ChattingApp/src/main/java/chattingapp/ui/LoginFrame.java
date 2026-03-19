@@ -457,7 +457,6 @@ public class LoginFrame extends javax.swing.JFrame {
                         main.setVisible(true);
 
                         // 🔥 connect đúng panel đang dùng UI
-                        main.getChatPanel().initWebSocket();
 
                         this.dispose();
 

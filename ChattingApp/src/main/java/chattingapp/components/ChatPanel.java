@@ -164,7 +164,8 @@ public class ChatPanel extends javax.swing.JPanel {
     }
 
     public void initWebSocket() {
-
+        System.out.println("🚀 INIT WS CALLED");
+System.out.println("🎯 currentChatUserId: " + currentChatUserId);
         if (SessionManager.getUserId() == null) {
             System.out.println("⏳ đợi userId...");
 
@@ -182,28 +183,28 @@ public class ChatPanel extends javax.swing.JPanel {
 
         stompClient.connect(message -> {
 
-            System.out.println("📩 WS: " + message.getContent());
+    System.out.println("📩 WS: " + message.getContent());
 
-            if (currentChatUserId == null) {
-                return;
-            }
+    String myId = SessionManager.getCurrentUser().getUserId();
 
-            String myId = SessionManager.getCurrentUser().getUserId();
+    boolean isCurrentChat
+            = currentChatUserId != null &&
+            (
+                (message.getSenderId().equals(myId)
+                && message.getReceiverId().equals(currentChatUserId))
+                ||
+                (message.getSenderId().equals(currentChatUserId)
+                && message.getReceiverId().equals(myId))
+            );
 
-            boolean isCurrentChat
-                    = (message.getSenderId().equals(myId)
-                    && message.getReceiverId().equals(currentChatUserId))
-                    || (message.getSenderId().equals(currentChatUserId)
-                    && message.getReceiverId().equals(myId));
-
-            if (!isCurrentChat) {
-                return;
-            }
-
-            javax.swing.SwingUtilities.invokeLater(() -> {
-                addSingleMessage(message);
-            });
+    if (isCurrentChat) {
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            addSingleMessage(message);
         });
+    } else {
+        System.out.println("📥 RECEIVED BUT NOT CURRENT CHAT");
+    }
+});
     }
 
     private void renderMessages(java.util.List<Message> messages) {

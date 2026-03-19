@@ -20,25 +20,34 @@ public class StompClientService {
 
     public void connect(MessageListener listener) {
 
-        stompClient = new WebSocketStompClient(new StandardWebSocketClient());
-        stompClient.setMessageConverter(new MappingJackson2MessageConverter());
+    String userId = SessionManager.getUserId();
 
-        stompClient.connect("ws://localhost:8080/ws", new StompSessionHandlerAdapter() {
+    if (userId == null) {
+        System.out.println("❌ WS NOT CONNECT: userId null");
+        return;
+    }
+
+    System.out.println("🔥 WS START with userId = " + userId);
+
+    try {
+       stompClient = new WebSocketStompClient(new StandardWebSocketClient());
+
+        MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
+
+        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+
+        converter.setObjectMapper(mapper);
+
+        stompClient.setMessageConverter(converter);
+
+        stompClient.connectAsync("ws://localhost:8080/ws", new StompSessionHandlerAdapter() {
 
             @Override
             public void afterConnected(StompSession session, StompHeaders headers) {
-                
-                
-                System.out.println("✅ STOMP connected");
 
-                String userId = SessionManager.getUserId();
-                   System.out.println("✅ WS CONNECTED");
+                System.out.println("✅ WS CONNECTED");
 
-        System.out.println("USER ID: " + userId);
-if (userId == null || userId.isEmpty()) {
-    System.out.println("❌ userId null → không connect websocket");
-    return;
-}
                 session.subscribe("/topic/messages/" + userId, new StompFrameHandler() {
 
                     @Override
@@ -48,10 +57,37 @@ if (userId == null || userId.isEmpty()) {
 
                     @Override
                     public void handleFrame(StompHeaders headers, Object payload) {
-                        listener.onMessage((Message) payload);
+
+                        Message msg = (Message) payload;
+
+                        System.out.println("📥 WS RECEIVE: " + msg.getContent());
+
+                        listener.onMessage(msg);
                     }
                 });
             }
+
+            @Override
+            public void handleTransportError(StompSession session, Throwable exception) {
+                System.out.println("❌ WS ERROR:");
+                exception.printStackTrace();
+            }
+
+            @Override
+            public void handleException(StompSession session,
+                                        StompCommand command,
+                                        StompHeaders headers,
+                                        byte[] payload,
+                                        Throwable exception) {
+
+                System.out.println("❌ WS EXCEPTION:");
+                exception.printStackTrace();
+            }
         });
+
+    } catch (Exception e) {
+        System.out.println("❌ WS INIT FAIL:");
+        e.printStackTrace();
     }
+}
 }

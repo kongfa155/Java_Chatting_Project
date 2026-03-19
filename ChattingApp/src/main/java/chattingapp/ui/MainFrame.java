@@ -29,6 +29,10 @@ public class MainFrame extends javax.swing.JFrame {
         initComponents();
         initFrame();
         initData();
+        javax.swing.SwingUtilities.invokeLater(() -> {
+        getChatPanel().initWebSocket();
+    });
+
 
     }
 

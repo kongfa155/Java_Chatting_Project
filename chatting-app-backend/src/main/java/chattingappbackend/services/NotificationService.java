@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import chattingappbackend.models.Notification;
 import chattingappbackend.models.NotificationType;
@@ -19,6 +20,7 @@ public class NotificationService {
     private NotificationRepository notificationRepository;
 
     // tạo notification
+    @Transactional
     public void createNotification(String userId, String content, NotificationType type) {
 
         Notification notification = new Notification(
@@ -31,19 +33,19 @@ public class NotificationService {
                 type
         );
 
-        notificationRepository.insertNotification(notification);
+        // ✅ JPA dùng save()
+        notificationRepository.save(notification);
     }
 
     // lấy danh sách notification
     public ApiResponse<List<Notification>> getNotifications(String userId) {
 
         List<Notification> notifications
-                = notificationRepository.findByUserId(userId);
+                = notificationRepository.findByUserIdAndIsDeletedFalseOrderByCreatedAtDesc(userId);
 
         return ApiResponse.success(
                 "Get notifications successfully",
                 notifications
         );
     }
-
 }

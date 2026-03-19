@@ -40,6 +40,7 @@ public class ChatPanel extends javax.swing.JPanel {
     private FileDrawerPanel fileDrawer;
     private boolean drawerOpen = false;
     private StompClientService stompClient;
+
     /**
      * Creates new form ChatPanel
      */
@@ -53,40 +54,39 @@ public class ChatPanel extends javax.swing.JPanel {
         chatContentPanel.add(fileDrawer, BorderLayout.EAST);
         showEmpty();
         txtMessage.getInputMap().put(
-        javax.swing.KeyStroke.getKeyStroke("ENTER"),
-        "sendMessage"
-    );
-        
+                javax.swing.KeyStroke.getKeyStroke("ENTER"),
+                "sendMessage"
+        );
 
-    txtMessage.getActionMap().put("sendMessage", new javax.swing.AbstractAction() {
-    @Override
-    public void actionPerformed(java.awt.event.ActionEvent e) {
-        if (!isSending) {
-            btnSendActionPerformed(null);
-        }
-    }
-});
+        txtMessage.getActionMap().put("sendMessage", new javax.swing.AbstractAction() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                if (!isSending) {
+                    btnSendActionPerformed(null);
+                }
+            }
+        });
 
-    // Alt + Enter = xuống dòng
-    txtMessage.getInputMap().put(
-        javax.swing.KeyStroke.getKeyStroke("alt ENTER"),
-        "insert-break"
-    );
+        // Alt + Enter = xuống dòng
+        txtMessage.getInputMap().put(
+                javax.swing.KeyStroke.getKeyStroke("alt ENTER"),
+                "insert-break"
+        );
     }
-    
+
     //Websocket
     private void addSingleMessage(Message msg) {
-            System.out.println("UI ADD MESSAGE: " + msg.getContent());
-        boolean isMine =
-            msg.getSenderId().equals(
-                SessionManager.getCurrentUser().getUserId()
-            );
+        System.out.println("UI ADD MESSAGE: " + msg.getContent());
+        boolean isMine
+                = msg.getSenderId().equals(
+                        SessionManager.getCurrentUser().getUserId()
+                );
 
         switch (msg.getMessageType()) {
 
             case TEXT -> {
-                MessageBubble bubble =
-                    new MessageBubble(msg.getContent(), isMine);
+                MessageBubble bubble
+                        = new MessageBubble(msg.getContent(), isMine);
                 messageContainer.add(bubble);
             }
 
@@ -101,17 +101,17 @@ public class ChatPanel extends javax.swing.JPanel {
         messageContainer.repaint();
 
         JScrollPane.getVerticalScrollBar().setValue(
-            JScrollPane.getVerticalScrollBar().getMaximum()
+                JScrollPane.getVerticalScrollBar().getMaximum()
         );
     }
-    
+
     private File chooseFile() {
 
         JFileChooser chooser = new JFileChooser();
 
         // chỉ cho chọn file hợp lệ
-        javax.swing.filechooser.FileNameExtensionFilter filter =
-                new javax.swing.filechooser.FileNameExtensionFilter(
+        javax.swing.filechooser.FileNameExtensionFilter filter
+                = new javax.swing.filechooser.FileNameExtensionFilter(
                         "Supported Files",
                         "png", "jpg", "jpeg",
                         "pdf", "docx", "xlsx", "pptx",
@@ -123,10 +123,9 @@ public class ChatPanel extends javax.swing.JPanel {
         // ❗ chặn luôn "All Files"
         chooser.setAcceptAllFileFilterUsed(false);
         int result = chooser.showOpenDialog(this);
-            chooser.addChoosableFileFilter(new FileNameExtensionFilter("Images", "png", "jpg", "jpeg"));
-            chooser.addChoosableFileFilter(new FileNameExtensionFilter("Documents", "pdf", "docx", "xlsx", "pptx"));
-            chooser.addChoosableFileFilter(new FileNameExtensionFilter("Videos", "mp4"));
-
+        chooser.addChoosableFileFilter(new FileNameExtensionFilter("Images", "png", "jpg", "jpeg"));
+        chooser.addChoosableFileFilter(new FileNameExtensionFilter("Documents", "pdf", "docx", "xlsx", "pptx"));
+        chooser.addChoosableFileFilter(new FileNameExtensionFilter("Videos", "mp4"));
 
         if (result == javax.swing.JFileChooser.APPROVE_OPTION) {
             return chooser.getSelectedFile();
@@ -163,29 +162,41 @@ public class ChatPanel extends javax.swing.JPanel {
 
         return chattingapp.models.MessageType.FILE;
     }
-    
-    public void initWebSocket() {
-        
-        if (SessionManager.getUserId() == null) {
-        System.out.println("⏳ đợi userId...");
-        
-        new javax.swing.Timer(500, e -> {
-            if (SessionManager.getUserId() != null) {
-                ((javax.swing.Timer)e.getSource()).stop();
-                initWebSocket();
-            }
-        }).start();
 
-        return;
-    }
+    public void initWebSocket() {
+
+        if (SessionManager.getUserId() == null) {
+            System.out.println("⏳ đợi userId...");
+
+            new javax.swing.Timer(500, e -> {
+                if (SessionManager.getUserId() != null) {
+                    ((javax.swing.Timer) e.getSource()).stop();
+                    initWebSocket();
+                }
+            }).start();
+
+            return;
+        }
+
         stompClient = new StompClientService();
 
         stompClient.connect(message -> {
 
-            if (currentChatUserId == null) return;
+            System.out.println("📩 WS: " + message.getContent());
 
-            if (!message.getSenderId().equals(currentChatUserId)
-                && !message.getReceiverId().equals(currentChatUserId)) {
+            if (currentChatUserId == null) {
+                return;
+            }
+
+            String myId = SessionManager.getCurrentUser().getUserId();
+
+            boolean isCurrentChat
+                    = (message.getSenderId().equals(myId)
+                    && message.getReceiverId().equals(currentChatUserId))
+                    || (message.getSenderId().equals(currentChatUserId)
+                    && message.getReceiverId().equals(myId));
+
+            if (!isCurrentChat) {
                 return;
             }
 
@@ -194,161 +205,161 @@ public class ChatPanel extends javax.swing.JPanel {
             });
         });
     }
+
     private void renderMessages(java.util.List<Message> messages) {
-    messageContainer.removeAll();
+        messageContainer.removeAll();
 
-    for (Message msg : messages) {
+        for (Message msg : messages) {
 
-        boolean isMine =
-            msg.getSenderId().equals(
-                SessionManager.getCurrentUser().getUserId()
-            );
-
-        switch (msg.getMessageType()) {
-
-            case IMAGE -> {
-                 try {
-        String imageUrl = ApiClient.getFileUrl(msg.getFileUrl());
-
-        URL url = new URL(imageUrl);
-
-        java.awt.image.BufferedImage bufferedImage =
-                javax.imageio.ImageIO.read(url);
-
-        if (bufferedImage == null) {
-            throw new RuntimeException("Image null");
-        }
-        
-
-        Image img = bufferedImage.getScaledInstance(220, -1, Image.SCALE_SMOOTH);
-
-        JLabel imageLabel = new JLabel(new ImageIcon(img));
-
-        // 🎯 PANEL CHA
-        JPanel imagePanel = new JPanel(new BorderLayout());
-        imagePanel.setOpaque(false);
-
-        imagePanel.add(imageLabel, BorderLayout.CENTER);
-
-        // 🎯 NÚT DOWNLOAD
-        JButton downloadBtn = new JButton("⬇");
-        downloadBtn.setFocusPainted(false);
-
-        downloadBtn.addActionListener(e -> {
-            try {
-                String downloadUrl = ApiClient.getFileUrl(msg.getFileUrl());
-
-                String fileName = msg.getContent() != null
-                        ? msg.getContent()
-                        : "image.jpg";
-
-                String downloadPath = System.getProperty("user.home") + "/Downloads/";
-                File saveFile = new File(downloadPath + fileName);
-
-                try (java.io.InputStream in = new URL(downloadUrl).openStream()) {
-                    java.nio.file.Files.copy(
-                            in,
-                            saveFile.toPath(),
-                            java.nio.file.StandardCopyOption.REPLACE_EXISTING
+            boolean isMine
+                    = msg.getSenderId().equals(
+                            SessionManager.getCurrentUser().getUserId()
                     );
-                }
 
-                // mở folder
-                if (System.getProperty("os.name").toLowerCase().contains("win")) {
-                    Runtime.getRuntime().exec(new String[]{
-                        "explorer.exe",
-                        "/select,",
-                        saveFile.getAbsolutePath()
-                    });
-                } else {
-                    Desktop.getDesktop().open(saveFile.getParentFile());
-                }
+            switch (msg.getMessageType()) {
 
-                System.out.println("Downloaded: " + saveFile.getAbsolutePath());
+                case IMAGE -> {
+                    try {
+                        String imageUrl = ApiClient.getFileUrl(msg.getFileUrl());
 
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        });
+                        URL url = new URL(imageUrl);
 
-        JPanel topRight = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        topRight.setOpaque(false);
-        topRight.add(downloadBtn);
+                        java.awt.image.BufferedImage bufferedImage
+                                = javax.imageio.ImageIO.read(url);
 
-        imagePanel.add(topRight, BorderLayout.NORTH);
+                        if (bufferedImage == null) {
+                            throw new RuntimeException("Image null");
+                        }
 
-        // 🎯 WRAPPER (trái/phải)
-        JPanel wrapper = new JPanel(new FlowLayout(
-                isMine ? FlowLayout.RIGHT : FlowLayout.LEFT
-        ));
-        wrapper.setOpaque(false);
+                        Image img = bufferedImage.getScaledInstance(220, -1, Image.SCALE_SMOOTH);
 
-        wrapper.add(imagePanel);
-        messageContainer.add(wrapper);
+                        JLabel imageLabel = new JLabel(new ImageIcon(img));
 
-    } catch (Exception e) {
-        System.out.println("❌ " + e.getMessage());
+                        // 🎯 PANEL CHA
+                        JPanel imagePanel = new JPanel(new BorderLayout());
+                        imagePanel.setOpaque(false);
 
-        JLabel error = new JLabel("⚠ Không load được ảnh");
-        messageContainer.add(error);
-    }
-            }
+                        imagePanel.add(imageLabel, BorderLayout.CENTER);
 
-            case FILE, VIDEO, AUDIO -> {
-                String fileName = msg.getContent() != null
-                                ? msg.getContent()
-                                : "file";
-
-                        JPanel filePanel = new JPanel();
-                        filePanel.setLayout(new BorderLayout());
-                        filePanel.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
-                        filePanel.setBackground(isMine ? new Color(0,120,255) : new Color(240,240,240));
-
-                        // 🧠 LEFT: icon + name
-                        JPanel left = new JPanel(new BorderLayout());
-                        left.setOpaque(false);
-
-                        JLabel icon = new JLabel("📄");
-                        icon.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 8));
-
-                        JLabel name = new JLabel(fileName);
-                        name.setForeground(isMine ? Color.WHITE : Color.BLACK);
-
-                        left.add(icon, BorderLayout.WEST);
-                        left.add(name, BorderLayout.CENTER);
-
-                        // 🧠 RIGHT: download button
+                        // 🎯 NÚT DOWNLOAD
                         JButton downloadBtn = new JButton("⬇");
                         downloadBtn.setFocusPainted(false);
 
                         downloadBtn.addActionListener(e -> {
                             try {
-                                String fileUrl = "http://localhost:8080" + msg.getFileUrl();
+                                String downloadUrl = ApiClient.getFileUrl(msg.getFileUrl());
 
-                                // 🧠 tên file
-                                String downloadName = msg.getContent() != null
+                                String fileName = msg.getContent() != null
                                         ? msg.getContent()
-                                        : "file";
+                                        : "image.jpg";
 
-                                // 🧠 folder Downloads
                                 String downloadPath = System.getProperty("user.home") + "/Downloads/";
+                                File saveFile = new File(downloadPath + fileName);
 
-                                // 🧠 file đích
-                                File saveFile = new File(downloadPath + downloadName);
-
-                                // 🧠 tải file
-                                try (java.io.InputStream in = new URL(fileUrl).openStream()) {
+                                try (java.io.InputStream in = new URL(downloadUrl).openStream()) {
                                     java.nio.file.Files.copy(
-                                        in,
-                                        saveFile.toPath(),
-                                        java.nio.file.StandardCopyOption.REPLACE_EXISTING
+                                            in,
+                                            saveFile.toPath(),
+                                            java.nio.file.StandardCopyOption.REPLACE_EXISTING
                                     );
                                 }
 
-                                // 🧠 mở folder
-                               String path = saveFile.getAbsolutePath();
-
+                                // mở folder
                                 if (System.getProperty("os.name").toLowerCase().contains("win")) {
+                                    Runtime.getRuntime().exec(new String[]{
+                                        "explorer.exe",
+                                        "/select,",
+                                        saveFile.getAbsolutePath()
+                                    });
+                                } else {
+                                    Desktop.getDesktop().open(saveFile.getParentFile());
+                                }
+
+                                System.out.println("Downloaded: " + saveFile.getAbsolutePath());
+
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+                        });
+
+                        JPanel topRight = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+                        topRight.setOpaque(false);
+                        topRight.add(downloadBtn);
+
+                        imagePanel.add(topRight, BorderLayout.NORTH);
+
+                        // 🎯 WRAPPER (trái/phải)
+                        JPanel wrapper = new JPanel(new FlowLayout(
+                                isMine ? FlowLayout.RIGHT : FlowLayout.LEFT
+                        ));
+                        wrapper.setOpaque(false);
+
+                        wrapper.add(imagePanel);
+                        messageContainer.add(wrapper);
+
+                    } catch (Exception e) {
+                        System.out.println("❌ " + e.getMessage());
+
+                        JLabel error = new JLabel("⚠ Không load được ảnh");
+                        messageContainer.add(error);
+                    }
+                }
+
+                case FILE, VIDEO, AUDIO -> {
+                    String fileName = msg.getContent() != null
+                            ? msg.getContent()
+                            : "file";
+
+                    JPanel filePanel = new JPanel();
+                    filePanel.setLayout(new BorderLayout());
+                    filePanel.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
+                    filePanel.setBackground(isMine ? new Color(0, 120, 255) : new Color(240, 240, 240));
+
+                    // 🧠 LEFT: icon + name
+                    JPanel left = new JPanel(new BorderLayout());
+                    left.setOpaque(false);
+
+                    JLabel icon = new JLabel("📄");
+                    icon.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 8));
+
+                    JLabel name = new JLabel(fileName);
+                    name.setForeground(isMine ? Color.WHITE : Color.BLACK);
+
+                    left.add(icon, BorderLayout.WEST);
+                    left.add(name, BorderLayout.CENTER);
+
+                    // 🧠 RIGHT: download button
+                    JButton downloadBtn = new JButton("⬇");
+                    downloadBtn.setFocusPainted(false);
+
+                    downloadBtn.addActionListener(e -> {
+                        try {
+                            String fileUrl = "http://localhost:8080" + msg.getFileUrl();
+
+                            // 🧠 tên file
+                            String downloadName = msg.getContent() != null
+                                    ? msg.getContent()
+                                    : "file";
+
+                            // 🧠 folder Downloads
+                            String downloadPath = System.getProperty("user.home") + "/Downloads/";
+
+                            // 🧠 file đích
+                            File saveFile = new File(downloadPath + downloadName);
+
+                            // 🧠 tải file
+                            try (java.io.InputStream in = new URL(fileUrl).openStream()) {
+                                java.nio.file.Files.copy(
+                                        in,
+                                        saveFile.toPath(),
+                                        java.nio.file.StandardCopyOption.REPLACE_EXISTING
+                                );
+                            }
+
+                            // 🧠 mở folder
+                            String path = saveFile.getAbsolutePath();
+
+                            if (System.getProperty("os.name").toLowerCase().contains("win")) {
                                 Runtime.getRuntime().exec(new String[]{
                                     "explorer.exe",
                                     "/select,",
@@ -357,50 +368,52 @@ public class ChatPanel extends javax.swing.JPanel {
                             } else {
                                 Desktop.getDesktop().open(saveFile.getParentFile());
                             }
-                                System.out.println("Downloaded: " + saveFile.getAbsolutePath());
+                            System.out.println("Downloaded: " + saveFile.getAbsolutePath());
 
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                            }
-                        });
-                        JPanel right = new JPanel(new BorderLayout());
-                        right.setOpaque(false);
-                        right.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 0));
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    });
+                    JPanel right = new JPanel(new BorderLayout());
+                    right.setOpaque(false);
+                    right.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 0));
 
-                        right.add(downloadBtn, BorderLayout.CENTER);
+                    right.add(downloadBtn, BorderLayout.CENTER);
 
-                        filePanel.add(left, BorderLayout.CENTER);
-                        filePanel.add(right, BorderLayout.EAST);
+                    filePanel.add(left, BorderLayout.CENTER);
+                    filePanel.add(right, BorderLayout.EAST);
 
-                        // wrapper
-                        JPanel wrapper = new JPanel(new FlowLayout(
-                                isMine ? FlowLayout.RIGHT : FlowLayout.LEFT
-                        ));
-                        wrapper.setOpaque(false);
+                    // wrapper
+                    JPanel wrapper = new JPanel(new FlowLayout(
+                            isMine ? FlowLayout.RIGHT : FlowLayout.LEFT
+                    ));
+                    wrapper.setOpaque(false);
 
-                        wrapper.add(filePanel);
-                        messageContainer.add(wrapper);
-            }
+                    wrapper.add(filePanel);
+                    messageContainer.add(wrapper);
+                }
 
-            case TEXT -> {
-                MessageBubble bubble =
-                    new MessageBubble(msg.getContent(), isMine);
-                messageContainer.add(bubble);
+                case TEXT -> {
+                    MessageBubble bubble
+                            = new MessageBubble(msg.getContent(), isMine);
+                    messageContainer.add(bubble);
+                }
             }
         }
+
+        messageContainer.revalidate();
+        messageContainer.repaint();
+
+        JScrollPane.getVerticalScrollBar().setValue(
+                JScrollPane.getVerticalScrollBar().getMaximum()
+        );
     }
 
-    messageContainer.revalidate();
-    messageContainer.repaint();
-
-    JScrollPane.getVerticalScrollBar().setValue(
-        JScrollPane.getVerticalScrollBar().getMaximum()
-    );
-}
-    
-        public void loadChat(ChatData data) {
+    public void loadChat(ChatData data) {
         showChat();
-        if (data == null) return;
+        if (data == null) {
+            return;
+        }
 
         currentChatUserId = data.getContact().getUserId();
         lblName.setText(data.getContact().getDisplayName());
@@ -409,22 +422,24 @@ public class ChatPanel extends javax.swing.JPanel {
         MessageService service = new MessageService();
 
         service.getConversation(currentChatUserId)
-            .thenAccept(messages -> {
-                javax.swing.SwingUtilities.invokeLater(() -> {
-                    renderMessages(messages);
+                .thenAccept(messages -> {
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+                        renderMessages(messages);
+                    });
                 });
-            });
     }
-        private void loadChatFromCurrent() {
+
+    private void loadChatFromCurrent() {
         MessageService service = new MessageService();
 
         service.getConversation(currentChatUserId)
-            .thenAccept(messages -> {
-                javax.swing.SwingUtilities.invokeLater(() -> {
-                    renderMessages(messages);
+                .thenAccept(messages -> {
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+                        renderMessages(messages);
+                    });
                 });
-            });
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -544,17 +559,19 @@ public class ChatPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAttachActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAttachActionPerformed
-       File file = chooseFile();
-    if (file == null) return;
+        File file = chooseFile();
+        if (file == null) {
+            return;
+        }
 
-    MessageService service = new MessageService();
+        MessageService service = new MessageService();
 
-    service.sendFile(currentChatUserId, file)
-        .thenAccept(msg -> {
-            javax.swing.SwingUtilities.invokeLater(() -> {
-               
-            });
-        });
+        service.sendFile(currentChatUserId, file)
+                .thenAccept(msg -> {
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+
+                    });
+                });
     }//GEN-LAST:event_btnAttachActionPerformed
     private void toggleDrawer() {
 
@@ -565,7 +582,7 @@ public class ChatPanel extends javax.swing.JPanel {
         if (drawerOpen) {
             //Nữa MiMi viết cho tui hàm lấy toàn bộ chat mà không phải text của mình với bạn hiện tại tại chỗ này nhe
 
-           MessageService service = new MessageService();
+            MessageService service = new MessageService();
 
             service.getConversation(currentChatUserId)
                     .thenAccept(messages -> {
@@ -585,13 +602,25 @@ public class ChatPanel extends javax.swing.JPanel {
     private boolean isSending = false;
 
     private void btnSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendActionPerformed
-         if (isSending) return; // 🚫 chặn spam
+         if (isSending) return;
 
     String text = txtMessage.getText().trim();
-        System.out.println(text);
     if (text.isEmpty()) return;
 
     isSending = true;
+
+    String myId = SessionManager.getCurrentUser().getUserId();
+
+    // 🔥 render ngay (optimistic UI)
+    Message fakeMsg = new Message();
+    fakeMsg.setContent(text);
+    fakeMsg.setSenderId(myId);
+    fakeMsg.setReceiverId(currentChatUserId);
+    fakeMsg.setMessageType(MessageType.TEXT);
+
+    addSingleMessage(fakeMsg);
+
+    txtMessage.setText("");
 
     MessageService service = new MessageService();
 
@@ -599,12 +628,6 @@ public class ChatPanel extends javax.swing.JPanel {
             .thenAccept(msg -> {
 
                 javax.swing.SwingUtilities.invokeLater(() -> {
-
-                    txtMessage.setText("");
-
-                  
-                    
-
                     isSending = false;
                 });
 

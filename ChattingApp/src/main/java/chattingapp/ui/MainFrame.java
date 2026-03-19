@@ -4,6 +4,7 @@
  */
 package chattingapp.ui;
 
+import chattingapp.components.ChatPanel;
 import chattingapp.components.SideBarPanel;
 import chattingapp.models.User;
 import chattingapp.utils.SessionManager;
@@ -28,19 +29,25 @@ public class MainFrame extends javax.swing.JFrame {
         initComponents();
         initFrame();
         initData();
-        
+
     }
-    private void initData(){
+
+    public ChatPanel getChatPanel() {
+        return chatPanel1;
+    }
+
+    private void initData() {
         SideBarPanel newSideBar = new SideBarPanel();
         leftSplitPane.setLeftComponent(newSideBar);
         leftSplitPane.setDividerLocation(70);
         mainSplitPane.setDividerLocation(300);
-        
+
         //Cấp cao thiết lập kênh đàm thoại, yêu cầu chatPanel tiếng hành load lại giao diện khung chat
         chatListPanel1.setChatSelectionListener(data -> {
             chatPanel1.loadChat(data);
         });
     }
+
     private void initFrame() {
         //Set kích cỡ cho nó lên 3/4 màn hình
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();

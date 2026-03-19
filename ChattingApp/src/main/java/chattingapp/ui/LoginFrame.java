@@ -4,6 +4,7 @@
  */
 package chattingapp.ui;
 
+import chattingapp.components.ChatPanel;
 import chattingapp.dtos.user.forgotpassword.ForgotPasswordOTPRequestDTO;
 import chattingapp.dtos.user.forgotpassword.ForgotPasswordVerifyRequest;
 import chattingapp.dtos.user.login.LoginRequetDTO;
@@ -451,8 +452,16 @@ public class LoginFrame extends javax.swing.JFrame {
                         user.setEmail(response.email()); // Nếu có email để dùng cho UpdateEmailDialog
 
                         SessionManager.setSession(response.accessToken(), user);
-                        new MainFrame().setVisible(true);
+                        // 🚀 connect websocket sau khi login
+                        MainFrame main = new MainFrame();
+                        main.setVisible(true);
+
+                        // 🔥 connect đúng panel đang dùng UI
+                        main.getChatPanel().initWebSocket();
+
                         this.dispose();
+
+
                     });
                 })
                 .exceptionally(ex -> {

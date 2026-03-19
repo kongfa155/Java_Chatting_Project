@@ -14,6 +14,7 @@ import chattingapp.models.Message;
 import chattingapp.models.MessageType;
 import chattingapp.services.ApiClient;
 import chattingapp.services.MessageService;
+import chattingapp.services.StompClientService;
 import chattingapp.utils.SessionManager;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -38,7 +39,7 @@ public class ChatPanel extends javax.swing.JPanel {
     private String currentChatUserId;
     private FileDrawerPanel fileDrawer;
     private boolean drawerOpen = false;
-
+    private StompClientService stompClient;
     /**
      * Creates new form ChatPanel
      */
@@ -55,6 +56,7 @@ public class ChatPanel extends javax.swing.JPanel {
         javax.swing.KeyStroke.getKeyStroke("ENTER"),
         "sendMessage"
     );
+        
 
     txtMessage.getActionMap().put("sendMessage", new javax.swing.AbstractAction() {
     @Override
@@ -71,7 +73,38 @@ public class ChatPanel extends javax.swing.JPanel {
         "insert-break"
     );
     }
+    
+    //Websocket
+    private void addSingleMessage(Message msg) {
+            System.out.println("UI ADD MESSAGE: " + msg.getContent());
+        boolean isMine =
+            msg.getSenderId().equals(
+                SessionManager.getCurrentUser().getUserId()
+            );
 
+        switch (msg.getMessageType()) {
+
+            case TEXT -> {
+                MessageBubble bubble =
+                    new MessageBubble(msg.getContent(), isMine);
+                messageContainer.add(bubble);
+            }
+
+            default -> {
+                // file/image → tạm reload
+                loadChatFromCurrent();
+                return;
+            }
+        }
+
+        messageContainer.revalidate();
+        messageContainer.repaint();
+
+        JScrollPane.getVerticalScrollBar().setValue(
+            JScrollPane.getVerticalScrollBar().getMaximum()
+        );
+    }
+    
     private File chooseFile() {
 
         JFileChooser chooser = new JFileChooser();
@@ -130,6 +163,37 @@ public class ChatPanel extends javax.swing.JPanel {
 
         return chattingapp.models.MessageType.FILE;
     }
+    
+    public void initWebSocket() {
+        
+        if (SessionManager.getUserId() == null) {
+        System.out.println("⏳ đợi userId...");
+        
+        new javax.swing.Timer(500, e -> {
+            if (SessionManager.getUserId() != null) {
+                ((javax.swing.Timer)e.getSource()).stop();
+                initWebSocket();
+            }
+        }).start();
+
+        return;
+    }
+        stompClient = new StompClientService();
+
+        stompClient.connect(message -> {
+
+            if (currentChatUserId == null) return;
+
+            if (!message.getSenderId().equals(currentChatUserId)
+                && !message.getReceiverId().equals(currentChatUserId)) {
+                return;
+            }
+
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                addSingleMessage(message);
+            });
+        });
+    }
     private void renderMessages(java.util.List<Message> messages) {
     messageContainer.removeAll();
 
@@ -154,6 +218,7 @@ public class ChatPanel extends javax.swing.JPanel {
         if (bufferedImage == null) {
             throw new RuntimeException("Image null");
         }
+        
 
         Image img = bufferedImage.getScaledInstance(220, -1, Image.SCALE_SMOOTH);
 
@@ -487,7 +552,7 @@ public class ChatPanel extends javax.swing.JPanel {
     service.sendFile(currentChatUserId, file)
         .thenAccept(msg -> {
             javax.swing.SwingUtilities.invokeLater(() -> {
-                loadChatFromCurrent(); // 🔥 chỉ gọi lại thôi
+               
             });
         });
     }//GEN-LAST:event_btnAttachActionPerformed
@@ -523,6 +588,7 @@ public class ChatPanel extends javax.swing.JPanel {
          if (isSending) return; // 🚫 chặn spam
 
     String text = txtMessage.getText().trim();
+        System.out.println(text);
     if (text.isEmpty()) return;
 
     isSending = true;
@@ -537,8 +603,7 @@ public class ChatPanel extends javax.swing.JPanel {
                     txtMessage.setText("");
 
                   
-                    // reload từ server
-                  loadChatFromCurrent();
+                    
 
                     isSending = false;
                 });

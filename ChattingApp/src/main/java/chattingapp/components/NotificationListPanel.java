@@ -19,55 +19,28 @@ public class NotificationListPanel extends javax.swing.JPanel {
      */
     public NotificationListPanel() {
         initComponents();
-        loadFakeData();
+
     }
 
     public void setData(List<Notification> list) {
-        this.removeAll();
+        pnlContainer.removeAll(); // Xóa các item cũ trong container
 
-        for (Notification n : list) {
-            this.add(new javax.swing.JLabel("🔔 " + n.getContent()));
-        }
-
-        this.revalidate();
-        this.repaint();
+    for (Notification n : list) {
+        // Sử dụng class ItemPanel bạn đã tạo
+        NotificationItemPanel item = new NotificationItemPanel(n);
+        
+        // Cố định chiều cao tối đa để không bị giãn
+        item.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, 60));
+        
+        pnlContainer.add(item);
+        pnlContainer.add(javax.swing.Box.createVerticalStrut(5)); // Khoảng cách giữa các thông báo
     }
 
-    private void loadFakeData() {
+    // Quan trọng: Thêm một Glue ở cuối để đẩy các item lên trên cùng
+    pnlContainer.add(javax.swing.Box.createVerticalGlue());
 
-        List<Notification> list = List.of(
-                new Notification(
-                        "1",
-                        "U01",
-                        "CP gửi lời mời kết bạn",
-                        false,
-                        false,
-                        LocalDateTime.now(),
-                        null
-                ),
-                new Notification(
-                        "2",
-                        "U01",
-                        "Bạn có tin nhắn mới",
-                        true,
-                        false,
-                        LocalDateTime.now(),
-                        null
-                )
-        );
-
-        for (Notification n : list) {
-
-            NotificationItemPanel item
-                    = new NotificationItemPanel(n);
-
-            pnlContainer.add(item);
-            pnlContainer.add(javax.swing.Box.createVerticalStrut(3));
-
-        }
-
-        pnlContainer.revalidate();
-        pnlContainer.repaint();
+    pnlContainer.revalidate();
+    pnlContainer.repaint();
     }
 
     /**

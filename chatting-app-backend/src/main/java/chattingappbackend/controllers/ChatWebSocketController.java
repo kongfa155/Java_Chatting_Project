@@ -2,6 +2,7 @@ package chattingappbackend.controllers;
 
 import chattingappbackend.models.Message;
 import chattingappbackend.models.Notification;
+import chattingappbackend.repositories.UserRepository;
 import chattingappbackend.services.MessageService;
 import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,8 @@ public class ChatWebSocketController {
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
-
+    @Autowired
+    private UserRepository userRepository;
     // Hashtable lưu trữ trạng thái các phòng chat đang hoạt động (nếu cần quản lý thêm)
     private final Map<String, String> activeChatRooms = new ConcurrentHashMap<>();
 
@@ -43,14 +45,17 @@ public class ChatWebSocketController {
         // Thay vì gửi đến /topic/messages/{id}, ta gửi đến /topic/chatroom/{chatId}
         System.out.println("🚀 BROADCASTING TO ROOM: " + chatId);
         messagingTemplate.convertAndSend("/topic/chatroom/" + chatId, message);
-
+// Lấy thông tin người gửi để lấy Display Name
+        String senderDisplayName = userRepository.findById(message.getSenderId())
+                .map(user -> user.getDisplayName())
+                .orElse("Người dùng lạ"); // Trường hợp dự phòng nếu không tìm thấy User
         // Gửi notification cho người nhận
         messagingTemplate.convertAndSend(
                 "/topic/notifications/" + message.getReceiverId(),
                 new Notification(
                         UUID.randomUUID().toString(),
                         message.getReceiverId(),
-                        "Bạn có tin nhắn mới từ " + message.getSenderId(),
+                        "Bạn có tin nhắn mới từ " + senderDisplayName,
                         false,
                         false,
                         LocalDateTime.now(),

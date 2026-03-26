@@ -1,5 +1,6 @@
 package chattingapp.services;
 
+import chattingapp.config.ServerConfig;
 import chattingapp.models.Message;
 import chattingapp.utils.SessionManager;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
@@ -32,7 +33,7 @@ public class StompClientService {
             converter.setObjectMapper(mapper);
             stompClient.setMessageConverter(converter);
 
-            stompClient.connectAsync("ws://localhost:8080/ws", new StompSessionHandlerAdapter() {
+            stompClient.connectAsync("ws:" + ServerConfig.SERVER_URL +"/ws", new StompSessionHandlerAdapter() {
                 @Override
                 public void afterConnected(StompSession session, StompHeaders headers) {
                     System.out.println("✅ WS CONNECTED");

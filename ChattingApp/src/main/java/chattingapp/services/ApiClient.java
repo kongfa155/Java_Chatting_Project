@@ -1,13 +1,14 @@
 package chattingapp.services;
 
+import chattingapp.config.ServerConfig;
 import java.net.http.HttpClient;
 import java.time.Duration;
 
 public class ApiClient {
 
     private static HttpClient client;
-    private static final String BASE_URL = "http://localhost:8080/api";
-    private static final String FILE_BASE = "http://localhost:8080";
+    private static final String BASE_URL = ServerConfig.SERVER_URL + "/api";
+    private static final String FILE_BASE = ServerConfig.SERVER_URL;
 
     public static HttpClient getClient(){
         if(client==null){

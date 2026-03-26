@@ -49,7 +49,6 @@ D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\services\FriendServic
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\services\MessageService.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\services\StompClientService.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\services\UserService.java
-D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\services\WebSocketClientService.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\ui\EditProfileDialog.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\ui\LoginFrame.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\ui\MainFrame.java
@@ -59,5 +58,6 @@ D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\ui\UpdateEmailDialog.
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\ui\UpdatePasswordDialog.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\utils\AvatarUtil.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\utils\GlobalErrorHandler.java
+D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\utils\NotificationManager.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\utils\SessionManager.java
 D:\code\Java\JavaApp\ChattingApp\src\main\java\chattingapp\utils\TimeUtil.java

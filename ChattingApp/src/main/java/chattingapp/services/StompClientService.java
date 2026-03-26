@@ -2,6 +2,7 @@ package chattingapp.services;
 
 import chattingapp.config.ServerConfig;
 import chattingapp.models.Message;
+import chattingapp.models.Notification;
 import chattingapp.utils.SessionManager;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.*;
@@ -17,13 +18,21 @@ public class StompClientService {
     private StompSession currentSession;
 
     public interface MessageListener {
+
         void onMessage(Message message);
+    }
+
+    public interface NotificationListener {
+
+        void onNotification(Notification notification);
     }
 
     // Giữ nguyên tên hàm cũ
     public void connect(MessageListener listener) {
         String userId = SessionManager.getUserId();
-        if (userId == null) return;
+        if (userId == null) {
+            return;
+        }
 
         try {
             stompClient = new WebSocketStompClient(new StandardWebSocketClient());
@@ -33,7 +42,7 @@ public class StompClientService {
             converter.setObjectMapper(mapper);
             stompClient.setMessageConverter(converter);
 
-            stompClient.connectAsync("ws:" + ServerConfig.SERVER_URL +"/ws", new StompSessionHandlerAdapter() {
+            stompClient.connectAsync("ws:" + ServerConfig.SERVER_URL + "/ws", new StompSessionHandlerAdapter() {
                 @Override
                 public void afterConnected(StompSession session, StompHeaders headers) {
                     System.out.println("✅ WS CONNECTED");
@@ -42,7 +51,10 @@ public class StompClientService {
                     // Vẫn giữ subscribe mặc định theo UserID để nhận thông báo hệ thống/cuộc gọi nếu cần
                     session.subscribe("/topic/messages/" + userId, new StompFrameHandler() {
                         @Override
-                        public Type getPayloadType(StompHeaders headers) { return Message.class; }
+                        public Type getPayloadType(StompHeaders headers) {
+                            return Message.class;
+                        }
+
                         @Override
                         public void handleFrame(StompHeaders headers, Object payload) {
                             listener.onMessage((Message) payload);
@@ -56,11 +68,13 @@ public class StompClientService {
     }
 
     /**
-     * Tên hàm mới: subscribeToConversation
-     * Mục đích: Tạo ra chatId duy nhất cho 2 người và lắng nghe chung 1 kênh
+     * Tên hàm mới: subscribeToConversation Mục đích: Tạo ra chatId duy nhất cho
+     * 2 người và lắng nghe chung 1 kênh
      */
     public void subscribeToConversation(String myId, String partnerId, MessageListener listener) {
-        if (currentSession == null || !currentSession.isConnected()) return;
+        if (currentSession == null || !currentSession.isConnected()) {
+            return;
+        }
 
         // Tạo chatId duy nhất bằng cách sắp xếp 2 ID (Ví dụ: "user1_user2")
         String[] ids = {myId, partnerId};
@@ -79,6 +93,25 @@ public class StompClientService {
             public void handleFrame(StompHeaders headers, Object payload) {
                 Message msg = (Message) payload;
                 listener.onMessage(msg);
+            }
+        });
+    }
+
+    public void subscribeToNotifications(String userId, NotificationListener listener) {
+        if (currentSession == null || !currentSession.isConnected()) {
+            return;
+        }
+
+        currentSession.subscribe("/topic/notifications/" + userId, new StompFrameHandler() {
+            @Override
+            public Type getPayloadType(StompHeaders headers) {
+                return Notification.class;
+            }
+
+            @Override
+            public void handleFrame(StompHeaders headers, Object payload) {
+                Notification noti = (Notification) payload;
+                listener.onNotification(noti); // ✅ đúng
             }
         });
     }

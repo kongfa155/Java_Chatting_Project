@@ -108,6 +108,11 @@ public class FriendshipService {
         // 👉 JPA dirty checking
         friendship.setStatus(FriendshipStatus.ACCEPTED);
 
+        notificationService.createNotification(
+                friendship.getUserId(), // người gửi request ban đầu
+                "Lời mời kết bạn đã được chấp nhận",
+                NotificationType.FRIEND
+        );
         return ApiResponse.success("Friend request accepted", null);
     }
 

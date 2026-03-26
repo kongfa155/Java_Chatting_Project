@@ -7,6 +7,8 @@ package chattingapp.ui;
 import chattingapp.components.ChatPanel;
 import chattingapp.components.SideBarPanel;
 import chattingapp.models.User;
+import chattingapp.services.StompClientService;
+import chattingapp.utils.NotificationManager;
 import chattingapp.utils.SessionManager;
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -30,10 +32,36 @@ public class MainFrame extends javax.swing.JFrame {
         initFrame();
         initData();
         javax.swing.SwingUtilities.invokeLater(() -> {
-        getChatPanel().initWebSocket();
-    });
+            getChatPanel().initWebSocket();
 
+            initNotificationSocket();
+        });
 
+    }
+
+    private void initNotificationSocket() {
+        String userId = SessionManager.getUserId();
+
+        // Đảm bảo chatPanel đã khởi tạo stompClient
+        StompClientService service = getChatPanel().getStompClientService();
+
+        if (service != null) {
+            service.subscribeToNotifications(userId, noti -> {
+                NotificationManager.add(noti);
+                sideBarPanel1.updateBadge();
+                System.out.println("🔔 NOTI: " + noti.getContent());
+            });
+        } else {
+            // Nếu chưa có service, thử lại sau một chút (hoặc gọi initWebSocket trước)
+            System.out.println("⚠ StompClientService chưa sẵn sàng, đang thử lại...");
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                try {
+                    Thread.sleep(1000);
+                } catch (Exception e) {
+                }
+                initNotificationSocket();
+            });
+        }
     }
 
     public ChatPanel getChatPanel() {

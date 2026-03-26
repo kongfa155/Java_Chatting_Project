@@ -10,6 +10,7 @@ import chattingapp.ui.LoginFrame;
 import chattingapp.ui.UpdatePasswordDialog;
 import chattingapp.ui.UpdateEmailDialog;
 import chattingapp.utils.AvatarUtil;
+import chattingapp.utils.NotificationManager;
 import chattingapp.utils.SessionManager;
 import javax.swing.ImageIcon;
 import javax.swing.JPopupMenu;
@@ -25,9 +26,21 @@ public class SideBarPanel extends javax.swing.JPanel {
      */
     //Fake data
     private User currentUser;
+    private javax.swing.JLabel lblBadge;
 
     public SideBarPanel() {
         initComponents();
+        lblBadge = new javax.swing.JLabel();
+        lblBadge.setForeground(java.awt.Color.WHITE);
+        lblBadge.setBackground(java.awt.Color.RED);
+        lblBadge.setOpaque(true);
+        lblBadge.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 10));
+        lblBadge.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblBadge.setVisible(false);
+
+// overlay lên nút 🔔
+        btnNotify.setLayout(new java.awt.BorderLayout());
+        btnNotify.add(lblBadge, java.awt.BorderLayout.NORTH);
         loadUser();
     }
 
@@ -37,6 +50,19 @@ public class SideBarPanel extends javax.swing.JPanel {
         if (currentUser != null) {
             setAvatar(currentUser.getAvatarUrl());
         }
+    }
+
+    public void updateBadge() {
+        int count = NotificationManager.getUnreadCount();
+
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            if (count > 0) {
+                lblBadge.setText(String.valueOf(count));
+                lblBadge.setVisible(true);
+            } else {
+                lblBadge.setVisible(false);
+            }
+        });
     }
 
     public final void setAvatar(String avatarURL) {
@@ -197,15 +223,19 @@ public class SideBarPanel extends javax.swing.JPanel {
 
     private void btnNotifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNotifyActionPerformed
         // TODO add your handling code here:
+        NotificationManager.markAllRead();
+        updateBadge();
+
         JPopupMenu popup = new JPopupMenu();
 
         NotificationListPanel panel = new NotificationListPanel();
+        panel.setData(NotificationManager.getAll());
+
         panel.setPreferredSize(new java.awt.Dimension(300, 400));
 
         popup.setLayout(new java.awt.BorderLayout());
         popup.add(panel);
 
-        // hiển thị bên phải nút
         popup.show(btnNotify, btnNotify.getWidth() + 5, 0);
     }//GEN-LAST:event_btnNotifyActionPerformed
 

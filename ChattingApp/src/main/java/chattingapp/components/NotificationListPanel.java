@@ -19,38 +19,47 @@ public class NotificationListPanel extends javax.swing.JPanel {
      */
     public NotificationListPanel() {
         initComponents();
-         loadFakeData();
+        loadFakeData();
     }
- private void loadFakeData() {
+
+    public void setData(List<Notification> list) {
+        this.removeAll();
+
+        for (Notification n : list) {
+            this.add(new javax.swing.JLabel("🔔 " + n.getContent()));
+        }
+
+        this.revalidate();
+        this.repaint();
+    }
+
+    private void loadFakeData() {
 
         List<Notification> list = List.of(
-
-            new Notification(
-                "1",
-                "U01",
-                "CP gửi lời mời kết bạn",
-                false,
-                false,
-                LocalDateTime.now(),
-                null
-            ),
-
-            new Notification(
-                "2",
-                "U01",
-                "Bạn có tin nhắn mới",
-                true,
-                false,
-                LocalDateTime.now(),
-                null
-            )
-
+                new Notification(
+                        "1",
+                        "U01",
+                        "CP gửi lời mời kết bạn",
+                        false,
+                        false,
+                        LocalDateTime.now(),
+                        null
+                ),
+                new Notification(
+                        "2",
+                        "U01",
+                        "Bạn có tin nhắn mới",
+                        true,
+                        false,
+                        LocalDateTime.now(),
+                        null
+                )
         );
 
         for (Notification n : list) {
 
-            NotificationItemPanel item =
-                    new NotificationItemPanel(n);
+            NotificationItemPanel item
+                    = new NotificationItemPanel(n);
 
             pnlContainer.add(item);
             pnlContainer.add(javax.swing.Box.createVerticalStrut(3));
@@ -60,6 +69,7 @@ public class NotificationListPanel extends javax.swing.JPanel {
         pnlContainer.revalidate();
         pnlContainer.repaint();
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always

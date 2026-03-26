@@ -12,12 +12,15 @@ import chattingappbackend.models.Notification;
 import chattingappbackend.models.NotificationType;
 import chattingappbackend.repositories.NotificationRepository;
 import chattingappbackend.responses.ApiResponse;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 @Service
 public class NotificationService {
 
     @Autowired
     private NotificationRepository notificationRepository;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     // tạo notification
     @Transactional
@@ -35,6 +38,12 @@ public class NotificationService {
 
         // ✅ JPA dùng save()
         notificationRepository.save(notification);
+
+        // 🚀 REALTIME PUSH
+        messagingTemplate.convertAndSend(
+                "/topic/notifications/" + userId,
+                notification
+        );
     }
 
     // lấy danh sách notification

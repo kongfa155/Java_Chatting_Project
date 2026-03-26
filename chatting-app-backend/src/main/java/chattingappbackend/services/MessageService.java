@@ -26,9 +26,10 @@ public class MessageService {
 
     @Autowired
     private MessageRepository messageRepository;
-    
+
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
+
     // SEND MESSAGE
     public ApiResponse<Message> sendMessage(String senderId, SendMessageRequestDTO request) {
 
@@ -65,9 +66,9 @@ public class MessageService {
                 saved
         );
 
-return ApiResponse.success("Message sent successfully", saved);
+        return ApiResponse.success("Message sent successfully", saved);
     }
-    
+
     public void saveFromSocket(Message message) {
 
         message.setMessageId(UUID.randomUUID().toString());
@@ -79,29 +80,33 @@ return ApiResponse.success("Message sent successfully", saved);
 
         // 🚀 push realtime cho người nhận
         // 🚀 receiver
-            messagingTemplate.convertAndSend(
-                    "/topic/messages/" + saved.getReceiverId(),
-                    saved
-            );
+        messagingTemplate.convertAndSend(
+                "/topic/messages/" + saved.getReceiverId(),
+                saved
+        );
 
-            // 🚀 sender (để UI nó cũng nhận realtime)
-            messagingTemplate.convertAndSend(
-                    "/topic/messages/" + saved.getSenderId(),
-                    saved
-            );
+        // 🚀 sender (để UI nó cũng nhận realtime)
+        messagingTemplate.convertAndSend(
+                "/topic/messages/" + saved.getSenderId(),
+                saved
+        );
+        //Thông báo
+        messagingTemplate.convertAndSend(
+                "/topic/notifications/" + saved.getReceiverId(),
+                "Bạn có tin nhắn mới từ " + saved.getSenderId()
+        );
     }
-    
+
     // GET CONVERSATION
     public ApiResponse<List<Message>> getConversation(String userA, String userB) {
 
-            
-    List<Message> messages =
-            messageRepository.findConversation(userA, userB);
+        List<Message> messages
+                = messageRepository.findConversation(userA, userB);
 
-    // bỏ message đã delete
-    messages.removeIf(Message::isDeleted);
+        // bỏ message đã delete
+        messages.removeIf(Message::isDeleted);
 
-    return ApiResponse.success("Conversation fetched successfully", messages);
+        return ApiResponse.success("Conversation fetched successfully", messages);
     }
 
     // MARK MESSAGE AS READ
@@ -129,8 +134,9 @@ return ApiResponse.success("Message sent successfully", saved);
 
         return ApiResponse.success("Message deleted", null);
     }
-        //SEND FILE
-        private MessageType detectFileType(String ext) {
+    //SEND FILE
+
+    private MessageType detectFileType(String ext) {
 
         String name = ext.toLowerCase();
 
@@ -147,9 +153,9 @@ return ApiResponse.success("Message sent successfully", saved);
         }
 
         if (name.equals(".pdf")
-            || name.equals(".docx")
-            || name.equals(".xlsx")
-            || name.equals(".pptx")) {
+                || name.equals(".docx")
+                || name.equals(".xlsx")
+                || name.equals(".pptx")) {
             return MessageType.FILE;
         }
 
@@ -158,58 +164,58 @@ return ApiResponse.success("Message sent successfully", saved);
 
     public Message sendFile(String senderId, String receiverId, MultipartFile file) throws IOException {
 
-            // tạo tên file random
-            String originalName = file.getOriginalFilename();
-            String extension = "";
+        // tạo tên file random
+        String originalName = file.getOriginalFilename();
+        String extension = "";
 
-            if (originalName != null && originalName.contains(".")) {
-                extension = originalName.substring(originalName.lastIndexOf("."));
-            }
+        if (originalName != null && originalName.contains(".")) {
+            extension = originalName.substring(originalName.lastIndexOf("."));
+        }
 
-            // filename sạch (không dính tiếng Việt)
-            String fileName = UUID.randomUUID() + extension;
+        // filename sạch (không dính tiếng Việt)
+        String fileName = UUID.randomUUID() + extension;
 
-            // tạo folder uploads nếu chưa có
-            Path uploadDir = Paths.get("uploads");
-            Files.createDirectories(uploadDir);
+        // tạo folder uploads nếu chưa có
+        Path uploadDir = Paths.get("uploads");
+        Files.createDirectories(uploadDir);
 
-            // đường dẫn file
-            Path filePath = uploadDir.resolve(fileName);
+        // đường dẫn file
+        Path filePath = uploadDir.resolve(fileName);
 
-            // lưu file
-            Files.copy(file.getInputStream(), filePath);
+        // lưu file
+        Files.copy(file.getInputStream(), filePath);
 
-            // tạo message
-            Message msg = new Message();
-            msg.setMessageId(UUID.randomUUID().toString());
-            msg.setSenderId(senderId);
-            msg.setReceiverId(receiverId);
-            // set type đúng
-            msg.setMessageType(detectFileType(extension));
+        // tạo message
+        Message msg = new Message();
+        msg.setMessageId(UUID.randomUUID().toString());
+        msg.setSenderId(senderId);
+        msg.setReceiverId(receiverId);
+        // set type đúng
+        msg.setMessageType(detectFileType(extension));
 
-            // lưu tên file để FE hiển thị
-            msg.setContent(file.getOriginalFilename());
+        // lưu tên file để FE hiển thị
+        msg.setContent(file.getOriginalFilename());
 
-            // url file
-            msg.setFileUrl("/uploads/" + fileName);
-            msg.setSentAt(LocalDateTime.now());
-            msg.setRead(false);
-            msg.setDeleted(false);
+        // url file
+        msg.setFileUrl("/uploads/" + fileName);
+        msg.setSentAt(LocalDateTime.now());
+        msg.setRead(false);
+        msg.setDeleted(false);
 
-            Message saved = messageRepository.save(msg);
+        Message saved = messageRepository.save(msg);
 
-            // 🚀 push realtime
-            messagingTemplate.convertAndSend(
-                    "/topic/messages/" + receiverId,
-                    saved
-            );
+        // 🚀 push realtime
+        messagingTemplate.convertAndSend(
+                "/topic/messages/" + receiverId,
+                saved
+        );
 
-            messagingTemplate.convertAndSend(
-                    "/topic/messages/" + senderId,
-                    saved
-            );
+        messagingTemplate.convertAndSend(
+                "/topic/messages/" + senderId,
+                saved
+        );
 
-            return saved;
+        return saved;
 
     }
 }

@@ -164,60 +164,57 @@ public class ChatPanel extends javax.swing.JPanel {
     }
     private boolean isWsConnected = false;
 
-
     public void initWebSocket() {
-    System.out.println("🚀 INIT WS CALLED");
-    System.out.println("🎯 currentChatUserId: " + currentChatUserId);
+        System.out.println("🚀 INIT WS CALLED");
 
-    // 🔒 chặn connect nhiều lần
-    if (isWsConnected) {
-        System.out.println("⚠ WS already connected, skip");
-        return;
-    }
-
-    // ⏳ đợi userId
-    if (SessionManager.getUserId() == null) {
-        System.out.println("⏳ đợi userId...");
-
-        new javax.swing.Timer(500, e -> {
-            if (SessionManager.getUserId() != null) {
-                ((javax.swing.Timer) e.getSource()).stop();
-                initWebSocket(); // gọi lại 1 lần duy nhất
-            }
-        }).start();
-
-        return;
-    }
-
-    stompClient = new StompClientService();
-
-    stompClient.connect(message -> {
-
-        System.out.println("📩 WS: " + message.getContent());
-
-        String myId = SessionManager.getCurrentUser().getUserId();
-
-        boolean isCurrentChat
-                = currentChatUserId != null &&
-                (
-                    (message.getSenderId().equals(myId)
-                    && message.getReceiverId().equals(currentChatUserId))
-                    ||
-                    (message.getSenderId().equals(currentChatUserId)
-                    && message.getReceiverId().equals(myId))
-                );
-
-        if (isCurrentChat) {
-            javax.swing.SwingUtilities.invokeLater(() -> {
-                addSingleMessage(message);
-            });
-        } else {
-            System.out.println("📥 RECEIVED BUT NOT CURRENT CHAT");
+        // 🔒 chặn connect nhiều lần
+        if (isWsConnected) {
+            System.out.println("⚠ WS already connected, skip");
+            return;
         }
-    });
+        if (stompClient == null) {
+            stompClient = new StompClientService();
+        }
+        // ⏳ đợi userId
+        if (SessionManager.getUserId() == null) {
+            System.out.println("⏳ đợi userId...");
 
-    // ✅ đánh dấu đã connect
-    isWsConnected = true;
+            new javax.swing.Timer(500, e -> {
+                if (SessionManager.getUserId() != null) {
+                    ((javax.swing.Timer) e.getSource()).stop();
+                    initWebSocket(); // gọi lại 1 lần duy nhất
+                }
+            }).start();
+
+            return;
+        }
+
+        stompClient = new StompClientService();
+
+        stompClient.connect(message -> {
+
+            System.out.println("📩 WS: " + message.getContent());
+
+            String myId = SessionManager.getCurrentUser().getUserId();
+
+            boolean isCurrentChat
+                    = currentChatUserId != null
+                    && ((message.getSenderId().equals(myId)
+                    && message.getReceiverId().equals(currentChatUserId))
+                    || (message.getSenderId().equals(currentChatUserId)
+                    && message.getReceiverId().equals(myId)));
+
+            if (isCurrentChat) {
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    addSingleMessage(message);
+                });
+            } else {
+                System.out.println("📥 RECEIVED BUT NOT CURRENT CHAT");
+            }
+        });
+
+        // ✅ đánh dấu đã connect
+        isWsConnected = true;
     }
 
     private void renderMessages(java.util.List<Message> messages) {
@@ -616,36 +613,41 @@ public class ChatPanel extends javax.swing.JPanel {
     private boolean isSending = false;
 
     private void btnSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendActionPerformed
-         if (isSending) return;
+        if (isSending) {
+            return;
+        }
 
-    String text = txtMessage.getText().trim();
-    if (text.isEmpty()) return;
+        String text = txtMessage.getText().trim();
+        if (text.isEmpty()) {
+            return;
+        }
 
-    isSending = true;
+        isSending = true;
 
-    String myId = SessionManager.getCurrentUser().getUserId();
+        String myId = SessionManager.getCurrentUser().getUserId();
 
-    // 🔥 render ngay (optimistic UI)
-   
-    txtMessage.setText("");
+        // 🔥 render ngay (optimistic UI)
+        txtMessage.setText("");
 
-    MessageService service = new MessageService();
+        MessageService service = new MessageService();
 
-    service.sendMessage(currentChatUserId, text)
-            .thenAccept(msg -> {
+        service.sendMessage(currentChatUserId, text)
+                .thenAccept(msg -> {
 
-                javax.swing.SwingUtilities.invokeLater(() -> {
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+                        isSending = false;
+                    });
+
+                })
+                .exceptionally(ex -> {
+                    ex.printStackTrace();
                     isSending = false;
+                    return null;
                 });
-
-            })
-            .exceptionally(ex -> {
-                ex.printStackTrace();
-                isSending = false;
-                return null;
-            });
     }//GEN-LAST:event_btnSendActionPerformed
-
+    public StompClientService getStompClientService() {
+        return stompClient;
+    }
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
         toggleDrawer();

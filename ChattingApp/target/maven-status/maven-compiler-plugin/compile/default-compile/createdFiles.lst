@@ -3,7 +3,6 @@ chattingapp\services\StompClientService$1$1.class
 chattingapp\components\SearchResultItemPanel.class
 chattingapp\dtos\user\register\RegisterResponseDTO.class
 chattingapp\dtos\user\register\RegisterVerifyRequestDTO.class
-chattingapp\services\WebSocketClientService$1.class
 chattingapp\ui\LoginFrame$2.class
 chattingapp\models\MessageType.class
 chattingapp\dtos\SendFriendDTO.class
@@ -21,6 +20,7 @@ chattingapp\models\FriendshipStatus.class
 chattingapp\components\SideBarPanel.class
 chattingapp\dtos\user\changeprofile\ChangeProfileRequestDTO.class
 chattingapp\components\ChatItemPanel$1.class
+chattingapp\services\StompClientService$NotificationListener.class
 chattingapp\services\FriendService.class
 chattingapp\responses\ApiResponse.class
 chattingapp\components\ChatPanel$1.class
@@ -28,7 +28,7 @@ chattingapp\dtos\user\forgotpassword\ForgotPasswordOTPRequestDTO.class
 chattingapp\ui\MainFrame.class
 chattingapp\dtos\user\changeprofile\ChangeProfileResponseDTO.class
 chattingapp\dtos\user\register\RegisterVerifyResponseDTO.class
-chattingapp\services\WebSocketClientService$MessageListener.class
+chattingapp\utils\NotificationManager.class
 chattingapp\utils\AvatarUtil.class
 chattingapp\utils\SessionManager.class
 chattingapp\components\ChatListPanel$ChatSelectionListener.class
@@ -43,6 +43,7 @@ chattingapp\dtos\SearchDTO.class
 chattingapp\components\ChatPanel$2.class
 chattingapp\dtos\FriendLoadDTO.class
 chattingapp\components\ChatItemPanel$ChatItemClickListener.class
+chattingapp\services\StompClientService$3.class
 chattingapp\components\AddFriendPopupPanel.class
 chattingapp\services\StompClientService.class
 chattingapp\components\NotificationListPanel.class
@@ -67,7 +68,6 @@ chattingapp\components\NotificationItemPanel.class
 chattingapp\models\User.class
 chattingapp\components\SideBarPanel$1.class
 chattingapp\dtos\user\login\LoginResponseDTO.class
-chattingapp\services\WebSocketClientService.class
 chattingapp\services\MessageService.class
 chattingapp\models\NotificationType.class
 chattingapp\services\StompClientService$1.class

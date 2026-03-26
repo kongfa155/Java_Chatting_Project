@@ -21,6 +21,7 @@ import javax.swing.JPopupMenu;
  */
 public class SideBarPanel extends javax.swing.JPanel {
 
+    private static SideBarPanel instance;
     /**
      * Creates new form SideBarPanel
      */
@@ -30,6 +31,8 @@ public class SideBarPanel extends javax.swing.JPanel {
 
     public SideBarPanel() {
         initComponents();
+        instance = this;
+
         lblBadge = new javax.swing.JLabel();
         lblBadge.setForeground(java.awt.Color.WHITE);
         lblBadge.setBackground(java.awt.Color.RED);
@@ -45,6 +48,12 @@ public class SideBarPanel extends javax.swing.JPanel {
         lblBadge.setBounds(25, 0, 15, 15); // Đặt vị trí góc trên bên phải của nút (40x40)
 
         loadUser();
+    }
+
+    public static void updateBadgeExternal() {
+        if (instance != null) {
+            instance.updateBadge(); // Gọi hàm updateBadge có sẵn của bạn
+        }
     }
 
     private void loadUser() {

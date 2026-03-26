@@ -223,7 +223,16 @@ public class ChatPanel extends javax.swing.JPanel {
         } else {
             // TIN NHẮN ĐẾN TỪ NGƯỜI KHÁC -> TỰ TẠO NOTIFICATION NẾU SERVER KHÔNG GỬI
             System.out.println("📥 RECEIVED BUT NOT CURRENT CHAT - Creating local noti");
+// 1. Tạo đối tượng Notification và lưu vào Manager
+            chattingapp.models.Notification n = new chattingapp.models.Notification();
+            n.setContent("Tin nhắn từ " + message.getSenderId());
+            n.setRead(false);
+            chattingapp.utils.NotificationManager.add(n);
 
+            // 2. Lệnh cho SideBar cập nhật giao diện ngay lập tức
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                chattingapp.components.SideBarPanel.updateBadgeExternal();
+            });
             // Đoạn này dự phòng nếu Server chỉ gửi Message mà không gửi gói Notification riêng
             /*
         chattingapp.models.Notification n = new chattingapp.models.Notification();

@@ -1,5 +1,4 @@
 chattingapp\dtos\user\changeemail\ChangeEmailRequestDTO.class
-chattingapp\services\StompClientService$1$1.class
 chattingapp\components\SearchResultItemPanel.class
 chattingapp\dtos\user\register\RegisterResponseDTO.class
 chattingapp\dtos\user\register\RegisterVerifyRequestDTO.class
@@ -43,7 +42,6 @@ chattingapp\dtos\SearchDTO.class
 chattingapp\components\ChatPanel$2.class
 chattingapp\dtos\FriendLoadDTO.class
 chattingapp\components\ChatItemPanel$ChatItemClickListener.class
-chattingapp\services\StompClientService$3.class
 chattingapp\components\AddFriendPopupPanel.class
 chattingapp\services\StompClientService.class
 chattingapp\components\NotificationListPanel.class

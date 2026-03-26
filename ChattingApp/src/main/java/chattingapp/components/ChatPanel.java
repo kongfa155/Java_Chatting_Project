@@ -207,6 +207,33 @@ public class ChatPanel extends javax.swing.JPanel {
         isWsConnected = true;
     }
 
+    public void handleIncomingMessage(Message message) {
+        System.out.println("📩 WS MESSAGE RECEIVED: " + message.getContent());
+
+        String myId = SessionManager.getCurrentUser().getUserId();
+
+        // Kiểm tra xem tin nhắn có thuộc về cuộc hội thoại đang mở không
+        boolean isCurrentChat = currentChatUserId != null
+                && (message.getSenderId().equals(currentChatUserId) || message.getSenderId().equals(myId));
+
+        if (isCurrentChat) {
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                addSingleMessage(message);
+            });
+        } else {
+            // TIN NHẮN ĐẾN TỪ NGƯỜI KHÁC -> TỰ TẠO NOTIFICATION NẾU SERVER KHÔNG GỬI
+            System.out.println("📥 RECEIVED BUT NOT CURRENT CHAT - Creating local noti");
+
+            // Đoạn này dự phòng nếu Server chỉ gửi Message mà không gửi gói Notification riêng
+            /*
+        chattingapp.models.Notification n = new chattingapp.models.Notification();
+        n.setContent("Tin nhắn mới từ " + message.getSenderId());
+        n.setRead(false);
+        chattingapp.utils.NotificationManager.add(n);
+             */
+        }
+    }
+
     private void renderMessages(java.util.List<Message> messages) {
         messageContainer.removeAll();
 

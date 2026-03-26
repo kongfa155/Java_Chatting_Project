@@ -22,6 +22,7 @@ chattingapp\components\ChatItemPanel$1.class
 chattingapp\services\StompClientService$NotificationListener.class
 chattingapp\services\FriendService.class
 chattingapp\responses\ApiResponse.class
+chattingapp\components\FileDrawerPanel$FileClickListener.class
 chattingapp\components\ChatPanel$1.class
 chattingapp\dtos\user\forgotpassword\ForgotPasswordOTPRequestDTO.class
 chattingapp\ui\MainFrame.class
@@ -42,6 +43,7 @@ chattingapp\dtos\SearchDTO.class
 chattingapp\components\ChatPanel$2.class
 chattingapp\dtos\FriendLoadDTO.class
 chattingapp\components\ChatItemPanel$ChatItemClickListener.class
+chattingapp\components\FileDrawerPanel$1.class
 chattingapp\components\AddFriendPopupPanel.class
 chattingapp\services\StompClientService.class
 chattingapp\components\NotificationListPanel.class

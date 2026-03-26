@@ -18,28 +18,26 @@ public class FileDrawerPanel extends javax.swing.JPanel {
      */
     public FileDrawerPanel() {
         initComponents();
-        loadFakeData();
     }
 
-    private void loadFakeData() {
+   
 
-        fileContainer.removeAll();
+    public interface FileClickListener {
+            void onFileClick(String messageId);
+        }
 
-        fileContainer.add(new FileItemPanel("report.pdf", "12 Mar 10:30"));
-        fileContainer.add(new FileItemPanel("image.png", "13 Mar 09:20"));
-        fileContainer.add(new FileItemPanel("video.mp4", "14 Mar 21:10"));
+        private FileClickListener listener;
 
-        fileContainer.revalidate();
-        fileContainer.repaint();
-    }
-
+        public void setFileClickListener(FileClickListener listener) {
+            this.listener = listener;
+        }
     public void loadFiles(java.util.List<Message> messages) {
 
+        
         fileContainer.removeAll();
 
         for (Message msg : messages) {
 
-            // bỏ message text
             if (msg.getMessageType() == MessageType.TEXT) {
                 continue;
             }
@@ -54,11 +52,22 @@ public class FileDrawerPanel extends javax.swing.JPanel {
 
             String time = msg.getSentAt().toString();
 
-            fileContainer.add(new FileItemPanel(fileName, time));
-        }
+            FileItemPanel item = new FileItemPanel(fileName, time, msg.getMessageId());
 
-        fileContainer.revalidate();
-        fileContainer.repaint();
+            // 🔥 click → báo về ChatPanel
+            item.addMouseListener(new java.awt.event.MouseAdapter() {
+                public void mouseClicked(java.awt.event.MouseEvent evt) {
+                    if (listener != null) {
+                        listener.onFileClick(msg.getMessageId());
+                    }
+                }
+            });
+
+            fileContainer.add(item);
+    }
+
+    fileContainer.revalidate();
+    fileContainer.repaint();
     }
 
     private String extractFileName(String url) {

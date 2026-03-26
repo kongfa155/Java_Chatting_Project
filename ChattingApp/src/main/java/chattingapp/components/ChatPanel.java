@@ -40,6 +40,7 @@ public class ChatPanel extends javax.swing.JPanel {
     private FileDrawerPanel fileDrawer;
     private boolean drawerOpen = false;
     private StompClientService stompClient;
+   private java.util.Map<String, java.awt.Component> messageMap = new java.util.HashMap<>();
 
     /**
      * Creates new form ChatPanel
@@ -50,8 +51,16 @@ public class ChatPanel extends javax.swing.JPanel {
         ScrollMes.putClientProperty("JTextField.placeholderText", "Type a message...");
         fileDrawer = new FileDrawerPanel();
         fileDrawer.setVisible(false);
-
+        
         chatContentPanel.add(fileDrawer, BorderLayout.EAST);
+            fileDrawer.setFileClickListener(messageId -> {
+        java.awt.Component comp = messageMap.get(messageId);
+
+        if (comp != null) {
+                ((javax.swing.JComponent) comp).scrollRectToVisible(comp.getBounds());
+        }
+            });
+        
         showEmpty();
         txtMessage.getInputMap().put(
                 javax.swing.KeyStroke.getKeyStroke("ENTER"),
@@ -100,9 +109,13 @@ public class ChatPanel extends javax.swing.JPanel {
         messageContainer.revalidate();
         messageContainer.repaint();
 
+       javax.swing.SwingUtilities.invokeLater(() -> {
+               JScrollPane.revalidate();
+
         JScrollPane.getVerticalScrollBar().setValue(
-                JScrollPane.getVerticalScrollBar().getMaximum()
+            JScrollPane.getVerticalScrollBar().getMaximum()
         );
+     });
     }
 
     private File chooseFile() {
@@ -333,6 +346,7 @@ public class ChatPanel extends javax.swing.JPanel {
 
                         wrapper.add(imagePanel);
                         messageContainer.add(wrapper);
+                        messageMap.put(msg.getMessageId(), wrapper);
 
                     } catch (Exception e) {
                         System.out.println("❌ " + e.getMessage());
@@ -428,6 +442,7 @@ public class ChatPanel extends javax.swing.JPanel {
 
                     wrapper.add(filePanel);
                     messageContainer.add(wrapper);
+                    messageMap.put(msg.getMessageId(), wrapper);
                 }
 
                 case TEXT -> {
@@ -441,8 +456,11 @@ public class ChatPanel extends javax.swing.JPanel {
         messageContainer.revalidate();
         messageContainer.repaint();
 
-        JScrollPane.getVerticalScrollBar().setValue(
-                JScrollPane.getVerticalScrollBar().getMaximum()
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                javax.swing.JScrollBar vertical = JScrollPane.getVerticalScrollBar();
+
+                vertical.setValue(vertical.getMaximum());
+            }
         );
     }
 

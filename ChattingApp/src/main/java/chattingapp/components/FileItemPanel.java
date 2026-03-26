@@ -23,6 +23,19 @@ public class FileItemPanel extends javax.swing.JPanel {
         lblFileName.setText(fileName);
         lblTime.setText(time);
     }
+    private String messageId;
+
+    public FileItemPanel(String fileName, String time, String messageId) {
+        initComponents();
+        this.messageId = messageId;
+
+        lblFileName.setText(fileName);
+        lblTime.setText(time);
+    }
+
+    public String getMessageId() {
+        return messageId;
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.

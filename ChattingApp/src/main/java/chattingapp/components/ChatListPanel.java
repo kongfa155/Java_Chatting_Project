@@ -26,9 +26,14 @@ public class ChatListPanel extends javax.swing.JPanel {
         setupUI();
         loadFriends();
     }
-    //Hàm này sau này dùng để cập nhật lại list khi có tin nhắn mới
-    public void receiveNewMessage(){};
     
+    //Hàm này sau này dùng để cập nhật lại list khi có tin nhắn mới
+    public void receiveNewMessage() {
+        loadFriends(); // reload lại list
+    }    
+    
+      
+      
     private void setupUI() {
 
         // Search box đẹp hơn

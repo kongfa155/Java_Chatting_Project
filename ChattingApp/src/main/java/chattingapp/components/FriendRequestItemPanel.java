@@ -39,6 +39,8 @@ public class FriendRequestItemPanel extends javax.swing.JPanel {
 
                     javax.swing.SwingUtilities.invokeLater(() -> {
                         lblName.setText(lblName.getText() + " (đã kết bạn)");
+                           // 🔥 reload chat list
+                chattingapp.ui.MainFrame.updateChatList();
                     });
 
                 })

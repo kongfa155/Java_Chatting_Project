@@ -42,6 +42,7 @@ public class ChatPanel extends javax.swing.JPanel {
     private StompClientService stompClient;
    private java.util.Map<String, java.awt.Component> messageMap = new java.util.HashMap<>();
 
+    
     /**
      * Creates new form ChatPanel
      */
@@ -81,6 +82,7 @@ public class ChatPanel extends javax.swing.JPanel {
                 javax.swing.KeyStroke.getKeyStroke("alt ENTER"),
                 "insert-break"
         );
+        
     }
 
     //Websocket
@@ -222,7 +224,7 @@ public class ChatPanel extends javax.swing.JPanel {
 
     public void handleIncomingMessage(Message message) {
         System.out.println("📩 WS MESSAGE RECEIVED: " + message.getContent());
-
+        chattingapp.ui.MainFrame.updateChatList();
         String myId = SessionManager.getCurrentUser().getUserId();
 
         // Kiểm tra xem tin nhắn có thuộc về cuộc hội thoại đang mở không
@@ -255,6 +257,8 @@ public class ChatPanel extends javax.swing.JPanel {
              */
         }
     }
+    
+  
 
     private void renderMessages(java.util.List<Message> messages) {
         messageContainer.removeAll();

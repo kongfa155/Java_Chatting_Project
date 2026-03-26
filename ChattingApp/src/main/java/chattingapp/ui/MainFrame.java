@@ -22,11 +22,13 @@ public class MainFrame extends javax.swing.JFrame {
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MainFrame.class.getName());
     //Fake data
     private User currentUser;
+    private static MainFrame instance;
 
     /**
      * Creates new form MainFrame
      */
     public MainFrame() {
+            instance = this;
         this.currentUser = SessionManager.getCurrentUser();
         initComponents();
         initFrame();
@@ -38,6 +40,11 @@ public class MainFrame extends javax.swing.JFrame {
         });
 
     }
+    public static void updateChatList() {
+    if (instance != null) {
+        instance.chatListPanel1.receiveNewMessage();
+    }
+}
 
     private void initNotificationSocket() {
         String userId = SessionManager.getUserId();

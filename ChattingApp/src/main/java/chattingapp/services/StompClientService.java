@@ -32,7 +32,7 @@ public class StompClientService {
             converter.setObjectMapper(mapper);
             stompClient.setMessageConverter(converter);
 
-            stompClient.connectAsync("ws://192.168.1.131:8080/ws", new StompSessionHandlerAdapter() {
+            stompClient.connectAsync("ws://localhost:8080/ws", new StompSessionHandlerAdapter() {
                 @Override
                 public void afterConnected(StompSession session, StompHeaders headers) {
                     System.out.println("✅ WS CONNECTED");

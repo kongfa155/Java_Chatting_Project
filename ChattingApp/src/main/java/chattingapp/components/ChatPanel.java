@@ -162,49 +162,62 @@ public class ChatPanel extends javax.swing.JPanel {
 
         return chattingapp.models.MessageType.FILE;
     }
+    private boolean isWsConnected = false;
+
 
     public void initWebSocket() {
-        System.out.println("🚀 INIT WS CALLED");
-System.out.println("🎯 currentChatUserId: " + currentChatUserId);
-        if (SessionManager.getUserId() == null) {
-            System.out.println("⏳ đợi userId...");
+    System.out.println("🚀 INIT WS CALLED");
+    System.out.println("🎯 currentChatUserId: " + currentChatUserId);
 
-            new javax.swing.Timer(500, e -> {
-                if (SessionManager.getUserId() != null) {
-                    ((javax.swing.Timer) e.getSource()).stop();
-                    initWebSocket();
-                }
-            }).start();
-
-            return;
-        }
-
-        stompClient = new StompClientService();
-
-        stompClient.connect(message -> {
-
-    System.out.println("📩 WS: " + message.getContent());
-
-    String myId = SessionManager.getCurrentUser().getUserId();
-
-    boolean isCurrentChat
-            = currentChatUserId != null &&
-            (
-                (message.getSenderId().equals(myId)
-                && message.getReceiverId().equals(currentChatUserId))
-                ||
-                (message.getSenderId().equals(currentChatUserId)
-                && message.getReceiverId().equals(myId))
-            );
-
-    if (isCurrentChat) {
-        javax.swing.SwingUtilities.invokeLater(() -> {
-            addSingleMessage(message);
-        });
-    } else {
-        System.out.println("📥 RECEIVED BUT NOT CURRENT CHAT");
+    // 🔒 chặn connect nhiều lần
+    if (isWsConnected) {
+        System.out.println("⚠ WS already connected, skip");
+        return;
     }
-});
+
+    // ⏳ đợi userId
+    if (SessionManager.getUserId() == null) {
+        System.out.println("⏳ đợi userId...");
+
+        new javax.swing.Timer(500, e -> {
+            if (SessionManager.getUserId() != null) {
+                ((javax.swing.Timer) e.getSource()).stop();
+                initWebSocket(); // gọi lại 1 lần duy nhất
+            }
+        }).start();
+
+        return;
+    }
+
+    stompClient = new StompClientService();
+
+    stompClient.connect(message -> {
+
+        System.out.println("📩 WS: " + message.getContent());
+
+        String myId = SessionManager.getCurrentUser().getUserId();
+
+        boolean isCurrentChat
+                = currentChatUserId != null &&
+                (
+                    (message.getSenderId().equals(myId)
+                    && message.getReceiverId().equals(currentChatUserId))
+                    ||
+                    (message.getSenderId().equals(currentChatUserId)
+                    && message.getReceiverId().equals(myId))
+                );
+
+        if (isCurrentChat) {
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                addSingleMessage(message);
+            });
+        } else {
+            System.out.println("📥 RECEIVED BUT NOT CURRENT CHAT");
+        }
+    });
+
+    // ✅ đánh dấu đã connect
+    isWsConnected = true;
     }
 
     private void renderMessages(java.util.List<Message> messages) {
@@ -613,14 +626,7 @@ System.out.println("🎯 currentChatUserId: " + currentChatUserId);
     String myId = SessionManager.getCurrentUser().getUserId();
 
     // 🔥 render ngay (optimistic UI)
-    Message fakeMsg = new Message();
-    fakeMsg.setContent(text);
-    fakeMsg.setSenderId(myId);
-    fakeMsg.setReceiverId(currentChatUserId);
-    fakeMsg.setMessageType(MessageType.TEXT);
-
-    addSingleMessage(fakeMsg);
-
+   
     txtMessage.setText("");
 
     MessageService service = new MessageService();

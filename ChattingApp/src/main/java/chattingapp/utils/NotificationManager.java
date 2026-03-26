@@ -15,27 +15,23 @@ import java.util.List;
 public class NotificationManager {
 
     private static final List<Notification> notifications = new ArrayList<>();
-    private static int unreadCount = 0;
-
-    public static void add(Notification noti) {
-        notifications.add(0, noti); // thêm lên đầu
-        if (!noti.isRead()) {
-            unreadCount++;
-        }
-    }
 
     public static List<Notification> getAll() {
         return notifications;
     }
 
+    public static void add(Notification noti) {
+        notifications.add(0, noti);
+    }
+
     public static int getUnreadCount() {
-        return unreadCount;
+        // Tính toán dựa trên trạng thái thực tế của list
+        return (int) notifications.stream().filter(n -> !n.isRead()).count();
     }
 
     public static void markAllRead() {
         for (Notification n : notifications) {
             n.setRead(true);
         }
-        unreadCount = 0;
     }
 }

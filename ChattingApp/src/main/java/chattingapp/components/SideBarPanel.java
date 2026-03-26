@@ -38,9 +38,12 @@ public class SideBarPanel extends javax.swing.JPanel {
         lblBadge.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblBadge.setVisible(false);
 
-// overlay lên nút 🔔
-        btnNotify.setLayout(new java.awt.BorderLayout());
-        btnNotify.add(lblBadge, java.awt.BorderLayout.NORTH);
+// Sử dụng JLayeredPane hoặc đơn giản là set Text cho Button nếu không muốn cầu kỳ
+        // Nếu bạn muốn giữ lblBadge nổi lên trên:
+        btnNotify.setLayout(null); // Tắt layout của button để đặt badge tự do
+        btnNotify.add(lblBadge);
+        lblBadge.setBounds(25, 0, 15, 15); // Đặt vị trí góc trên bên phải của nút (40x40)
+
         loadUser();
     }
 

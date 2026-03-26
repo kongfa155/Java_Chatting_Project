@@ -49,7 +49,7 @@ public class MainFrame extends javax.swing.JFrame {
             service.subscribeToNotifications(userId, noti -> {
                 NotificationManager.add(noti);
                 sideBarPanel1.updateBadge();
-                System.out.println("🔔 NOTI: " + noti.getContent());
+                System.out.println("🔔 Đã cập nhật NOTI: " + noti.getContent());
             });
         } else {
             // Nếu chưa có service, thử lại sau một chút (hoặc gọi initWebSocket trước)
@@ -69,8 +69,8 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private void initData() {
-        SideBarPanel newSideBar = new SideBarPanel();
-        leftSplitPane.setLeftComponent(newSideBar);
+//        SideBarPanel newSideBar = new SideBarPanel();
+//        leftSplitPane.setLeftComponent(newSideBar);
         leftSplitPane.setDividerLocation(70);
         mainSplitPane.setDividerLocation(300);
 

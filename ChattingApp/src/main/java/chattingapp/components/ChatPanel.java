@@ -167,53 +167,43 @@ public class ChatPanel extends javax.swing.JPanel {
     public void initWebSocket() {
         System.out.println("🚀 INIT WS CALLED");
 
-        // 🔒 chặn connect nhiều lần
         if (isWsConnected) {
             System.out.println("⚠ WS already connected, skip");
             return;
         }
-        if (stompClient == null) {
-            stompClient = new StompClientService();
-        }
-        // ⏳ đợi userId
-        if (SessionManager.getUserId() == null) {
-            System.out.println("⏳ đợi userId...");
 
+        if (SessionManager.getUserId() == null) {
             new javax.swing.Timer(500, e -> {
                 if (SessionManager.getUserId() != null) {
                     ((javax.swing.Timer) e.getSource()).stop();
-                    initWebSocket(); // gọi lại 1 lần duy nhất
+                    initWebSocket();
                 }
             }).start();
-
             return;
         }
 
-        stompClient = new StompClientService();
+        if (stompClient == null) {
+            stompClient = new StompClientService();
+        }
 
-        stompClient.connect(message -> {
+        // Gọi hàm connect mới với 2 listener
+        stompClient.connect(
+                // 1. Xử lý Tin nhắn (MessageListener)
+                message -> {
+                    handleIncomingMessage(message);
+                },
+                // 2. Xử lý Thông báo (NotificationListener)
+                notification -> {
+                    chattingapp.utils.NotificationManager.add(notification);
+                    // Cập nhật chuông ở SideBarPanel thông qua MainFrame hoặc Event
+                    // Ở đây bạn có thể dùng SwingUtilities để đảm bảo an toàn luồng
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+                        // MainFrame.getInstance().getSideBar().updateBadge(); 
+                        // Hoặc cách bạn đang dùng để link tới SideBar
+                    });
+                }
+        );
 
-            System.out.println("📩 WS: " + message.getContent());
-
-            String myId = SessionManager.getCurrentUser().getUserId();
-
-            boolean isCurrentChat
-                    = currentChatUserId != null
-                    && ((message.getSenderId().equals(myId)
-                    && message.getReceiverId().equals(currentChatUserId))
-                    || (message.getSenderId().equals(currentChatUserId)
-                    && message.getReceiverId().equals(myId)));
-
-            if (isCurrentChat) {
-                javax.swing.SwingUtilities.invokeLater(() -> {
-                    addSingleMessage(message);
-                });
-            } else {
-                System.out.println("📥 RECEIVED BUT NOT CURRENT CHAT");
-            }
-        });
-
-        // ✅ đánh dấu đã connect
         isWsConnected = true;
     }
 

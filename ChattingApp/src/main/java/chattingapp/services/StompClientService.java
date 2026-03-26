@@ -17,18 +17,20 @@ public class StompClientService {
     private WebSocketStompClient stompClient;
     private StompSession currentSession;
 
+    // Interface để lắng nghe tin nhắn
     public interface MessageListener {
 
         void onMessage(Message message);
     }
 
+    // Interface để lắng nghe thông báo
     public interface NotificationListener {
 
         void onNotification(Notification notification);
     }
 
-    // Giữ nguyên tên hàm cũ
-    public void connect(MessageListener listener) {
+    // Sửa hàm connect để nhận cả 2 listener ngay từ đầu
+    public void connect(MessageListener msgListener, NotificationListener notiListener) {
         String userId = SessionManager.getUserId();
         if (userId == null) {
             return;
@@ -45,21 +47,24 @@ public class StompClientService {
             stompClient.connectAsync("ws:" + ServerConfig.SERVER_URL + "/ws", new StompSessionHandlerAdapter() {
                 @Override
                 public void afterConnected(StompSession session, StompHeaders headers) {
-                    System.out.println("✅ WS CONNECTED");
+                    System.out.println("✅ WS CONNECTED SUCCESSFULLY");
                     currentSession = session;
 
-                    // Vẫn giữ subscribe mặc định theo UserID để nhận thông báo hệ thống/cuộc gọi nếu cần
-                    session.subscribe("/topic/messages/" + userId, new StompFrameHandler() {
-                        @Override
-                        public Type getPayloadType(StompHeaders headers) {
-                            return Message.class;
-                        }
-
-                        @Override
-                        public void handleFrame(StompHeaders headers, Object payload) {
-                            listener.onMessage((Message) payload);
-                        }
+                    // 1. Subscribe nhận tin nhắn cá nhân (Hệ thống/Backup)
+                    subscribeToTopic("/topic/messages/" + userId, Message.class, payload -> {
+                        msgListener.onMessage((Message) payload);
                     });
+
+                    // 2. Subscribe nhận THÔNG BÁO (Chuông báo) - ĐĂNG KÝ NGAY TẠI ĐÂY
+                    subscribeToTopic("/topic/notifications/" + userId, Notification.class, payload -> {
+                        System.out.println("🔔 NOTIFICATION RECEIVED VIA WS: " + ((Notification) payload).getContent());
+                        notiListener.onNotification((Notification) payload);
+                    });
+                }
+
+                @Override
+                public void handleException(StompSession session, StompCommand command, StompHeaders headers, byte[] payload, Throwable exception) {
+                    System.err.println("❌ WS ERROR: " + exception.getMessage());
                 }
             });
         } catch (Exception e) {
@@ -67,52 +72,47 @@ public class StompClientService {
         }
     }
 
-    /**
-     * Tên hàm mới: subscribeToConversation Mục đích: Tạo ra chatId duy nhất cho
-     * 2 người và lắng nghe chung 1 kênh
-     */
+    // Hàm tiện ích để subscribe gọn hơn
+    private void subscribeToTopic(String topic, Class<?> clazz, java.util.function.Consumer<Object> handler) {
+        currentSession.subscribe(topic, new StompFrameHandler() {
+            @Override
+            public Type getPayloadType(StompHeaders headers) {
+                return clazz;
+            }
+
+            @Override
+            public void handleFrame(StompHeaders headers, Object payload) {
+                handler.accept(payload);
+            }
+        });
+        System.out.println("📡 Subscribed to: " + topic);
+    }
+
     public void subscribeToConversation(String myId, String partnerId, MessageListener listener) {
         if (currentSession == null || !currentSession.isConnected()) {
             return;
         }
 
-        // Tạo chatId duy nhất bằng cách sắp xếp 2 ID (Ví dụ: "user1_user2")
         String[] ids = {myId, partnerId};
         Arrays.sort(ids);
         String chatId = ids[0] + "_" + ids[1];
 
-        System.out.println("📡 SUBSCRIBING TO ROOM: /topic/chatroom/" + chatId);
-
-        currentSession.subscribe("/topic/chatroom/" + chatId, new StompFrameHandler() {
-            @Override
-            public Type getPayloadType(StompHeaders headers) {
-                return Message.class;
-            }
-
-            @Override
-            public void handleFrame(StompHeaders headers, Object payload) {
-                Message msg = (Message) payload;
-                listener.onMessage(msg);
-            }
+        subscribeToTopic("/topic/chatroom/" + chatId, Message.class, payload -> {
+            listener.onMessage((Message) payload);
         });
     }
 
+    // Giữ lại cho tương thích nếu cần gọi lẻ, nhưng nên dùng trong connect
     public void subscribeToNotifications(String userId, NotificationListener listener) {
         if (currentSession == null || !currentSession.isConnected()) {
             return;
         }
-
-        currentSession.subscribe("/topic/notifications/" + userId, new StompFrameHandler() {
-            @Override
-            public Type getPayloadType(StompHeaders headers) {
-                return Notification.class;
-            }
-
-            @Override
-            public void handleFrame(StompHeaders headers, Object payload) {
-                Notification noti = (Notification) payload;
-                listener.onNotification(noti); // ✅ đúng
-            }
+        subscribeToTopic("/topic/notifications/" + userId, Notification.class, payload -> {
+            listener.onNotification((Notification) payload);
         });
+    }
+
+    public boolean isConnected() {
+        return currentSession != null && currentSession.isConnected();
     }
 }

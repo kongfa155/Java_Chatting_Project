@@ -31,7 +31,12 @@ public class NotificationItemPanel extends javax.swing.JPanel {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm dd/MM");
 
+        if (notification.getCreatedAt() != null) {
         lblTime.setText(notification.getCreatedAt().format(formatter));
+    } else {
+        lblTime.setText("--:--");
+    }
+
 
         updateStyle();
     }

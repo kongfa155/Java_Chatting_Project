@@ -1,7 +1,9 @@
 package chattingappbackend.controllers;
 
 import chattingappbackend.models.Message;
+import chattingappbackend.models.Notification;
 import chattingappbackend.services.MessageService;
+import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Controller;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Controller
@@ -40,5 +43,19 @@ public class ChatWebSocketController {
         // Thay vì gửi đến /topic/messages/{id}, ta gửi đến /topic/chatroom/{chatId}
         System.out.println("🚀 BROADCASTING TO ROOM: " + chatId);
         messagingTemplate.convertAndSend("/topic/chatroom/" + chatId, message);
+
+        // Gửi notification cho người nhận
+        messagingTemplate.convertAndSend(
+                "/topic/notifications/" + message.getReceiverId(),
+                new Notification(
+                        UUID.randomUUID().toString(),
+                        message.getReceiverId(),
+                        "Bạn có tin nhắn mới từ " + message.getSenderId(),
+                        false,
+                        false,
+                        LocalDateTime.now(),
+                        null
+                )
+        );
     }
 }

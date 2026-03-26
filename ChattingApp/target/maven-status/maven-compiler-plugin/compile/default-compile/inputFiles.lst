@@ -12,6 +12,7 @@
 /home/nhhun2005/Study/School/Java_Chatting_Project/ChattingApp/src/main/java/chattingapp/components/SearchResultItemPanel.java
 /home/nhhun2005/Study/School/Java_Chatting_Project/ChattingApp/src/main/java/chattingapp/components/SideBarPanel.java
 /home/nhhun2005/Study/School/Java_Chatting_Project/ChattingApp/src/main/java/chattingapp/config/GsonConfig.java
+/home/nhhun2005/Study/School/Java_Chatting_Project/ChattingApp/src/main/java/chattingapp/config/ServerConfig.java
 /home/nhhun2005/Study/School/Java_Chatting_Project/ChattingApp/src/main/java/chattingapp/config/ThemeManager.java
 /home/nhhun2005/Study/School/Java_Chatting_Project/ChattingApp/src/main/java/chattingapp/dtos/FriendLoadDTO.java
 /home/nhhun2005/Study/School/Java_Chatting_Project/ChattingApp/src/main/java/chattingapp/dtos/FriendRequestResponseDTO.java

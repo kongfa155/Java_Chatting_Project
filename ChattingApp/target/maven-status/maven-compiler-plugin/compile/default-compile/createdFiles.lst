@@ -12,9 +12,9 @@ chattingapp/services/WebSocketClientService$1.class
 chattingapp/models/MessageType.class
 chattingapp/ui/MainFrame.class
 chattingapp/ui/UpdatePasswordDialog.class
-chattingapp/MainApp.class
 chattingapp/models/Message.class
 chattingapp/dtos/SendFriendDTO.class
+chattingapp/MainApp.class
 chattingapp/components/NotificationItemPanel$1.class
 chattingapp/components/MessageBubble.class
 chattingapp/dtos/user/changepassword/ChangePasswordRequestDTO.class
@@ -61,6 +61,7 @@ chattingapp/services/StompClientService.class
 chattingapp/components/ChatPanel.class
 chattingapp/ui/OTPFrame.class
 chattingapp/components/ChatItemPanel.class
+chattingapp/config/ServerConfig.class
 chattingapp/dtos/user/register/RegisterResponseDTO.class
 chattingapp/dtos/user/login/LoginRequetDTO.class
 chattingapp/models/UserStatus.class

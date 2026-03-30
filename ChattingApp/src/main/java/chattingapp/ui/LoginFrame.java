@@ -454,7 +454,6 @@ String username = txtUsername.getText().trim();
                     
                     MainFrame main = new MainFrame();
                     main.setVisible(true);
-                    main.getChatPanel().initWebSocket();
 
                     this.dispose();
                 });

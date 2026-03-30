@@ -9,8 +9,10 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-@Entity
-@Table(name = "friendships")
+//Anotation của Spring dùng để báo cho hệ thống biết mà quản lý
+
+@Entity 
+@Table(name = "friendships") //Bản tên là friendship
 public class Friendship {
 
     @Id
@@ -30,6 +32,7 @@ public class Friendship {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    // constructor
     public Friendship() {
     }
 

@@ -27,9 +27,8 @@ public interface FriendshipRepository extends JpaRepository<Friendship, String> 
             @Param("userA") String userA,
             @Param("userB") String userB);
 
-    // 2. Insert (JPA KHÔNG cần query, dùng save())
-    // -> KHÔNG cần method insertFriendship nữa
-    // 3. Update status
+
+    // 2. Cập nhật trạng thái
     @Modifying
     @Transactional
     @Query("""
@@ -41,7 +40,7 @@ public interface FriendshipRepository extends JpaRepository<Friendship, String> 
             @Param("friendshipId") String friendshipId,
             @Param("status") FriendshipStatus status);
 
-    // 4. Pending requests (DTO projection)
+    // 3. Lấy tất cả danh sách lời mời kết bạn
     @Query("""
         SELECT new chattingappbackend.dtos.FriendRequestResponseDTO(
             f.friendshipId,
@@ -56,7 +55,7 @@ public interface FriendshipRepository extends JpaRepository<Friendship, String> 
     """)
     List<FriendRequestResponseDTO> findPendingRequests(@Param("userId") String userId);
 
-    // 5. Danh sách bạn bè
+    // 4. Lấy danh sách bạn bè
     @Query("""
         SELECT new chattingappbackend.dtos.FriendRequestResponseDTO(
             f.friendshipId,

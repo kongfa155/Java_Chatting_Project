@@ -21,9 +21,6 @@ import java.awt.CardLayout;
 import java.awt.Desktop;
 import java.awt.Image;
 import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import javax.swing.ImageIcon;
 import java.net.URL;
 import javax.swing.JButton;
@@ -36,33 +33,38 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public class ChatPanel extends javax.swing.JPanel {
 
+    //Lưu user hiện tại
     private String currentChatUserId;
+    //Quản lí hiển thị panel lấy file ở bên phải
     private FileDrawerPanel fileDrawer;
     private boolean drawerOpen = false;
+    //Thiết lập web socket
     private StompClientService stompClient;
-   private java.util.Map<String, java.awt.Component> messageMap = new java.util.HashMap<>();
+    //Dùng để scroll khi click vào item trong fileDrawer
+    private java.util.Map<String, java.awt.Component> messageMap = new java.util.HashMap<>();
 
-    
     /**
      * Creates new form ChatPanel
      */
     public ChatPanel() {
+        //Setup UI cơ bản
         initComponents();
         JScrollPane.getVerticalScrollBar().setUnitIncrement(30);
         ScrollMes.putClientProperty("JTextField.placeholderText", "Type a message...");
         fileDrawer = new FileDrawerPanel();
         fileDrawer.setVisible(false);
-        
+        //Thêm panel vào bên phải
         chatContentPanel.add(fileDrawer, BorderLayout.EAST);
-            fileDrawer.setFileClickListener(messageId -> {
-        java.awt.Component comp = messageMap.get(messageId);
-
-        if (comp != null) {
+        //Gắn event lắng nghe để scroll
+        fileDrawer.setFileClickListener(messageId -> {
+            java.awt.Component comp = messageMap.get(messageId);
+            if (comp != null) {
                 ((javax.swing.JComponent) comp).scrollRectToVisible(comp.getBounds());
-        }
-            });
-        
+            }
+        });
+
         showEmpty();
+        //Lắng nghe nút enter, nếu có = gửi tin nhắn
         txtMessage.getInputMap().put(
                 javax.swing.KeyStroke.getKeyStroke("ENTER"),
                 "sendMessage"
@@ -82,19 +84,20 @@ public class ChatPanel extends javax.swing.JPanel {
                 javax.swing.KeyStroke.getKeyStroke("alt ENTER"),
                 "insert-break"
         );
-        
+
     }
 
     //Websocket
     private void addSingleMessage(Message msg) {
-        System.out.println("UI ADD MESSAGE: " + msg.getContent());
+        System.out.println("Cập nhật giao diện thêm tin nhắn: " + msg.getContent());
+        //Điều kiện để lựa bên hiển thị tin nhắn
         boolean isMine
                 = msg.getSenderId().equals(
                         SessionManager.getCurrentUser().getUserId()
                 );
 
         switch (msg.getMessageType()) {
-
+            
             case TEXT -> {
                 MessageBubble bubble
                         = new MessageBubble(msg.getContent(), isMine);
@@ -111,13 +114,13 @@ public class ChatPanel extends javax.swing.JPanel {
         messageContainer.revalidate();
         messageContainer.repaint();
 
-       javax.swing.SwingUtilities.invokeLater(() -> {
-               JScrollPane.revalidate();
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            JScrollPane.revalidate();
 
-        JScrollPane.getVerticalScrollBar().setValue(
-            JScrollPane.getVerticalScrollBar().getMaximum()
-        );
-     });
+            JScrollPane.getVerticalScrollBar().setValue(
+                    JScrollPane.getVerticalScrollBar().getMaximum()
+            );
+        });
     }
 
     private File chooseFile() {
@@ -135,7 +138,7 @@ public class ChatPanel extends javax.swing.JPanel {
 
         chooser.setFileFilter(filter);
 
-        // ❗ chặn luôn "All Files"
+        // chặn luôn "All Files"
         chooser.setAcceptAllFileFilterUsed(false);
         int result = chooser.showOpenDialog(this);
         chooser.addChoosableFileFilter(new FileNameExtensionFilter("Images", "png", "jpg", "jpeg"));
@@ -160,7 +163,7 @@ public class ChatPanel extends javax.swing.JPanel {
     }
 
     private MessageType detectFileType(java.io.File file) {
-
+        //Kiểm tra kiểu của file => Trả về kiểu loại như mong muốn
         String name = file.getName().toLowerCase();
 
         if (name.endsWith(".png") || name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".gif")) {
@@ -180,13 +183,14 @@ public class ChatPanel extends javax.swing.JPanel {
     private boolean isWsConnected = false;
 
     public void initWebSocket() {
-        System.out.println("🚀 INIT WS CALLED");
-
+        //Log
+        System.out.println("Gọi WebSocket");
+        //Kiểm tra xem đã có WS chưa, nếu có thì không tạo lại
         if (isWsConnected) {
-            System.out.println("⚠ WS already connected, skip");
+            System.out.println("WS đã có");
             return;
         }
-
+        //Kiểm tra xem đã login chưa, nếu chưa delay xong lặp lại sau 500ms
         if (SessionManager.getUserId() == null) {
             new javax.swing.Timer(500, e -> {
                 if (SessionManager.getUserId() != null) {
@@ -196,7 +200,7 @@ public class ChatPanel extends javax.swing.JPanel {
             }).start();
             return;
         }
-
+        //Tạo kết nối Websocket
         if (stompClient == null) {
             stompClient = new StompClientService();
         }
@@ -223,22 +227,23 @@ public class ChatPanel extends javax.swing.JPanel {
     }
 
     public void handleIncomingMessage(Message message) {
-        System.out.println("📩 WS MESSAGE RECEIVED: " + message.getContent());
+        
+        System.out.println("WebSocket đã nhận được tin nhắn: " + message.getContent());
         chattingapp.ui.MainFrame.updateChatList();
         String myId = SessionManager.getCurrentUser().getUserId();
 
         // Kiểm tra xem tin nhắn có thuộc về cuộc hội thoại đang mở không
         boolean isCurrentChat = currentChatUserId != null
                 && (message.getSenderId().equals(currentChatUserId) || message.getSenderId().equals(myId));
-
+        //Nếu là đoạn chat đang mở, cập nhật ngay = addSingleMessage
         if (isCurrentChat) {
             javax.swing.SwingUtilities.invokeLater(() -> {
                 addSingleMessage(message);
             });
         } else {
             // TIN NHẮN ĐẾN TỪ NGƯỜI KHÁC -> TỰ TẠO NOTIFICATION NẾU SERVER KHÔNG GỬI
-            System.out.println("📥 RECEIVED BUT NOT CURRENT CHAT - Creating local noti");
-// 1. Tạo đối tượng Notification và lưu vào Manager
+            System.out.println("Nhận được tin nhắn từ nguồn khác, tạo thông báo mới");
+            // 1. Tạo đối tượng Notification và lưu vào Manager
             chattingapp.models.Notification n = new chattingapp.models.Notification();
             n.setContent("Tin nhắn từ " + message.getSenderId());
             n.setRead(false);
@@ -250,19 +255,17 @@ public class ChatPanel extends javax.swing.JPanel {
             });
             // Đoạn này dự phòng nếu Server chỉ gửi Message mà không gửi gói Notification riêng
             /*
-        chattingapp.models.Notification n = new chattingapp.models.Notification();
-        n.setContent("Tin nhắn mới từ " + message.getSenderId());
-        n.setRead(false);
-        chattingapp.utils.NotificationManager.add(n);
+                chattingapp.models.Notification n = new chattingapp.models.Notification();
+                n.setContent("Tin nhắn mới từ " + message.getSenderId());
+                n.setRead(false);
+                chattingapp.utils.NotificationManager.add(n);
              */
         }
     }
-    
-  
 
     private void renderMessages(java.util.List<Message> messages) {
         messageContainer.removeAll();
-
+        //Lấy toàn bộ tin nhắn
         for (Message msg : messages) {
 
             boolean isMine
@@ -271,20 +274,20 @@ public class ChatPanel extends javax.swing.JPanel {
                     );
 
             switch (msg.getMessageType()) {
-
+                //Nếu là hình ảnh
                 case IMAGE -> {
                     try {
                         String imageUrl = ApiClient.getFileUrl(msg.getFileUrl());
 
                         URL url = new URL(imageUrl);
-
+                        //Load từ URL
                         java.awt.image.BufferedImage bufferedImage
                                 = javax.imageio.ImageIO.read(url);
 
                         if (bufferedImage == null) {
                             throw new RuntimeException("Image null");
                         }
-
+                        //Scale ảnh lại
                         Image img = bufferedImage.getScaledInstance(220, -1, Image.SCALE_SMOOTH);
 
                         JLabel imageLabel = new JLabel(new ImageIcon(img));
@@ -295,7 +298,7 @@ public class ChatPanel extends javax.swing.JPanel {
 
                         imagePanel.add(imageLabel, BorderLayout.CENTER);
 
-                        // 🎯 NÚT DOWNLOAD
+                        // Tạo nút download
                         JButton downloadBtn = new JButton("⬇");
                         downloadBtn.setFocusPainted(false);
 
@@ -460,21 +463,23 @@ public class ChatPanel extends javax.swing.JPanel {
         messageContainer.revalidate();
         messageContainer.repaint();
 
-            javax.swing.SwingUtilities.invokeLater(() -> {
-                javax.swing.JScrollBar vertical = JScrollPane.getVerticalScrollBar();
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            javax.swing.JScrollBar vertical = JScrollPane.getVerticalScrollBar();
 
-                vertical.setValue(vertical.getMaximum());
-            }
+            vertical.setValue(vertical.getMaximum());
+        }
         );
     }
 
     public void loadChat(ChatData data) {
+        //Hiển thị ui chat
         showChat();
         if (data == null) {
             return;
         }
-
+        
         currentChatUserId = data.getContact().getUserId();
+        //Lấy tên người đang nhắn tin
         lblName.setText(data.getContact().getDisplayName());
         lblStatus.setText("Online");
 
@@ -483,12 +488,14 @@ public class ChatPanel extends javax.swing.JPanel {
         service.getConversation(currentChatUserId)
                 .thenAccept(messages -> {
                     javax.swing.SwingUtilities.invokeLater(() -> {
+                        //Load toàn bộ chat cũ
                         renderMessages(messages);
                     });
                 });
     }
 
     private void loadChatFromCurrent() {
+        //Reload chat hiện tại
         MessageService service = new MessageService();
 
         service.getConversation(currentChatUserId)
@@ -622,7 +629,8 @@ public class ChatPanel extends javax.swing.JPanel {
         if (file == null) {
             return;
         }
-
+        //Chọn file
+        //Gửi lên BE
         MessageService service = new MessageService();
 
         service.sendFile(currentChatUserId, file)
@@ -632,6 +640,7 @@ public class ChatPanel extends javax.swing.JPanel {
                     });
                 });
     }//GEN-LAST:event_btnAttachActionPerformed
+    //Đóng mở drawer bên phải
     private void toggleDrawer() {
 
         drawerOpen = !drawerOpen;
@@ -661,10 +670,11 @@ public class ChatPanel extends javax.swing.JPanel {
     private boolean isSending = false;
 
     private void btnSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendActionPerformed
+        //Kiểm tra gửi chưa, chặn gửi nhiều lần
         if (isSending) {
             return;
         }
-
+        //Lấy nội dung
         String text = txtMessage.getText().trim();
         if (text.isEmpty()) {
             return;
@@ -678,7 +688,7 @@ public class ChatPanel extends javax.swing.JPanel {
         txtMessage.setText("");
 
         MessageService service = new MessageService();
-
+        //Gọi API gửi tin nhắn
         service.sendMessage(currentChatUserId, text)
                 .thenAccept(msg -> {
 

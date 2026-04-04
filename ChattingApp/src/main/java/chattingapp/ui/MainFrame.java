@@ -5,8 +5,6 @@
 package chattingapp.ui;
 
 import chattingapp.components.ChatPanel;
-import chattingapp.components.SideBarPanel;
-import chattingapp.models.User;
 import chattingapp.services.StompClientService;
 import chattingapp.utils.NotificationManager;
 import chattingapp.utils.SessionManager;
@@ -19,17 +17,13 @@ import java.awt.Toolkit;
  */
 public class MainFrame extends javax.swing.JFrame {
 
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MainFrame.class.getName());
-    //Fake data
-    private User currentUser;
     private static MainFrame instance;
 
     /**
      * Creates new form MainFrame
      */
     public MainFrame() {
-            instance = this;
-        this.currentUser = SessionManager.getCurrentUser();
+        instance = this;
         initComponents();
         initFrame();
         initData();
@@ -40,11 +34,12 @@ public class MainFrame extends javax.swing.JFrame {
         });
 
     }
+
     public static void updateChatList() {
-    if (instance != null) {
-        instance.chatListPanel1.receiveNewMessage();
+        if (instance != null) {
+            instance.chatListPanel1.receiveNewMessage();
+        }
     }
-}
 
     private void initNotificationSocket() {
         String userId = SessionManager.getUserId();
@@ -53,21 +48,17 @@ public class MainFrame extends javax.swing.JFrame {
         StompClientService service = getChatPanel().getStompClientService();
 
         if (service != null) {
-            System.out.println("🚀 ĐANG TIẾN HÀNH SUBSCRIBE NOTIFICATIONS CHO: " + userId); // Thêm log này
+            System.out.println("ĐANG TIẾN HÀNH SUBSCRIBE NOTIFICATIONS CHO: " + userId); // Thêm log này
             service.subscribeToNotifications(userId, noti -> {
-                System.out.println("🔔 ĐÃ NHẬN GÓI TIN NOTIFICATION: " + noti.getContent()); // Thêm log này
+                System.out.println("ĐÃ NHẬN GÓI TIN NOTIFICATION: " + noti.getContent()); // Thêm log này
                 NotificationManager.add(noti);
                 sideBarPanel1.updateBadge();
-                System.out.println("🔔 Đã cập nhật NOTI: " + noti.getContent());
+                System.out.println("Đã cập nhật NOTI: " + noti.getContent());
             });
         } else {
             // Nếu chưa có service, thử lại sau một chút (hoặc gọi initWebSocket trước)
-            System.out.println("⚠ StompClientService chưa sẵn sàng, đang thử lại...");
+            System.out.println("StompClientService chưa sẵn sàng, đang thử lại...");
             javax.swing.SwingUtilities.invokeLater(() -> {
-                try {
-                    Thread.sleep(1000);
-                } catch (Exception e) {
-                }
                 initNotificationSocket();
             });
         }
@@ -78,8 +69,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private void initData() {
-//        SideBarPanel newSideBar = new SideBarPanel();
-//        leftSplitPane.setLeftComponent(newSideBar);
+
         leftSplitPane.setDividerLocation(70);
         mainSplitPane.setDividerLocation(300);
 
@@ -139,29 +129,10 @@ public class MainFrame extends javax.swing.JFrame {
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
-        }
+       
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> {
-            // Fake user để test FE
-            User fakeUser = new User();
-            fakeUser.setUserId("U01");
-            fakeUser.setUsername("cp123");
-            fakeUser.setDisplayName("CP Dev");
-            fakeUser.setEmail("test@gmail.com");
-            fakeUser.setAvatarUrl("https://free.vector6.com/wp-content/uploads/2021/03/0000000556-chim-canh-cut-hoc-bai-tai-hinh-png-38-300x256.png");
-            new MainFrame().setVisible(true);
-        });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

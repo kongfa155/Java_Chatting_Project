@@ -10,5 +10,5 @@ package chattingapp.config;
  * @author nhhun2005
  */
 public class ServerConfig {
-    public static final String SERVER_URL="//192.168.1.131:8080";
+    public static final String SERVER_URL="//localhost:8080";
 }

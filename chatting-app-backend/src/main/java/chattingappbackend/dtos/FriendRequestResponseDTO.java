@@ -1,7 +1,6 @@
 package chattingappbackend.dtos;
 
 import chattingappbackend.models.FriendshipStatus;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class FriendRequestResponseDTO {
 

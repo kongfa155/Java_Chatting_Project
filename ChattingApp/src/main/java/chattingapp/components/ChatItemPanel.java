@@ -28,14 +28,15 @@ public class ChatItemPanel extends javax.swing.JPanel {
     /**
      * Creates new form ChatItem
      */
-    public ChatItemPanel() {
-
-        initComponents();
-
-    }
+//    public ChatItemPanel() {
+//
+//        initComponents();
+//
+//    }
     //Hàm xử lý khi click vào item
     //Hãy tưởng tượng cái này như là một kênh đàm thoại, ai muốn sử dụng kênh đàm thoại này này thì phải setup hàm onChatItemClick
     public interface ChatItemClickListener {
+
         //Kiểm tra coi có ai đăng lắng nghe không, nếu có truyền dữ liệu của nó đi
         void onChatItemClick(ChatData data);
     }
@@ -55,16 +56,11 @@ public class ChatItemPanel extends javax.swing.JPanel {
         // Tin nhắn cuối
         if (data.getLastMessage() != null) {
             lblLastMessage.setText(data.getLastMessage().getContent());
-            lblTime.setText(
-                    data.getLastMessage().getSentAt().toLocalTime().toString()
-            );
+            lblTime.setText(TimeUtil.formatTime(data.getLastMessage().getSentAt()));
         } else {
             lblLastMessage.setText("");
             lblTime.setText("");
         }
-
-        // Thời gian
-        lblTime.setText(TimeUtil.formatTime(data.getLastMessage().getSentAt()));
 
         // Số tin chưa đọc
         if (data.getUnreadCount() > 0) {
@@ -94,8 +90,7 @@ public class ChatItemPanel extends javax.swing.JPanel {
                     setBackground(java.awt.Color.WHITE);
                 }
             }
-            
-            
+
             //Dùng để ChatItem thông báo đến toàn hệ thống là có người click
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
@@ -142,7 +137,6 @@ public class ChatItemPanel extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(300, 70));
         setLayout(new java.awt.BorderLayout());
 
-        lblAvatar.setText("a");
         lblAvatar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         lblAvatar.setPreferredSize(new java.awt.Dimension(60, 70));
         add(lblAvatar, java.awt.BorderLayout.WEST);

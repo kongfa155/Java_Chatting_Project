@@ -11,7 +11,6 @@ import chattingappbackend.dtos.user.forgotpassword.ForgotPasswordVerifyRequest;
 import chattingappbackend.dtos.user.login.LoginRequetDTO;
 import chattingappbackend.dtos.user.login.LoginResponseDTO;
 import chattingappbackend.dtos.user.register.*;
-import chattingappbackend.exceptions.AppException;
 import chattingappbackend.utils.JwtUtil;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

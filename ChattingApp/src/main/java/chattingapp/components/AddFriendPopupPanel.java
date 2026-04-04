@@ -41,8 +41,7 @@ public class AddFriendPopupPanel extends javax.swing.JPanel {
         txtFind = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         ListFindPanel = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        RequestFriendTab = new javax.swing.JScrollPane();
+        RequestFriendScroll = new javax.swing.JScrollPane();
         ListRequestPanel = new javax.swing.JPanel();
 
         setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -64,12 +63,6 @@ public class AddFriendPopupPanel extends javax.swing.JPanel {
         AddFriendTab.add(SearchPanel, java.awt.BorderLayout.PAGE_START);
 
         ListFindPanel.setLayout(new javax.swing.BoxLayout(ListFindPanel, javax.swing.BoxLayout.Y_AXIS));
-
-        jLabel1.setForeground(new java.awt.Color(153, 153, 153));
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Không tìm thấy người dùng");
-        ListFindPanel.add(jLabel1);
-
         jScrollPane1.setViewportView(ListFindPanel);
 
         AddFriendTab.add(jScrollPane1, java.awt.BorderLayout.CENTER);
@@ -77,9 +70,9 @@ public class AddFriendPopupPanel extends javax.swing.JPanel {
         jTabbedPane1.addTab("Tìm bạn", AddFriendTab);
 
         ListRequestPanel.setLayout(new javax.swing.BoxLayout(ListRequestPanel, javax.swing.BoxLayout.Y_AXIS));
-        RequestFriendTab.setViewportView(ListRequestPanel);
+        RequestFriendScroll.setViewportView(ListRequestPanel);
 
-        jTabbedPane1.addTab("Lời mời kết bạn", RequestFriendTab);
+        jTabbedPane1.addTab("Lời mời kết bạn", RequestFriendScroll);
 
         add(jTabbedPane1, java.awt.BorderLayout.PAGE_START);
     }// </editor-fold>//GEN-END:initComponents
@@ -89,10 +82,10 @@ private void loadFriendRequests() {
 
         service.getFriendRequests()
                 .thenAccept(list -> {
-                    System.out.println("Số request: " + list.size());
+//                    System.out.println("Số request: " + list.size());
 
                     for (FriendRequestResponseDTO dto : list) {
-                        System.out.println("Friend name: " + dto.getDisplayName());
+//                        System.out.println("Friend name: " + dto.getDisplayName());
                     }
                     SwingUtilities.invokeLater(() -> {
 
@@ -125,12 +118,6 @@ private void loadFriendRequests() {
     private void searchUser() {
 
         String email = txtSearch.getText().trim();
-
-        SwingUtilities.invokeLater(() -> {
-            ListFindPanel.removeAll();
-            ListFindPanel.revalidate();
-            ListFindPanel.repaint();
-        });
 
         UserService userService = new UserService();
 
@@ -197,9 +184,8 @@ private void loadFriendRequests() {
     private javax.swing.JPanel AddFriendTab;
     private javax.swing.JPanel ListFindPanel;
     private javax.swing.JPanel ListRequestPanel;
-    private javax.swing.JScrollPane RequestFriendTab;
+    private javax.swing.JScrollPane RequestFriendScroll;
     private javax.swing.JPanel SearchPanel;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JButton txtFind;

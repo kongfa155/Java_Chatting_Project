@@ -7,7 +7,7 @@
   </NonVisualComponents>
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="3"/>
-    <Property name="title" type="java.lang.String" value="&#x110;&#x103;ng nh&#x1ead;p"/>
+    <Property name="title" type="java.lang.String" value="&#x110;&#x103;ng k&#xfd;"/>
     <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
       <Dimension value="[400, 650]"/>
     </Property>
@@ -78,7 +78,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jLabel1" pref="71" max="32767" attributes="0"/>
+                      <Component id="jLabel1" pref="55" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -90,7 +90,6 @@
                 <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                   <Color blue="ff" green="ff" red="ff" type="rgb"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="ICON"/>
               </Properties>
             </Component>
           </SubComponents>
@@ -180,9 +179,6 @@
             <Component class="javax.swing.JTextField" name="txtDisplayName">
             </Component>
             <Component class="javax.swing.JTextField" name="txtEmail">
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtEmailActionPerformed"/>
-              </Events>
             </Component>
             <Component class="javax.swing.JRadioButton" name="radNam">
               <Properties>

@@ -4,9 +4,7 @@
  */
 package chattingapp.ui;
 
-import chattingapp.dtos.user.changepassword.ChangePasswordRequestDTO;
 import chattingapp.models.User;
-import chattingapp.services.UserService;
 import chattingapp.utils.SessionManager;
 import javax.swing.JOptionPane;
 
@@ -16,7 +14,6 @@ import javax.swing.JOptionPane;
  */
 public class UpdatePasswordDialog extends javax.swing.JDialog {
 
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(UpdatePasswordDialog.class.getName());
 
     /**
      * Creates new form UpdatePhoneDialog

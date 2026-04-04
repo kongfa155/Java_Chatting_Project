@@ -14,6 +14,7 @@ import chattingapp.utils.NotificationManager;
 import chattingapp.utils.SessionManager;
 import javax.swing.ImageIcon;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -79,14 +80,14 @@ public class SideBarPanel extends javax.swing.JPanel {
 
     public final void setAvatar(String avatarURL) {
 //        lblAvatar.setText("");
+        System.out.println("RAW avatar = [" + avatarURL + "]");
+
         new Thread(() -> {
             ImageIcon icon = AvatarUtil.loadAvatar(avatarURL, 40, true);
 
-            javax.swing.SwingUtilities.invokeLater(
-                    () -> {
-                        lblAvatar.setIcon(icon);
-                    }
-            );
+            SwingUtilities.invokeLater(() -> {
+                lblAvatar.setIcon(icon);
+            });
         }).start();
 
     }

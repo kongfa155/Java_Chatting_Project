@@ -4,7 +4,6 @@
  */
 package chattingapp.ui;
 
-import chattingapp.dtos.user.register.RegisterOTPRequestDTO;
 import chattingapp.dtos.user.register.RegisterRequestDTO;
 import chattingapp.services.UserService;
 
@@ -16,7 +15,6 @@ import javax.swing.JOptionPane;
  */
 public class RegisterFrame extends javax.swing.JFrame {
 
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(RegisterFrame.class.getName());
 
     /**
      * Creates new form LoginFrame
@@ -59,10 +57,9 @@ public class RegisterFrame extends javax.swing.JFrame {
         btnReg = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Đăng nhập");
+        setTitle("Đăng ký");
         setMinimumSize(new java.awt.Dimension(400, 650));
         setResizable(false);
-        getContentPane().setLayout(new java.awt.BorderLayout());
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setBorder(javax.swing.BorderFactory.createEmptyBorder(30, 30, 30, 30));
@@ -71,7 +68,6 @@ public class RegisterFrame extends javax.swing.JFrame {
         jPanel1.setLayout(new java.awt.GridBagLayout());
 
         jLabel1.setBackground(new java.awt.Color(255, 255, 255));
-        jLabel1.setText("ICON");
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -86,7 +82,7 @@ public class RegisterFrame extends javax.swing.JFrame {
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 71, Short.MAX_VALUE)
+                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -108,8 +104,6 @@ public class RegisterFrame extends javax.swing.JFrame {
                 dangNhapMouseClicked(evt);
             }
         });
-
-        txtEmail.addActionListener(this::txtEmailActionPerformed);
 
         buttonGroup1.add(radNam);
         radNam.setSelected(true);
@@ -251,10 +245,6 @@ String username = txtUsername.getText().trim();
             return null;
         });
     }//GEN-LAST:event_btnRegActionPerformed
-
-    private void txtEmailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtEmailActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtEmailActionPerformed
 
     /**
      * @param args the command line arguments

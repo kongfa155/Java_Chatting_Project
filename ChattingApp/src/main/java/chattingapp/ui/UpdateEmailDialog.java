@@ -4,9 +4,7 @@
  */
 package chattingapp.ui;
 
-import chattingapp.dtos.user.changeemail.ChangeEmailOTPRequestDTO;
 import chattingapp.models.User;
-import chattingapp.services.UserService;
 import chattingapp.utils.SessionManager;
 import javax.swing.JOptionPane;
 
@@ -15,8 +13,6 @@ import javax.swing.JOptionPane;
  * @author CP
  */
 public class UpdateEmailDialog extends javax.swing.JDialog {
-
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(UpdateEmailDialog.class.getName());
 
     /**
      * Creates new form UpdatePhoneDialog
@@ -30,20 +26,20 @@ public class UpdateEmailDialog extends javax.swing.JDialog {
 
     private void loadUser() {
 // Đảm bảo lấy đúng User từ Session
-    currentUser = SessionManager.getCurrentUser();
+        currentUser = SessionManager.getCurrentUser();
 
-    if (currentUser != null) {
-        System.out.println("DEBUG: Email hiện tại là: " + currentUser.getEmail()); // Check trong console
-        
-        // Cập nhật text cho TextField
-        txtCurrentEmail.setText(currentUser.getEmail());
-        
-        // Đảm bảo UI cập nhật lại
-        txtCurrentEmail.revalidate();
-        txtCurrentEmail.repaint();
-    } else {
-        System.out.println("DEBUG: currentUser bị NULL");
-    }
+        if (currentUser != null) {
+            System.out.println("DEBUG: Email hiện tại là: " + currentUser.getEmail()); // Check trong console
+
+            // Cập nhật text cho TextField
+            txtCurrentEmail.setText(currentUser.getEmail());
+
+            // Đảm bảo UI cập nhật lại
+            txtCurrentEmail.revalidate();
+            txtCurrentEmail.repaint();
+        } else {
+            System.out.println("DEBUG: currentUser bị NULL");
+        }
     }
 
     /**
@@ -148,65 +144,65 @@ public class UpdateEmailDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_btnCancelEmailActionPerformed
 
     private void btnSaveEmailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveEmailActionPerformed
-       String newEmail = txtNewEmail.getText().trim();
+        String newEmail = txtNewEmail.getText().trim();
 
-    // 1. Validate dữ liệu đầu vào (Client-side)
-    if (newEmail.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Vui lòng nhập email mới");
-        return; // Nút vẫn đang Enabled, user có thể nhập lại
-    }
+        // 1. Validate dữ liệu đầu vào (Client-side)
+        if (newEmail.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập email mới");
+            return; // Nút vẫn đang Enabled, user có thể nhập lại
+        }
 
-    if (!newEmail.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-        JOptionPane.showMessageDialog(this, "Định dạng email không hợp lệ", "Lỗi", JOptionPane.ERROR_MESSAGE);
-        return;
-    }
+        if (!newEmail.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+            JOptionPane.showMessageDialog(this, "Định dạng email không hợp lệ", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-    if (newEmail.equals(currentUser.getEmail())) {
-        JOptionPane.showMessageDialog(this, "Email mới không được trùng email hiện tại", "Lỗi", JOptionPane.ERROR_MESSAGE);
-        return;
-    }
+        if (newEmail.equals(currentUser.getEmail())) {
+            JOptionPane.showMessageDialog(this, "Email mới không được trùng email hiện tại", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-    // 2. Xác thực mật khẩu trước khi gọi API
-    javax.swing.JPasswordField pwd = new javax.swing.JPasswordField(10);
-    int action = JOptionPane.showConfirmDialog(this, pwd, "Nhập mật khẩu hiện tại để xác nhận", JOptionPane.OK_CANCEL_OPTION);
-    
-    if (action != JOptionPane.OK_OPTION) {
-        return; // User hủy, nút vẫn Enabled
-    }
+        // 2. Xác thực mật khẩu trước khi gọi API
+        javax.swing.JPasswordField pwd = new javax.swing.JPasswordField(10);
+        int action = JOptionPane.showConfirmDialog(this, pwd, "Nhập mật khẩu hiện tại để xác nhận", JOptionPane.OK_CANCEL_OPTION);
 
-    String password = new String(pwd.getPassword());
-    if (password.isBlank()) {
-        JOptionPane.showMessageDialog(this, "Mật khẩu không được để trống");
-        return;
-    }
+        if (action != JOptionPane.OK_OPTION) {
+            return; // User hủy, nút vẫn Enabled
+        }
 
-    // 3. Chống spam: Disable nút và bắt đầu gọi Service
-    btnSaveEmail.setEnabled(false);
-    btnSaveEmail.setText("Đang gửi...");
+        String password = new String(pwd.getPassword());
+        if (password.isBlank()) {
+            JOptionPane.showMessageDialog(this, "Mật khẩu không được để trống");
+            return;
+        }
 
-    chattingapp.dtos.user.changeemail.ChangeEmailOTPRequestDTO dto = 
-            new chattingapp.dtos.user.changeemail.ChangeEmailOTPRequestDTO(password, newEmail);
+        // 3. Chống spam: Disable nút và bắt đầu gọi Service
+        btnSaveEmail.setEnabled(false);
+        btnSaveEmail.setText("Đang gửi...");
 
-    new chattingapp.services.UserService().getChangeEmailOTP(dto)
-        .thenAccept(v -> {
-            javax.swing.SwingUtilities.invokeLater(() -> {
-                JOptionPane.showMessageDialog(this, "Mã xác thực đã được gửi đến email mới!");
-                // Mở form OTP
-                chattingapp.ui.OTPFrame otpFrame = new chattingapp.ui.OTPFrame(newEmail, currentUser.getUsername(), "CHANGE_EMAIL");
-                otpFrame.setVisible(true);
-                this.dispose();
-            });
-        })
-        .exceptionally(ex -> {
-            // 4. QUAN TRỌNG: Xử lý lỗi và ENABLE lại nút bấm để user sửa thông tin
-            javax.swing.SwingUtilities.invokeLater(() -> {
-                btnSaveEmail.setEnabled(true);
-                btnSaveEmail.setText("Lưu");
-                // Sử dụng GlobalErrorHandler đã xây dựng để thông báo lỗi chuyên nghiệp
-                chattingapp.utils.GlobalErrorHandler.handle(this, ex);
-            });
-            return null;
-        });
+        chattingapp.dtos.user.changeemail.ChangeEmailOTPRequestDTO dto
+                = new chattingapp.dtos.user.changeemail.ChangeEmailOTPRequestDTO(password, newEmail);
+
+        new chattingapp.services.UserService().getChangeEmailOTP(dto)
+                .thenAccept(v -> {
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+                        JOptionPane.showMessageDialog(this, "Mã xác thực đã được gửi đến email mới!");
+                        // Mở form OTP
+                        chattingapp.ui.OTPFrame otpFrame = new chattingapp.ui.OTPFrame(newEmail, currentUser.getUsername(), "CHANGE_EMAIL");
+                        otpFrame.setVisible(true);
+                        this.dispose();
+                    });
+                })
+                .exceptionally(ex -> {
+                    // 4. QUAN TRỌNG: Xử lý lỗi và ENABLE lại nút bấm để user sửa thông tin
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+                        btnSaveEmail.setEnabled(true);
+                        btnSaveEmail.setText("Lưu");
+                        // Sử dụng GlobalErrorHandler đã xây dựng để thông báo lỗi chuyên nghiệp
+                        chattingapp.utils.GlobalErrorHandler.handle(this, ex);
+                    });
+                    return null;
+                });
     }//GEN-LAST:event_btnSaveEmailActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

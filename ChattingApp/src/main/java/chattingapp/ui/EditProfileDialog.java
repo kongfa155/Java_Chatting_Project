@@ -4,13 +4,9 @@
  */
 package chattingapp.ui;
 
-import chattingapp.dtos.user.changeprofile.ChangeProfileRequestDTO;
 import chattingapp.models.User;
-import chattingapp.services.UserService;
 import chattingapp.utils.AvatarUtil;
 import chattingapp.utils.SessionManager;
-import java.awt.Event;
-import java.util.Arrays;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
@@ -21,7 +17,6 @@ import javax.swing.JOptionPane;
 public class EditProfileDialog extends javax.swing.JDialog {
 
     private User currentUser;
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(EditProfileDialog.class.getName());
 
     /**
      * Creates new form EditProfileDialog
@@ -32,24 +27,50 @@ public class EditProfileDialog extends javax.swing.JDialog {
         btnEdit.requestFocusInWindow();
     }
 
-private void loadUser() {
-currentUser = SessionManager.getCurrentUser();
-    if (currentUser == null) return;
+    private void loadUser() {
+        currentUser = SessionManager.getCurrentUser();
+        if (currentUser == null) {
+            return;
+        }
 
-    txtDisplayname.setText(currentUser.getDisplayName());
-    txtURLAvatar.setText(currentUser.getAvatarUrl());
+        txtDisplayname.setText(currentUser.getDisplayName());
+        txtURLAvatar.setText(currentUser.getAvatarUrl());
 
-    // Fix NPE: Kiểm tra null trước khi set. Mặc định là Male (true) nếu null.
-    boolean gender = (currentUser.getGender() != null) ? currentUser.getGender() : true;
-    rdMale.setSelected(gender);
-    rdFemale.setSelected(!gender);
-String avatarUrlWithCacheBuster = currentUser.getAvatarUrl();
-    if (avatarUrlWithCacheBuster != null && avatarUrlWithCacheBuster.startsWith("http")) {
-        avatarUrlWithCacheBuster += (avatarUrlWithCacheBuster.contains("?") ? "&" : "?") + "t=" + System.currentTimeMillis();
+        // Fix NPE: Kiểm tra null trước khi set. Mặc định là Male (true) nếu null.
+        boolean gender = (currentUser.getGender() != null) ? currentUser.getGender() : true;
+        rdMale.setSelected(gender);
+        rdFemale.setSelected(!gender);
+        String avatarUrlWithCacheBuster = currentUser.getAvatarUrl();
+        if (avatarUrlWithCacheBuster != null && avatarUrlWithCacheBuster.startsWith("http")) {
+            avatarUrlWithCacheBuster += (avatarUrlWithCacheBuster.contains("?") ? "&" : "?") + "t=" + System.currentTimeMillis();
+        }
+        previewAvatar(avatarUrlWithCacheBuster);
     }
-    previewAvatar(avatarUrlWithCacheBuster);
-}
 
+    private boolean isValidAvatarUrl(String url) {
+        if (url == null || url.isEmpty()) {
+            return false;
+        }
+
+        // 1. Độ dài tối đa
+        if (url.length() > 255) {
+            return false;
+        }
+
+        // 2. Phải bắt đầu bằng http hoặc https
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            return false;
+        }
+
+        // 3. Kiểm tra đuôi file ảnh
+        String lower = url.toLowerCase();
+
+        return lower.endsWith(".png")
+                || lower.endsWith(".jpg")
+                || lower.endsWith(".jpeg")
+                || lower.endsWith(".gif")
+                || lower.endsWith(".webp");
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -219,13 +240,22 @@ String avatarUrlWithCacheBuster = currentUser.getAvatarUrl();
         String displayName = txtDisplayname.getText().trim();
         boolean gender = rdMale.isSelected();
         char[] passwordChars = txtPassword.getPassword();
-        
+
         // 2. Client-side Validation
         if (url.isEmpty() || displayName.isEmpty() || passwordChars.length == 0) {
             JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ tất cả các trường!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
+        if (!isValidAvatarUrl(url)) {
+            JOptionPane.showMessageDialog(this,
+                    "Link avatar không hợp lệ!\n"
+                    + "- Phải là http/https\n"
+                    + "- Đuôi: png, jpg, jpeg, gif, webp\n"
+                    + "- Độ dài tối đa 255 ký tự",
+                    "Lỗi",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         // 3. Chống spam: Vô hiệu hóa các nút điều khiển
         btnSave.setEnabled(false);
         btnCancel.setEnabled(false);
@@ -233,45 +263,45 @@ String avatarUrlWithCacheBuster = currentUser.getAvatarUrl();
 
         // 4. Gọi Service cập nhật thông tin
         String password = new String(passwordChars);
-        chattingapp.dtos.user.changeprofile.ChangeProfileRequestDTO dto = 
-                new chattingapp.dtos.user.changeprofile.ChangeProfileRequestDTO(password, displayName, gender, url);
-        
-        new chattingapp.services.UserService().changeProfile(dto)
-            .thenAccept(v -> {
-                // 5. Cập nhật Session khi thành công
-                User user = SessionManager.getCurrentUser();
-                if (user != null) {
-                    user.setAvatarUrl(url);
-                    user.setDisplayName(displayName);
-                    user.setGender(gender);
-                    SessionManager.setSession(SessionManager.getToken(), user);
-                }
+        chattingapp.dtos.user.changeprofile.ChangeProfileRequestDTO dto
+                = new chattingapp.dtos.user.changeprofile.ChangeProfileRequestDTO(password, displayName, gender, url);
 
-                javax.swing.SwingUtilities.invokeLater(() -> {
-                    JOptionPane.showMessageDialog(this, "Cập nhật thông tin thành công!");
-                    // Xóa password khỏi memory (Security Best Practice)
-                    java.util.Arrays.fill(passwordChars, '0');
-                    this.dispose(); // CHỈ ĐÓNG KHI THÀNH CÔNG
+        new chattingapp.services.UserService().changeProfile(dto)
+                .thenAccept(v -> {
+                    // 5. Cập nhật Session khi thành công
+                    User user = SessionManager.getCurrentUser();
+                    if (user != null) {
+                        user.setAvatarUrl(url);
+                        user.setDisplayName(displayName);
+                        user.setGender(gender);
+                        SessionManager.setSession(SessionManager.getToken(), user);
+                    }
+
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+                        JOptionPane.showMessageDialog(this, "Cập nhật thông tin thành công!");
+                        // Xóa password khỏi memory (Security Best Practice)
+                        java.util.Arrays.fill(passwordChars, '0');
+                        this.dispose(); // CHỈ ĐÓNG KHI THÀNH CÔNG
+                    });
+                })
+                .exceptionally(ex -> {
+                    // 6. Xử lý lỗi và khôi phục trạng thái UI
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+                        // Sử dụng GlobalErrorHandler dùng chung đã xây dựng
+                        chattingapp.utils.GlobalErrorHandler.handle(this, ex);
+
+                        // Mở lại nút để người dùng sửa lỗi
+                        btnSave.setEnabled(true);
+                        btnCancel.setEnabled(true);
+                        btnEdit.setEnabled(true);
+
+                        // Clear password để user nhập lại
+                        txtPassword.setText("");
+                        txtPassword.requestFocus();
+                    });
+                    return null;
                 });
-            })
-            .exceptionally(ex -> {
-                // 6. Xử lý lỗi và khôi phục trạng thái UI
-                javax.swing.SwingUtilities.invokeLater(() -> {
-                    // Sử dụng GlobalErrorHandler dùng chung đã xây dựng
-                    chattingapp.utils.GlobalErrorHandler.handle(this, ex);
-                    
-                    // Mở lại nút để người dùng sửa lỗi
-                    btnSave.setEnabled(true);
-                    btnCancel.setEnabled(true);
-                    btnEdit.setEnabled(true);
-                    
-                    // Clear password để user nhập lại
-                    txtPassword.setText("");
-                    txtPassword.requestFocus();
-                });
-                return null;
-            });
-            
+
         // TUYỆT ĐỐI KHÔNG gọi this.dispose() ở đây vì code chạy Async
     }//GEN-LAST:event_btnSaveActionPerformed
 

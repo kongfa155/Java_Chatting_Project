@@ -6,8 +6,7 @@ package chattingapp.components;
 
 import java.awt.Color;
 import java.awt.FlowLayout;
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
+
 
 /**
  *

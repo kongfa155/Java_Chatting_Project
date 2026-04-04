@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package chattingapp.utils;
 
 import javax.imageio.ImageIO;
@@ -10,182 +6,199 @@ import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
-import com.formdev.flatlaf.util.UIScale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- *
- * @author CP
+ * AvatarUtil: Xử lý ảnh đại diện. Luồng thực thi: Load
+ * -> Crop Square -> Resize -> Make Circle -> Draw Status -> Cache
  */
-
-
-
 public class AvatarUtil {
 
+    // Cache lưu trữ để tránh việc xử lý lại cùng một ảnh nhiều lần
+    private static final Map<String, ImageIcon> CACHE = new ConcurrentHashMap<>();
+
+    // --- 1. ENTRY POINT (ĐIỂM VÀO CHÍNH) ---
+    /**
+     * Nạp avatar từ đường dẫn (file/url), xử lý bo tròn và trạng thái online.
+     */
     public static ImageIcon loadAvatar(String pathOrUrl, int size, boolean online) {
+        if (pathOrUrl == null || pathOrUrl.isEmpty()) {
+            return createDefaultAvatar(size);
+        }
+
+        String cacheKey = pathOrUrl + "_" + size + "_" + online;
+        if (CACHE.containsKey(cacheKey)) {
+            return CACHE.get(cacheKey);
+        }
+
         try {
-            int scaledSize = UIScale.scale(size);
-
-            BufferedImage original;
-            if (pathOrUrl.startsWith("http")) {
-                original = ImageIO.read(new URL(pathOrUrl));
-            } else {
-                original = ImageIO.read(new File(pathOrUrl));
+            // Bước 1: Tải ảnh gốc
+            BufferedImage img = loadImage(pathOrUrl);
+            if (img == null) {
+                return createDefaultAvatar(size);
             }
 
-            if (original == null)
-                throw new RuntimeException("Image read failed");
+            // Bước 2: Xử lý qua pipeline
+            BufferedImage processed = processAvatarPipeline(img, size, online);
 
-            // 1️⃣ Crop vuông từ center
-            BufferedImage square = cropToSquare(original);
-            int originalSize = square.getWidth();
-
-            // 2️⃣ Supersample nếu ảnh đủ lớn
-            int superSize = Math.min(originalSize, scaledSize * 2);
-            BufferedImage large = resize(square, superSize, superSize);
-
-            // 3️⃣ Cắt tròn
-            BufferedImage circle = makeCircle(large);
-
-            // 4️⃣ Resize về kích thước chuẩn
-            BufferedImage finalImg = resize(circle, scaledSize, scaledSize);
-
-            // 5️⃣ Thêm border trắng (Light theme nhìn đẹp hơn)
-            finalImg = addBorder(finalImg, UIScale.scale(2));
-
-            // 6️⃣ Thêm online indicator nếu cần
-            if (online) {
-                finalImg = addOnlineIndicator(finalImg);
-            }
-
-            // 7️⃣ Thêm shadow nhẹ
-            finalImg = addShadow(finalImg, UIScale.scale(4));
-
-            return new ImageIcon(finalImg);
+            // Bước 3: Đưa vào cache và trả về kết quả
+            ImageIcon icon = new ImageIcon(processed);
+            CACHE.put(cacheKey, icon);
+            return icon;
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Error loading avatar: " + pathOrUrl + " | " + e.getMessage());
             return createDefaultAvatar(size);
         }
     }
 
-    // Crop center thành hình vuông
-    private static BufferedImage cropToSquare(BufferedImage img) {
-        int size = Math.min(img.getWidth(), img.getHeight());
-        int x = (img.getWidth() - size) / 2;
-        int y = (img.getHeight() - size) / 2;
-        return img.getSubimage(x, y, size, size);
+    // --- 2. LOAD & PIPELINE ---
+    /**
+     * Tải ảnh lên
+     */
+    private static BufferedImage loadImage(String path) throws Exception {
+        if (path.startsWith("http")) {
+            URI uri = new URI(path);
+            URL url = uri.toURL();
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0");
+            conn.setConnectTimeout(5000);
+            conn.setReadTimeout(5000);
+
+            try (var is = conn.getInputStream()) {
+                return ImageIO.read(is);
+            }
+        } else {
+            File file = new File(path);
+            if (!file.exists()) {
+                return null;
+            }
+            return ImageIO.read(file);
+        }
     }
 
-    // Resize chất lượng cao
-    private static BufferedImage resize(BufferedImage img, int w, int h) {
-        BufferedImage resized = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = resized.createGraphics();
+    /**
+     * Cắt thành vuông, xong resize rồi mới cắt về hình tròn
+     */
+    private static BufferedImage processAvatarPipeline(BufferedImage img, int size, boolean online) {
+        BufferedImage square = cropToSquare(img);
+        BufferedImage resized = resizeImage(square, size);
+        BufferedImage circle = convertToCircle(resized);
 
-        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-        g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
-
-        g2.drawImage(img, 0, 0, w, h, null);
-        g2.dispose();
-        return resized;
-    }
-
-    // Cắt tròn mượt
-    private static BufferedImage makeCircle(BufferedImage img) {
-        int size = img.getWidth();
-        BufferedImage circle = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
-
-        Graphics2D g2 = circle.createGraphics();
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        g2.fillOval(0, 0, size, size);
-        g2.setComposite(AlphaComposite.SrcIn);
-        g2.drawImage(img, 0, 0, null);
-
-        g2.dispose();
+        if (online) {
+            drawOnlineStatus(circle);
+        }
         return circle;
     }
 
-    // Thêm border trắng (Light theme)
-    private static BufferedImage addBorder(BufferedImage img, int thickness) {
-        int size = img.getWidth();
-        Graphics2D g2 = img.createGraphics();
+    // --- 3. CÁC BƯỚC XỬ LÝ CHI TIẾT (IMAGE MANIPULATION) ---
+    /**
+     * Cắt vuông từ tâm
+     */
+    private static BufferedImage cropToSquare(BufferedImage img) {
+        int width = img.getWidth();
+        int height = img.getHeight();
+        int size = Math.min(width, height);
 
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setColor(Color.WHITE);
-        g2.setStroke(new BasicStroke(thickness));
-        g2.drawOval(thickness / 2, thickness / 2,
-                size - thickness, size - thickness);
+        int x = (width - size) / 2;
+        int y = (height - size) / 2;
 
-        g2.dispose();
-        return img;
+        return img.getSubimage(x, y, size, size);
     }
 
-    // Thêm shadow nhẹ tinh tế
-    private static BufferedImage addShadow(BufferedImage img, int shadowSize) {
-        int size = img.getWidth();
-        int total = size + shadowSize;
+    /**
+     * Thay đổi kích thước ảnh về kích thước yêu cầu
+     */
+    private static BufferedImage resizeImage(BufferedImage img, int size) {
+        BufferedImage out = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = out.createGraphics();
 
-        BufferedImage shadowImg = new BufferedImage(total, total, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = shadowImg.createGraphics();
+        applyQualityHints(g);
+        g.drawImage(img, 0, 0, size, size, null);
+        g.dispose();
 
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        // Shadow mềm nhẹ (Light theme nên rất nhẹ)
-        g2.setColor(new Color(0, 0, 0, 40));
-        g2.fillOval(shadowSize, shadowSize, size, size);
-
-        g2.drawImage(img, 0, 0, null);
-
-        g2.dispose();
-        return shadowImg;
+        return out;
     }
 
-    // Online indicator
-    private static BufferedImage addOnlineIndicator(BufferedImage img) {
+    /**
+     * Cắt ảnh bằng hình tròn sử dụng clipping
+     */
+    private static BufferedImage convertToCircle(BufferedImage img) {
         int size = img.getWidth();
-        Graphics2D g2 = img.createGraphics();
+        BufferedImage circle = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = circle.createGraphics();
 
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        int dotSize = size / 4;
-        int x = size - dotSize;
-        int y = size - dotSize;
-
-        g2.setColor(new Color(0, 200, 0));
-        g2.fillOval(x, y, dotSize, dotSize);
-
-        g2.setColor(Color.WHITE);
-        g2.setStroke(new BasicStroke(2));
-        g2.drawOval(x, y, dotSize, dotSize);
-
-        g2.dispose();
-        return img;
-    }
-
-    // Avatar mặc định
-    private static ImageIcon createDefaultAvatar(int size) {
-        int scaledSize = UIScale.scale(size);
-        BufferedImage img = new BufferedImage(scaledSize, scaledSize, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = img.createGraphics();
-
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        g.setColor(new Color(230, 230, 230));
-        g.fillOval(0, 0, scaledSize, scaledSize);
-
-        g.setColor(Color.WHITE);
-        g.setFont(new Font("Arial", Font.BOLD, scaledSize / 2));
-        FontMetrics fm = g.getFontMetrics();
-        String text = "?";
-
-        int x = (scaledSize - fm.stringWidth(text)) / 2;
-        int y = (scaledSize - fm.getHeight()) / 2 + fm.getAscent();
-        g.drawString(text, x, y);
+        applyQualityHints(g);
+        // Tạo vùng cắt hình elip (tròn)
+        g.setClip(new Ellipse2D.Float(0, 0, size, size));
+        g.drawImage(img, 0, 0, null);
 
         g.dispose();
+        return circle;
+    }
+
+    /**
+     * Vẽ chấm màu xanh hiển thị online
+     * Online.
+     */
+    private static void drawOnlineStatus(BufferedImage img) {
+        Graphics2D g = img.createGraphics();
+        applyQualityHints(g);
+
+        int size = img.getWidth();
+        int dotSize = size / 4;
+        int position = size - dotSize - (size / 20); // Cách lề một chút cho đẹp
+
+        // Vẽ viền trắng cho chấm online (tạo hiệu ứng tách biệt với avatar)
+        g.setColor(Color.WHITE);
+        g.fillOval(position - 1, position - 1, dotSize + 2, dotSize + 2);
+
+        // Vẽ chấm xanh
+        g.setColor(new Color(35, 165, 90)); // Màu xanh Discord-style
+        g.fillOval(position, position, dotSize, dotSize);
+
+        g.dispose();
+    }
+
+    // --- 4. UTILS & FALLBACK ---
+    /**
+     * Sử dụng khi cần ảnh nét
+     */
+    private static void applyQualityHints(Graphics2D g) {
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+    }
+
+    /**
+     * Avatar mặc định nếu lỗi không load được
+     */
+    private static ImageIcon createDefaultAvatar(int size) {
+        BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = img.createGraphics();
+
+        applyQualityHints(g);
+
+        // Vẽ nền xám
+        g.setColor(new Color(200, 200, 200));
+        g.fillOval(0, 0, size, size);
+
+        // Vẽ chữ "?" chính giữa
+        g.setColor(Color.WHITE);
+        g.setFont(new Font("SansSerif", Font.BOLD, size / 2));
+
+        FontMetrics fm = g.getFontMetrics();
+        String text = "?";
+        int x = (size - fm.stringWidth(text)) / 2;
+        int y = ((size - fm.getHeight()) / 2) + fm.getAscent();
+
+        g.drawString(text, x, y);
+        g.dispose();
+
         return new ImageIcon(img);
     }
 }

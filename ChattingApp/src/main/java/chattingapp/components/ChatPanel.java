@@ -97,7 +97,7 @@ public class ChatPanel extends javax.swing.JPanel {
                 );
 
         switch (msg.getMessageType()) {
-            
+
             case TEXT -> {
                 MessageBubble bubble
                         = new MessageBubble(msg.getContent(), isMine);
@@ -162,24 +162,24 @@ public class ChatPanel extends javax.swing.JPanel {
         cl.show(this, "card3");
     }
 
-    private MessageType detectFileType(java.io.File file) {
-        //Kiểm tra kiểu của file => Trả về kiểu loại như mong muốn
-        String name = file.getName().toLowerCase();
-
-        if (name.endsWith(".png") || name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".gif")) {
-            return chattingapp.models.MessageType.IMAGE;
-        }
-
-        if (name.endsWith(".mp4") || name.endsWith(".mkv") || name.endsWith(".mov") || name.endsWith(".avi")) {
-            return chattingapp.models.MessageType.VIDEO;
-        }
-
-        if (name.endsWith(".mp3") || name.endsWith(".wav")) {
-            return chattingapp.models.MessageType.AUDIO;
-        }
-
-        return chattingapp.models.MessageType.FILE;
-    }
+//    private MessageType detectFileType(java.io.File file) {
+//        //Kiểm tra kiểu của file => Trả về kiểu loại như mong muốn
+//        String name = file.getName().toLowerCase();
+//
+//        if (name.endsWith(".png") || name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".gif")) {
+//            return chattingapp.models.MessageType.IMAGE;
+//        }
+//
+//        if (name.endsWith(".mp4") || name.endsWith(".mkv") || name.endsWith(".mov") || name.endsWith(".avi")) {
+//            return chattingapp.models.MessageType.VIDEO;
+//        }
+//
+//        if (name.endsWith(".mp3") || name.endsWith(".wav")) {
+//            return chattingapp.models.MessageType.AUDIO;
+//        }
+//
+//        return chattingapp.models.MessageType.FILE;
+//    }
     private boolean isWsConnected = false;
 
     public void initWebSocket() {
@@ -227,7 +227,7 @@ public class ChatPanel extends javax.swing.JPanel {
     }
 
     public void handleIncomingMessage(Message message) {
-        
+
         System.out.println("WebSocket đã nhận được tin nhắn: " + message.getContent());
         chattingapp.ui.MainFrame.updateChatList();
         String myId = SessionManager.getCurrentUser().getUserId();
@@ -415,7 +415,7 @@ public class ChatPanel extends javax.swing.JPanel {
                             }
 
                             // 🧠 mở folder
-                            String path = saveFile.getAbsolutePath();
+//                            String path = saveFile.getAbsolutePath();
 
                             if (System.getProperty("os.name").toLowerCase().contains("win")) {
                                 Runtime.getRuntime().exec(new String[]{
@@ -477,6 +477,8 @@ public class ChatPanel extends javax.swing.JPanel {
         if (data == null) {
             return;
         }
+        drawerOpen = false;
+        fileDrawer.setVisible(false);
         
         currentChatUserId = data.getContact().getUserId();
         //Lấy tên người đang nhắn tin
@@ -682,7 +684,7 @@ public class ChatPanel extends javax.swing.JPanel {
 
         isSending = true;
 
-        String myId = SessionManager.getCurrentUser().getUserId();
+//        String myId = SessionManager.getCurrentUser().getUserId();
 
         // 🔥 render ngay (optimistic UI)
         txtMessage.setText("");

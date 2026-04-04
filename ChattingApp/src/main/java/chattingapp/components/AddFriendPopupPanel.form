@@ -103,23 +103,12 @@
                   <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBoxLayout">
                     <Property name="axis" type="int" value="1"/>
                   </Layout>
-                  <SubComponents>
-                    <Component class="javax.swing.JLabel" name="jLabel1">
-                      <Properties>
-                        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                          <Color blue="99" green="99" red="99" type="rgb"/>
-                        </Property>
-                        <Property name="horizontalAlignment" type="int" value="0"/>
-                        <Property name="text" type="java.lang.String" value="Kh&#xf4;ng t&#xec;m th&#x1ea5;y ng&#x1b0;&#x1edd;i d&#xf9;ng"/>
-                      </Properties>
-                    </Component>
-                  </SubComponents>
                 </Container>
               </SubComponents>
             </Container>
           </SubComponents>
         </Container>
-        <Container class="javax.swing.JScrollPane" name="RequestFriendTab">
+        <Container class="javax.swing.JScrollPane" name="RequestFriendScroll">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
               <JTabbedPaneConstraints tabName="L&#x1edd;i m&#x1edd;i k&#x1ebf;t b&#x1ea1;n">

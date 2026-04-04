@@ -9,6 +9,7 @@ import chattingapp.models.Message;
 import chattingapp.models.User;
 import chattingapp.services.FriendService;
 import chattingapp.dtos.FriendLoadDTO;
+
 /**
  *
  * @author CP
@@ -26,14 +27,13 @@ public class ChatListPanel extends javax.swing.JPanel {
         setupUI();
         loadFriends();
     }
-    
+    private java.util.List<ChatData> allChats = new java.util.ArrayList<>();
+
     //Hàm này sau này dùng để cập nhật lại list khi có tin nhắn mới
     public void receiveNewMessage() {
         loadFriends(); // reload lại list
-    }    
-    
-      
-      
+    }
+
     private void setupUI() {
 
         // Search box đẹp hơn
@@ -53,110 +53,104 @@ public class ChatListPanel extends javax.swing.JPanel {
         );
 
         scrollPane.getVerticalScrollBar().putClientProperty("JScrollBar.showButtons", false);
+        txtSearch.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                search();
+            }
+
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                search();
+            }
+
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                search();
+            }
+
+            private void search() {
+                String keyword = txtSearch.getText().trim();
+                filterList(keyword);
+            }
+        });
     }
 
     private void loadFriends() {
 
-    FriendService service = new FriendService();
+        FriendService service = new FriendService();
 
-    service.getFriends().thenAccept(friends -> {
+        service.getFriends().thenAccept(friends -> {
 
-        javax.swing.SwingUtilities.invokeLater(() -> {
+            javax.swing.SwingUtilities.invokeLater(() -> {
 
-            listContainer.removeAll();
+                listContainer.removeAll();
 
-            for (FriendLoadDTO f : friends) {
+                allChats.clear(); // reset
 
-                // Tạo user từ backend
-                User user = new User();
-                user.setUserId(f.getUserId());   // FIX LỖI
-                user.setDisplayName(f.getDisplayName());
-                user.setAvatarUrl(f.getAvatarUrl());
+                for (FriendLoadDTO f : friends) {
 
-                // Backend chưa có last message nên fake tạm
-                Message msg = new Message();
-                msg.setContent("");
-                msg.setSentAt(java.time.LocalDateTime.now());
+                    User user = new User();
+                    user.setUserId(f.getUserId());
+                    user.setDisplayName(f.getDisplayName());
+                    user.setAvatarUrl(f.getAvatarUrl());
 
-                ChatData data = new ChatData(user, msg, 0);
+                    Message msg = new Message();
+                    msg.setContent("");
+                    msg.setSentAt(java.time.LocalDateTime.now());
 
-                ChatItemPanel item = new ChatItemPanel(data);
+                    ChatData data = new ChatData(user, msg, 0);
 
-                item.setChatItemClickListener(clickedData -> {
-                        System.out.println("CLICK FRIEND TRIGGERED");
-                    if (selectedItem != null) {
-                        selectedItem.setSelected(false);
-                    }
+                    allChats.add(data); // ✅ lưu lại
 
-                    item.setSelected(true);
-                    selectedItem = item;
-
-                    if (chatSelectionListener != null) {
-                        chatSelectionListener.onChatSelected(clickedData);
-                    }
-                });
-
-                listContainer.add(item);
-            }
-
-            listContainer.revalidate();
-            listContainer.repaint();
-        });
-
-    });
-}
-    //Đây là kênh đàm thoại cấp cao, dùng để cho các quản lý giao tiếp tới nhau
-    public interface ChatSelectionListener {
-
-        void onChatSelected(ChatData data);
-    }
-    //Sau này cần một hàm LoadData trả về các đối tượng ChatData (cần tên, avatar, tin nhắn cuối cùng, số tin nhắn chưa đọc)
-    private void fakeData() {
-
-        listContainer.removeAll();
-
-        for (int i = 1; i <= 15; i++) {
-
-            // Tạo user giả
-            User user = new User();
-            user.setDisplayName("Friend " + i);
-            user.setAvatarUrl("https://i.pravatar.cc/150?img=" + i);
-
-            // Tạo message giả
-            Message msg = new Message();
-            msg.setContent("Hello bro this is message " + i);
-            msg.setSentAt(
-                    java.time.LocalDateTime.now().minusMinutes(i * 5)
-            );
-
-            // Tạo ChatData
-            ChatData data = new ChatData(user, msg, i % 4);
-
-            // Tạo ChatItemPanel
-            ChatItemPanel item = new ChatItemPanel(data);
-
-            // GẮN LISTENER
-            //Ông này muốn xài đàm thoại trên kênh nên là định nghĩa một hàm setChatItemClick, hàm sẽ chạy khi có người click vào một item
-            item.setChatItemClickListener(clickedData -> {
-                //Unselect vật phẩm cũ
-                if (selectedItem != null) {
-                    selectedItem.setSelected(false);
+                    ChatItemPanel item = createItem(data);
+                    listContainer.add(item);
                 }
-                //Select vật phẩm mới
-                item.setSelected(true);
-                selectedItem = item;
 
-                if (chatSelectionListener != null) {
-                    chatSelectionListener.onChatSelected(clickedData);
-                }
+                listContainer.revalidate();
+                listContainer.repaint();
             });
 
-            // Thêm vào list
-            listContainer.add(item);
+        });
+    }
+
+    private ChatItemPanel createItem(ChatData data) {
+        ChatItemPanel item = new ChatItemPanel(data);
+
+        item.setChatItemClickListener(clickedData -> {
+            if (selectedItem != null) {
+                selectedItem.setSelected(false);
+            }
+
+            item.setSelected(true);
+            selectedItem = item;
+
+            if (chatSelectionListener != null) {
+                chatSelectionListener.onChatSelected(clickedData);
+            }
+        });
+
+        return item;
+    }
+
+    private void filterList(String keyword) {
+        listContainer.removeAll();
+
+        String lower = keyword.toLowerCase();
+
+        for (ChatData data : allChats) {
+            String name = data.getContact().getDisplayName().toLowerCase();
+
+            if (name.contains(lower)) {
+                listContainer.add(createItem(data));
+            }
         }
 
         listContainer.revalidate();
         listContainer.repaint();
+    }
+
+    //Đây là kênh đàm thoại cấp cao, dùng để cho các quản lý giao tiếp tới nhau
+    public interface ChatSelectionListener {
+
+        void onChatSelected(ChatData data);
     }
 
     public void setChatSelectionListener(ChatSelectionListener listener) {
@@ -180,7 +174,6 @@ public class ChatListPanel extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(300, 0));
         setLayout(new java.awt.BorderLayout());
 
-        txtSearch.setText("Search");
         txtSearch.setMinimumSize(new java.awt.Dimension(64, 40));
         txtSearch.setPreferredSize(new java.awt.Dimension(71, 45));
         add(txtSearch, java.awt.BorderLayout.PAGE_START);

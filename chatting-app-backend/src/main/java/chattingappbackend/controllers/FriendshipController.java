@@ -1,6 +1,5 @@
 package chattingappbackend.controllers;
 
-import chattingappbackend.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import chattingappbackend.responses.ApiResponse;
 import chattingappbackend.services.FriendshipService;
-import chattingappbackend.services.UserService;
 import chattingappbackend.utils.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 

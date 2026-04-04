@@ -6,7 +6,6 @@ package chattingapp.services;
 
 import chattingapp.dtos.FriendLoadDTO;
 import chattingapp.dtos.FriendRequestResponseDTO;
-import chattingapp.dtos.SendFriendDTO;
 import chattingapp.utils.SessionManager;
 import java.net.URI;
 import java.net.URLEncoder;

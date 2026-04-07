@@ -88,6 +88,7 @@ public class FriendService extends BaseService {
                 .sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(response -> handleResponseList(response, FriendRequestResponseDTO.class));
     }
+
     // ======================
     public CompletableFuture<List<FriendLoadDTO>> getFriends() {
 
@@ -100,5 +101,35 @@ public class FriendService extends BaseService {
         return ApiClient.getClient()
                 .sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(response -> handleResponseList(response, FriendLoadDTO.class));
+    }
+
+    public CompletableFuture<Void> deleteFriend(String friendId) {
+
+        String url = ApiClient.getBaseUrl()
+                + "/friendships/delete"
+                + "?friendId=" + URLEncoder.encode(friendId, StandardCharsets.UTF_8);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .POST(HttpRequest.BodyPublishers.noBody())
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + SessionManager.getToken())
+                .build();
+
+        return ApiClient.getClient()
+                .sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenApply(response -> handleResponse(response, Void.class));
+    }
+
+    public CompletableFuture<Boolean> isFriend(String friendId) {
+        // Lấy danh sách bạn bè hiện tại và check xem friendId có tồn tại không
+        return getFriends().thenApply(friends -> {
+            for (FriendLoadDTO f : friends) {
+                if (f.getUserId().equals(friendId)) {
+                    return true;
+                }
+            }
+            return false;
+        });
     }
 }

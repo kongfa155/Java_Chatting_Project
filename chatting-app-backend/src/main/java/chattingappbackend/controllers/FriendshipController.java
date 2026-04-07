@@ -17,7 +17,7 @@ import jakarta.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping("/api/friendships")
 public class FriendshipController {
-    
+
     //Tiêm các dịch vụ cần vào bean
     @Autowired
     FriendshipService friendshipService; //Gọi xử lý logic bạn bè
@@ -25,6 +25,7 @@ public class FriendshipController {
     @Autowired
     private JwtUtil jwtUtil; //Lấy user id từ JWT
     //Gửi lời mời kết bạn cần có email được truyền dưới dạng query param
+
     @PostMapping("/send")
     public ResponseEntity<ApiResponse<Void>> send(
             @RequestParam String email,
@@ -37,6 +38,7 @@ public class FriendshipController {
                 friendshipService.sendFriendRequest(currentUserId, email)
         );
     }
+
     //Chấp nhận lời mời kêt sbanj truyền id dưới dạng path variable
     @PostMapping("/accept/{id}")
     public ResponseEntity<ApiResponse<Void>> accept(
@@ -49,6 +51,7 @@ public class FriendshipController {
                 friendshipService.acceptRequest(id, currentUserId)
         );
     }
+
     //Lấy các lời mời ở trạng thái pending
     @GetMapping("/requests")
     public ResponseEntity<?> getPendingRequests(HttpServletRequest request) {
@@ -59,6 +62,7 @@ public class FriendshipController {
                 friendshipService.getPendingRequests(userId)
         );
     }
+
     //Lấy danh sách bạn bè của user
     @GetMapping("/friends")
     public ResponseEntity<?> getFriends(HttpServletRequest request) {
@@ -69,6 +73,7 @@ public class FriendshipController {
                 friendshipService.getFriends(userId)
         );
     }
+
     //Từ chối lời mời kết bạn
     @PostMapping("/reject/{id}")
     public ResponseEntity<ApiResponse<Void>> reject(
@@ -78,6 +83,19 @@ public class FriendshipController {
         String currentUserId = jwtUtil.getUserIdFromRequest(request);
         return ResponseEntity.ok(
                 friendshipService.rejectRequest(id, currentUserId)
+        );
+    }
+    // Xóa bạn
+
+    @PostMapping("/delete")
+    public ResponseEntity<ApiResponse<Void>> deleteFriend(
+            @RequestParam String friendId,
+            HttpServletRequest request
+    ) {
+        String userId = jwtUtil.getUserIdFromRequest(request);
+
+        return ResponseEntity.ok(
+                friendshipService.deleteFriend(userId, friendId)
         );
     }
 }

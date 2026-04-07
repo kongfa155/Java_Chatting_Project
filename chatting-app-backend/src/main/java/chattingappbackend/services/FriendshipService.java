@@ -22,6 +22,7 @@ import chattingappbackend.responses.ApiResponse;
 //Đây là lớp xử lý logic liên quan đến kết bạn
 @Service
 public class FriendshipService {
+
     //Nhờ JPA Inject các đối tượng cần vào lớp
     @Autowired
     private FriendshipRepository friendshipRepository; //Thao tác DB bảng Friendship
@@ -32,9 +33,10 @@ public class FriendshipService {
     @Autowired
     private NotificationService notificationService; //Thao tác db bảng Noti, dùng để tạo thông báo
     //1. Gửi lời mời kết bạn
+
     @Transactional
     public ApiResponse<Void> sendFriendRequest(String senderId, String email) {
-        
+
         //Tìm thông tin người gửi và người nhận, không thấy báo lỗi
         User sender = userRepository.findById(senderId)
                 .orElseThrow(() -> new AppException("USER_NOT_FOUND", "Không tìm thấy người dùng"));
@@ -67,7 +69,6 @@ public class FriendshipService {
                 // Khi tự close transaction, Hibernate thấy cập nhật dữ liệu, tự cập nhật
                 // Nếu cần thiết thì có thể tự gọi
 //                friendshipRepository.save(f);
-
                 return ApiResponse.success("Friend request resent", null);
             }
         }
@@ -132,7 +133,7 @@ public class FriendshipService {
         return ApiResponse.success("Friend request rejected", null);
     }
 
-   // 4. Kiểm tra trạng thái bạn bè
+    // 4. Kiểm tra trạng thái bạn bè
     public FriendshipStatus checkFriendship(String userA, String userB) {
         //Gọi Repository để kiểm tra trạng thái hiện tại của bạn bè (nếu chưa từng có gì thì trả về null
         return friendshipRepository
@@ -168,5 +169,43 @@ public class FriendshipService {
                 "Friend list fetched",
                 friends
         );
+    }
+    //7. Xóa bạn
+
+    @Transactional
+    public ApiResponse<Void> deleteFriend(String userA, String userB) {
+
+        Optional<Friendship> existing
+                = friendshipRepository.findFriendshipBetween(userA, userB);
+
+        if (existing.isEmpty()) {
+            throw new AppException("NOT_FOUND", "Friendship not found");
+        }
+
+        Friendship f = existing.get();
+
+        // ❗ check trạng thái chi tiết
+        if (f.getStatus() == FriendshipStatus.DECLINED) {
+            throw new AppException("ALREADY_UNFRIENDED", "Already unfriended");
+        }
+
+        if (f.getStatus() == FriendshipStatus.PENDING) {
+            throw new AppException("NOT_FRIEND", "Friend request not accepted yet");
+        }
+
+        // ✅ chuyển về DECLINED
+        f.setStatus(FriendshipStatus.DECLINED);
+
+        // (optional) cập nhật thời gian
+        f.setCreatedAt(LocalDateTime.now());
+
+        // (optional) gửi thông báo
+        notificationService.createNotification(
+                userB,
+                "Bạn đã bị hủy kết bạn",
+                NotificationType.FRIEND
+        );
+
+        return ApiResponse.success("Unfriended successfully", null);
     }
 }

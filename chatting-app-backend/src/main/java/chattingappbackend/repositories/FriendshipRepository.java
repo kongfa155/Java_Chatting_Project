@@ -27,7 +27,6 @@ public interface FriendshipRepository extends JpaRepository<Friendship, String> 
             @Param("userA") String userA,
             @Param("userB") String userB);
 
-
     // 2. Cập nhật trạng thái
     @Modifying
     @Transactional
@@ -74,4 +73,5 @@ public interface FriendshipRepository extends JpaRepository<Friendship, String> 
         WHERE f.status = 'ACCEPTED'
     """)
     List<FriendRequestResponseDTO> findFriend(@Param("userId") String userId);
+
 }

@@ -13,6 +13,7 @@ import chattingapp.models.ChatData;
 import chattingapp.models.Message;
 import chattingapp.models.MessageType;
 import chattingapp.services.ApiClient;
+import chattingapp.services.FriendService;
 import chattingapp.services.MessageService;
 import chattingapp.services.StompClientService;
 import chattingapp.utils.SessionManager;
@@ -62,7 +63,9 @@ public class ChatPanel extends javax.swing.JPanel {
                 ((javax.swing.JComponent) comp).scrollRectToVisible(comp.getBounds());
             }
         });
-
+        fileDrawer.setDeleteFriendListener(() -> {
+            deleteFriend();
+        });
         showEmpty();
         //Lắng nghe nút enter, nếu có = gửi tin nhắn
         txtMessage.getInputMap().put(
@@ -121,6 +124,32 @@ public class ChatPanel extends javax.swing.JPanel {
                     JScrollPane.getVerticalScrollBar().getMaximum()
             );
         });
+    }
+
+    private void deleteFriend() {
+        FriendService service = new FriendService();
+
+        service.deleteFriend(currentChatUserId)
+                .thenRun(() -> {
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+                        javax.swing.JOptionPane.showMessageDialog(this, "Đã xóa bạn");
+
+                        // reset UI
+                        showEmpty();
+                        messageContainer.removeAll();
+                        messageContainer.repaint();
+                    });
+                    chattingapp.ui.MainFrame.updateChatList();
+                })
+                .exceptionally(ex -> {
+                    ex.printStackTrace();
+
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+                        javax.swing.JOptionPane.showMessageDialog(this, "Xóa thất bại");
+                    });
+
+                    return null;
+                });
     }
 
     private File chooseFile() {
@@ -416,7 +445,6 @@ public class ChatPanel extends javax.swing.JPanel {
 
                             // 🧠 mở folder
 //                            String path = saveFile.getAbsolutePath();
-
                             if (System.getProperty("os.name").toLowerCase().contains("win")) {
                                 Runtime.getRuntime().exec(new String[]{
                                     "explorer.exe",
@@ -479,7 +507,7 @@ public class ChatPanel extends javax.swing.JPanel {
         }
         drawerOpen = false;
         fileDrawer.setVisible(false);
-        
+
         currentChatUserId = data.getContact().getUserId();
         //Lấy tên người đang nhắn tin
         lblName.setText(data.getContact().getDisplayName());
@@ -685,7 +713,6 @@ public class ChatPanel extends javax.swing.JPanel {
         isSending = true;
 
 //        String myId = SessionManager.getCurrentUser().getUserId();
-
         // 🔥 render ngay (optimistic UI)
         txtMessage.setText("");
 

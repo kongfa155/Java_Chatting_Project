@@ -7,6 +7,7 @@ package chattingapp.components;
 import chattingapp.dtos.FriendRequestResponseDTO;
 import chattingapp.services.FriendService;
 import chattingapp.services.UserService;
+import chattingapp.ui.MainFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
@@ -19,6 +20,12 @@ public class AddFriendPopupPanel extends javax.swing.JPanel {
     /**
      * Creates new form AddFriendPopupPanel
      */
+    private Runnable onCloseListener;
+
+    public void setOnCloseListener(Runnable listener) {
+        this.onCloseListener = listener;
+    }
+
     public AddFriendPopupPanel() {
         initComponents();
         txtSearch.putClientProperty("JTextField.placeholderText", "Nhập email...");
@@ -113,6 +120,21 @@ private void loadFriendRequests() {
                     ex.printStackTrace();
                     return null;
                 });
+    }
+
+    public void closePopup() {
+        // Gọi listener trước khi đóng
+        if (onCloseListener != null) {
+            onCloseListener.run();
+        }
+
+        // Đồng thời refresh chat list mặc định
+        MainFrame.updateChatList();
+
+        java.awt.Window window = javax.swing.SwingUtilities.getWindowAncestor(this);
+        if (window != null) {
+            window.dispose();
+        }
     }
 
     private void searchUser() {

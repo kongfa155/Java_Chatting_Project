@@ -113,18 +113,38 @@ public class ChatListPanel extends javax.swing.JPanel {
 
     private ChatItemPanel createItem(ChatData data) {
         ChatItemPanel item = new ChatItemPanel(data);
+        FriendService service = new FriendService(); // Tạo instance service
 
         item.setChatItemClickListener(clickedData -> {
-            if (selectedItem != null) {
-                selectedItem.setSelected(false);
-            }
+            // Kiểm tra xem friend còn tồn tại không
+            service.isFriend(clickedData.getContact().getUserId())
+                    .thenAccept(isFriend -> {
+                        javax.swing.SwingUtilities.invokeLater(() -> {
+                            if (!isFriend) {
+                                // Nếu đã bị xóa, thông báo và reload list
+                                javax.swing.JOptionPane.showMessageDialog(
+                                        this,
+                                        clickedData.getContact().getDisplayName() + " đã không còn là bạn.",
+                                        "Thông báo",
+                                        javax.swing.JOptionPane.WARNING_MESSAGE
+                                );
+                                receiveNewMessage(); // reload list chat
+                                return;
+                            }
 
-            item.setSelected(true);
-            selectedItem = item;
+                            // Nếu còn là bạn, chọn item bình thường
+                            if (selectedItem != null) {
+                                selectedItem.setSelected(false);
+                            }
 
-            if (chatSelectionListener != null) {
-                chatSelectionListener.onChatSelected(clickedData);
-            }
+                            item.setSelected(true);
+                            selectedItem = item;
+
+                            if (chatSelectionListener != null) {
+                                chatSelectionListener.onChatSelected(clickedData);
+                            }
+                        });
+                    });
         });
 
         return item;

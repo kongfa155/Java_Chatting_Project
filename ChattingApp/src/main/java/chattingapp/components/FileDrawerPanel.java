@@ -20,20 +20,19 @@ public class FileDrawerPanel extends javax.swing.JPanel {
         initComponents();
     }
 
-   
-
     public interface FileClickListener {
-            void onFileClick(String messageId);
-        }
 
-        private FileClickListener listener;
+        void onFileClick(String messageId);
+    }
 
-        public void setFileClickListener(FileClickListener listener) {
-            this.listener = listener;
-        }
+    private FileClickListener listener;
+
+    public void setFileClickListener(FileClickListener listener) {
+        this.listener = listener;
+    }
+
     public void loadFiles(java.util.List<Message> messages) {
 
-        
         fileContainer.removeAll();
 
         for (Message msg : messages) {
@@ -64,10 +63,10 @@ public class FileDrawerPanel extends javax.swing.JPanel {
             });
 
             fileContainer.add(item);
-    }
+        }
 
-    fileContainer.revalidate();
-    fileContainer.repaint();
+        fileContainer.revalidate();
+        fileContainer.repaint();
     }
 
     private String extractFileName(String url) {
@@ -94,7 +93,9 @@ public class FileDrawerPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
+        btnDeleteFriend = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         JScrollPane = new javax.swing.JScrollPane();
         fileContainer = new javax.swing.JPanel();
@@ -110,7 +111,14 @@ public class FileDrawerPanel extends javax.swing.JPanel {
         jLabel1.setText("Shared Files");
         jLabel1.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 15, 10, 10));
         jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        add(jLabel1, java.awt.BorderLayout.NORTH);
+        jPanel2.add(jLabel1);
+
+        btnDeleteFriend.setText("Xóa bạn");
+        btnDeleteFriend.setFocusPainted(false);
+        btnDeleteFriend.addActionListener(this::btnDeleteFriendActionPerformed);
+        jPanel2.add(btnDeleteFriend);
+
+        add(jPanel2, java.awt.BorderLayout.PAGE_START);
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setName(""); // NOI18N
@@ -126,12 +134,40 @@ public class FileDrawerPanel extends javax.swing.JPanel {
 
         add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
+public interface DeleteFriendListener {
+
+        void onDeleteFriend();
+    }
+
+    private DeleteFriendListener deleteListener;
+
+    public void setDeleteFriendListener(DeleteFriendListener listener) {
+        this.deleteListener = listener;
+    }
+    private void btnDeleteFriendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteFriendActionPerformed
+        // TODO add your handling code here:
+        int result = javax.swing.JOptionPane.showConfirmDialog(
+                this,
+                "Bạn có chắc muốn xóa bạn này không?",
+                "Xác nhận",
+                javax.swing.JOptionPane.YES_NO_OPTION
+        );
+
+        if (result == javax.swing.JOptionPane.YES_OPTION) {
+            if (deleteListener != null) {
+                deleteListener.onDeleteFriend();
+            }
+        }
+
+    }//GEN-LAST:event_btnDeleteFriendActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane JScrollPane;
+    private javax.swing.JButton btnDeleteFriend;
     private javax.swing.JPanel fileContainer;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     // End of variables declaration//GEN-END:variables
 }

@@ -228,6 +228,19 @@ public class SideBarPanel extends javax.swing.JPanel {
         );
 
         AddFriendPopupPanel panel = new AddFriendPopupPanel();
+        dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent e) {
+                // Gọi reload chat list
+                chattingapp.ui.MainFrame.updateChatList();
+            }
+
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                // Gọi luôn khi user nhấn nút X
+                chattingapp.ui.MainFrame.updateChatList();
+            }
+        });
         dialog.setContentPane(panel);
         dialog.pack();
         dialog.setLocationRelativeTo(null);

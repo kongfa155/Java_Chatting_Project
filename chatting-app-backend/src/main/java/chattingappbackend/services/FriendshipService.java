@@ -37,10 +37,6 @@ public class FriendshipService {
     @Transactional
     public ApiResponse<Void> sendFriendRequest(String senderId, String email) {
 
-        //Tìm thông tin người gửi và người nhận, không thấy báo lỗi
-        User sender = userRepository.findById(senderId)
-                .orElseThrow(() -> new AppException("USER_NOT_FOUND", "Không tìm thấy người dùng"));
-
         User receiver = userRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException("USER_NOT_FOUND", "Không tìm thấy người dùng"));
         //Không cho phép kết bạn với chính mình
@@ -87,7 +83,7 @@ public class FriendshipService {
         // Tạo thông báo
         notificationService.createNotification(
                 receiver.getUserId(),
-                "Bạn có lời mời kết bạn mới đến từ " + sender.getDisplayName(),
+                "Bạn có lời mời kết bạn mới",
                 NotificationType.FRIEND
         );
 

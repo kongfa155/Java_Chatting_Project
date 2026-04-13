@@ -93,7 +93,7 @@ public class MessageService {
         //Thông báo
         messagingTemplate.convertAndSend(
                 "/topic/notifications/" + saved.getReceiverId(),
-                "Bạn có tin nhắn mới từ " + saved.getSenderId()
+                "Bạn có tin nhắn mới"
         );
     }
 

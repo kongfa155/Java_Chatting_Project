@@ -128,6 +128,8 @@ public class ChatListPanel extends javax.swing.JPanel {
                                         "Thông báo",
                                         javax.swing.JOptionPane.WARNING_MESSAGE
                                 );
+                                
+                                 chattingapp.ui.MainFrame.getInstance().getChatPanel().resetChat();
                                 receiveNewMessage(); // reload list chat
                                 return;
                             }

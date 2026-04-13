@@ -126,6 +126,16 @@ public class ChatPanel extends javax.swing.JPanel {
         });
     }
 
+    public void resetChat() {
+        currentChatUserId = null;
+
+        messageContainer.removeAll();
+        messageContainer.revalidate();
+        messageContainer.repaint();
+
+        showEmpty();
+    }
+
     private void deleteFriend() {
         FriendService service = new FriendService();
 

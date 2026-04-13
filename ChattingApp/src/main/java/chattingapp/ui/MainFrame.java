@@ -90,6 +90,10 @@ public class MainFrame extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }
 
+    public static MainFrame getInstance() {
+        return instance;
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -129,7 +133,7 @@ public class MainFrame extends javax.swing.JFrame {
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
-       
+
         //</editor-fold>
 
         /* Create and display the form */

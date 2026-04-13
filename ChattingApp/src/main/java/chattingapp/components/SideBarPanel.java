@@ -29,6 +29,7 @@ public class SideBarPanel extends javax.swing.JPanel {
     //Fake data
     private User currentUser;
     private javax.swing.JLabel lblBadge;
+    private JPopupMenu currentPopup;
 
     public SideBarPanel() {
         initComponents();
@@ -62,6 +63,25 @@ public class SideBarPanel extends javax.swing.JPanel {
 
         if (currentUser != null) {
             setAvatar(currentUser.getAvatarUrl());
+        }
+    }
+
+    public static void updateNotificationUI() {
+        if (instance != null) {
+            instance.refreshPopupIfOpen();
+        }
+    }
+
+    private void refreshPopupIfOpen() {
+        if (currentPopup != null && currentPopup.isVisible()) {
+
+            NotificationListPanel panel = new NotificationListPanel();
+            panel.setData(NotificationManager.getAll());
+
+            currentPopup.removeAll();
+            currentPopup.add(panel);
+            currentPopup.revalidate();
+            currentPopup.repaint();
         }
     }
 
@@ -252,17 +272,17 @@ public class SideBarPanel extends javax.swing.JPanel {
         NotificationManager.markAllRead();
         updateBadge();
 
-        JPopupMenu popup = new JPopupMenu();
+        currentPopup = new JPopupMenu();
 
         NotificationListPanel panel = new NotificationListPanel();
         panel.setData(NotificationManager.getAll());
 
         panel.setPreferredSize(new java.awt.Dimension(300, 400));
 
-        popup.setLayout(new java.awt.BorderLayout());
-        popup.add(panel);
+        currentPopup.setLayout(new java.awt.BorderLayout());
+currentPopup.add(panel);
 
-        popup.show(btnNotify, btnNotify.getWidth() + 5, 0);
+currentPopup.show(btnNotify, btnNotify.getWidth() + 5, 0);
     }//GEN-LAST:event_btnNotifyActionPerformed
 
     private void menuLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuLogoutActionPerformed

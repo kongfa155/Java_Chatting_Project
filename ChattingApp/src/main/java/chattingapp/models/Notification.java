@@ -4,6 +4,7 @@
  */
 package chattingapp.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;
 
 /**
@@ -12,11 +13,16 @@ import java.time.LocalDateTime;
  */
 public class Notification {
       //Properties
+    @JsonProperty("notification_id")
     private String notificationId;
+    @JsonProperty("user_id")
     private String userId;
     private String content;
+    @JsonProperty("is_read")
     private boolean isRead;
+    @JsonProperty("is_deleted")
     private boolean isDeleted;
+    @JsonProperty("created_at")
     private LocalDateTime createdAt;
     private NotificationType type;
 
@@ -32,6 +38,7 @@ public class Notification {
         this.content = content;
         this.isRead = isRead;
         this.isDeleted = isDeleted;
+        
         this.createdAt = createdAt;
         this.type = type;
     }

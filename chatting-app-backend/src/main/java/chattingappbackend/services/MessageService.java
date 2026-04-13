@@ -4,6 +4,8 @@ import chattingappbackend.models.Message;
 import chattingappbackend.models.MessageType;
 import chattingappbackend.dtos.SendMessageRequestDTO;
 import chattingappbackend.exceptions.AppException;
+import chattingappbackend.models.Notification;
+import chattingappbackend.models.NotificationType;
 import chattingappbackend.repositories.MessageRepository;
 import chattingappbackend.responses.ApiResponse;
 
@@ -29,6 +31,8 @@ public class MessageService {
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
+    @Autowired
+    private NotificationService notificationService;
 
     // SEND MESSAGE
     public ApiResponse<Message> sendMessage(String senderId, SendMessageRequestDTO request) {
@@ -65,36 +69,21 @@ public class MessageService {
                 "/topic/messages/" + saved.getSenderId(),
                 saved
         );
-
+        notificationService.createNotification(
+                saved.getReceiverId(),
+                "Bạn có tin nhắn mới",
+                NotificationType.MESSAGE
+        );
         return ApiResponse.success("Message sent successfully", saved);
     }
 
-    public void saveFromSocket(Message message) {
-
+    public Message saveFromSocket(Message message) {
         message.setMessageId(UUID.randomUUID().toString());
         message.setSentAt(LocalDateTime.now());
         message.setRead(false);
         message.setDeleted(false);
 
-        Message saved = messageRepository.save(message);
-
-        // 🚀 push realtime cho người nhận
-        // 🚀 receiver
-        messagingTemplate.convertAndSend(
-                "/topic/messages/" + saved.getReceiverId(),
-                saved
-        );
-
-        // 🚀 sender (để UI nó cũng nhận realtime)
-        messagingTemplate.convertAndSend(
-                "/topic/messages/" + saved.getSenderId(),
-                saved
-        );
-        //Thông báo
-        messagingTemplate.convertAndSend(
-                "/topic/notifications/" + saved.getReceiverId(),
-                "Bạn có tin nhắn mới"
-        );
+        return messageRepository.save(message);
     }
 
     // GET CONVERSATION

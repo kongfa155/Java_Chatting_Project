@@ -5,6 +5,7 @@
 package chattingapp.ui;
 
 import chattingapp.components.ChatPanel;
+import chattingapp.components.NotificationListPanel;
 import chattingapp.services.StompClientService;
 import chattingapp.utils.NotificationManager;
 import chattingapp.utils.SessionManager;
@@ -29,8 +30,6 @@ public class MainFrame extends javax.swing.JFrame {
         initData();
         javax.swing.SwingUtilities.invokeLater(() -> {
             getChatPanel().initWebSocket();
-
-            initNotificationSocket();
         });
 
     }
@@ -38,29 +37,6 @@ public class MainFrame extends javax.swing.JFrame {
     public static void updateChatList() {
         if (instance != null) {
             instance.chatListPanel1.receiveNewMessage();
-        }
-    }
-
-    private void initNotificationSocket() {
-        String userId = SessionManager.getUserId();
-
-        // Đảm bảo chatPanel đã khởi tạo stompClient
-        StompClientService service = getChatPanel().getStompClientService();
-
-        if (service != null) {
-            System.out.println("ĐANG TIẾN HÀNH SUBSCRIBE NOTIFICATIONS CHO: " + userId); // Thêm log này
-            service.subscribeToNotifications(userId, noti -> {
-                System.out.println("ĐÃ NHẬN GÓI TIN NOTIFICATION: " + noti.getContent()); // Thêm log này
-                NotificationManager.add(noti);
-                sideBarPanel1.updateBadge();
-                System.out.println("Đã cập nhật NOTI: " + noti.getContent());
-            });
-        } else {
-            // Nếu chưa có service, thử lại sau một chút (hoặc gọi initWebSocket trước)
-            System.out.println("StompClientService chưa sẵn sàng, đang thử lại...");
-            javax.swing.SwingUtilities.invokeLater(() -> {
-                initNotificationSocket();
-            });
         }
     }
 

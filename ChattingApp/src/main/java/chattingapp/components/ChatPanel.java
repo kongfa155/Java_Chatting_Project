@@ -12,10 +12,12 @@ import javax.swing.JPanel;
 import chattingapp.models.ChatData;
 import chattingapp.models.Message;
 import chattingapp.models.MessageType;
+import chattingapp.models.NotificationType;
 import chattingapp.services.ApiClient;
 import chattingapp.services.FriendService;
 import chattingapp.services.MessageService;
 import chattingapp.services.StompClientService;
+import chattingapp.utils.NotificationManager;
 import chattingapp.utils.SessionManager;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -246,18 +248,32 @@ public class ChatPanel extends javax.swing.JPanel {
 
         // Gọi hàm connect mới với 2 listener
         stompClient.connect(
-                // 1. Xử lý Tin nhắn (MessageListener)
                 message -> {
                     handleIncomingMessage(message);
                 },
-                // 2. Xử lý Thông báo (NotificationListener)
                 notification -> {
-                    chattingapp.utils.NotificationManager.add(notification);
-                    // Cập nhật chuông ở SideBarPanel thông qua MainFrame hoặc Event
-                    // Ở đây bạn có thể dùng SwingUtilities để đảm bảo an toàn luồng
+
+                    System.out.println("🔥 NHẬN NOTI: " + notification.getContent());
+
+                    // 🚫 Nếu đang chat với người gửi → bỏ qua
+                    if (notification.getType() == NotificationType.MESSAGE) {
+
+                        // ⚠️ notification.getUserId() = receiver (mày)
+                        // nên phải lấy sender từ content hoặc thêm field senderId
+                        // 👉 TEMP FIX (dựa vào currentChatUserId)
+                        if (currentChatUserId != null
+                        && notification.getContent().contains(currentChatUserId)) {
+
+                            System.out.println("🚫 Đang chat → bỏ notification");
+                            return;
+                        }
+                    }
+
+                    NotificationManager.add(notification);
+
                     javax.swing.SwingUtilities.invokeLater(() -> {
-                        // MainFrame.getInstance().getSideBar().updateBadge(); 
-                        // Hoặc cách bạn đang dùng để link tới SideBar
+                        chattingapp.components.SideBarPanel.updateNotificationUI();
+                        chattingapp.components.SideBarPanel.updateBadgeExternal();
                     });
                 }
         );
@@ -269,36 +285,17 @@ public class ChatPanel extends javax.swing.JPanel {
 
         System.out.println("WebSocket đã nhận được tin nhắn: " + message.getContent());
         chattingapp.ui.MainFrame.updateChatList();
+
         String myId = SessionManager.getCurrentUser().getUserId();
 
-        // Kiểm tra xem tin nhắn có thuộc về cuộc hội thoại đang mở không
         boolean isCurrentChat = currentChatUserId != null
-                && (message.getSenderId().equals(currentChatUserId) || message.getSenderId().equals(myId));
-        //Nếu là đoạn chat đang mở, cập nhật ngay = addSingleMessage
+                && ((message.getSenderId().equals(currentChatUserId) && message.getReceiverId().equals(myId))
+                || (message.getSenderId().equals(myId) && message.getReceiverId().equals(currentChatUserId)));
+
         if (isCurrentChat) {
             javax.swing.SwingUtilities.invokeLater(() -> {
                 addSingleMessage(message);
             });
-        } else {
-            // TIN NHẮN ĐẾN TỪ NGƯỜI KHÁC -> TỰ TẠO NOTIFICATION NẾU SERVER KHÔNG GỬI
-            System.out.println("Nhận được tin nhắn từ nguồn khác, tạo thông báo mới");
-            // 1. Tạo đối tượng Notification và lưu vào Manager
-            chattingapp.models.Notification n = new chattingapp.models.Notification();
-            n.setContent("Tin nhắn từ " + message.getSenderId());
-            n.setRead(false);
-            chattingapp.utils.NotificationManager.add(n);
-
-            // 2. Lệnh cho SideBar cập nhật giao diện ngay lập tức
-            javax.swing.SwingUtilities.invokeLater(() -> {
-                chattingapp.components.SideBarPanel.updateBadgeExternal();
-            });
-            // Đoạn này dự phòng nếu Server chỉ gửi Message mà không gửi gói Notification riêng
-            /*
-                chattingapp.models.Notification n = new chattingapp.models.Notification();
-                n.setContent("Tin nhắn mới từ " + message.getSenderId());
-                n.setRead(false);
-                chattingapp.utils.NotificationManager.add(n);
-             */
         }
     }
 

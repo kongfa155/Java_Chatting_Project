@@ -5,8 +5,10 @@
 package chattingapp.components;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
-
+import java.awt.FontMetrics;
+import java.awt.Insets;
 
 /**
  *
@@ -15,24 +17,56 @@ import java.awt.FlowLayout;
 public class MessageBubble extends javax.swing.JPanel {
 
     public MessageBubble(String text, boolean isMine) {
+
         initComponents();
         bubblePanel.putClientProperty("FlatLaf.style", "arc:20");
-        lblMessage.setText("<html><div style='max-width:220px'>" + text + "</div></html>");
 
+        FontMetrics fm = txtMessage.getFontMetrics(txtMessage.getFont());
+        int textWidth = fm.stringWidth(text);
+
+        int maxWidth = 250;
+
+        String html;
+
+        if (textWidth <= maxWidth) {
+            // 👉 text ngắn → không ép width
+            html = "<html>" + escapeHtml(text) + "</html>";
+        } else {
+            // 👉 text dài → ép width để wrap
+            html = "<html><table><tr><td width='250'>"
+                    + escapeHtml(text)
+                    + "</td></tr></table></html>";
+        }
+
+        txtMessage.setText(html);
         if (isMine) {
 
             setLayout(new FlowLayout(FlowLayout.RIGHT));
 
             bubblePanel.setBackground(new Color(0, 122, 255));
-            lblMessage.setForeground(Color.WHITE);
+            txtMessage.setForeground(Color.WHITE);
 
         } else {
 
             setLayout(new FlowLayout(FlowLayout.LEFT));
 
             bubblePanel.setBackground(new Color(240, 240, 240));
-            lblMessage.setForeground(Color.BLACK);
+            txtMessage.setForeground(Color.BLACK);
         }
+
+    }
+
+    private String escapeHtml(String text) {
+        if (text == null) {
+            return "";
+        }
+
+        return text
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("\\n", "<br>");
     }
 
     /**
@@ -52,26 +86,26 @@ public class MessageBubble extends javax.swing.JPanel {
     private void initComponents() {
 
         bubblePanel = new javax.swing.JPanel();
-        lblMessage = new javax.swing.JLabel();
+        txtMessage = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(255, 255, 255));
+        setLayout(new java.awt.BorderLayout());
 
         bubblePanel.setBackground(new java.awt.Color(255, 255, 255));
-        bubblePanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(8, 12, 8, 12));
+        bubblePanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(12, 8, 12, 8));
         bubblePanel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        bubblePanel.setLayout(new java.awt.BorderLayout());
+        bubblePanel.setLayout(new javax.swing.BoxLayout(bubblePanel, javax.swing.BoxLayout.Y_AXIS));
 
-        lblMessage.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        lblMessage.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        lblMessage.setText("jLabel1");
-        bubblePanel.add(lblMessage, java.awt.BorderLayout.CENTER);
+        txtMessage.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        txtMessage.setFocusable(false);
+        bubblePanel.add(txtMessage);
 
-        add(bubblePanel);
+        add(bubblePanel, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel bubblePanel;
-    private javax.swing.JLabel lblMessage;
+    private javax.swing.JLabel txtMessage;
     // End of variables declaration//GEN-END:variables
 }

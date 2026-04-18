@@ -635,6 +635,7 @@ public class ChatPanel extends javax.swing.JPanel {
         inputPanel.add(btnAttach, java.awt.BorderLayout.LINE_START);
 
         txtMessage.setColumns(20);
+        txtMessage.setLineWrap(true);
         txtMessage.setRows(5);
         ScrollMes.setViewportView(txtMessage);
 
@@ -713,7 +714,10 @@ public class ChatPanel extends javax.swing.JPanel {
             return;
         }
         //Lấy nội dung
-        String text = txtMessage.getText().trim();
+        String text = txtMessage.getText()
+        .replace("\r", "")
+        .replace("\n", "\\n") // 🔥 QUAN TRỌNG
+        .trim();
         if (text.isEmpty()) {
             return;
         }

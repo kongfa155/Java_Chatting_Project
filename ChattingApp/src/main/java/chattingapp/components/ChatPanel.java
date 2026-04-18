@@ -4,7 +4,6 @@
  */
 package chattingapp.components;
 
-import chattingapp.config.ServerConfig;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import javax.swing.BorderFactory;
@@ -429,7 +428,7 @@ public class ChatPanel extends javax.swing.JPanel {
 
                     downloadBtn.addActionListener(e -> {
                         try {
-                            String fileUrl = "http:" + ServerConfig.SERVER_URL + ":8080" + msg.getFileUrl();
+                            String fileUrl = ApiClient.getFileUrl(msg.getFileUrl());
 
                             // 🧠 tên file
                             String downloadName = msg.getContent() != null

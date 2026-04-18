@@ -62,7 +62,7 @@ public class ChatPanel extends javax.swing.JPanel {
         fileDrawer.setFileClickListener(messageId -> {
             java.awt.Component comp = messageMap.get(messageId);
             if (comp != null) {
-                ((javax.swing.JComponent) comp).scrollRectToVisible(comp.getBounds());
+                scrollToMessage(comp);
             }
         });
         fileDrawer.setDeleteFriendListener(() -> {
@@ -203,6 +203,19 @@ public class ChatPanel extends javax.swing.JPanel {
         cl.show(this, "card3");
     }
 
+    private void scrollToMessage(java.awt.Component comp) {
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            java.awt.Rectangle target = javax.swing.SwingUtilities.convertRectangle(
+                    comp.getParent(),
+                    comp.getBounds(),
+                    messageContainer
+            );
+
+            target.y = Math.max(target.y - 12, 0);
+            messageContainer.scrollRectToVisible(target);
+        });
+    }
+
 //    private MessageType detectFileType(java.io.File file) {
 //        //Kiểm tra kiểu của file => Trả về kiểu loại như mong muốn
 //        String name = file.getName().toLowerCase();
@@ -301,6 +314,7 @@ public class ChatPanel extends javax.swing.JPanel {
 
     private void renderMessages(java.util.List<Message> messages) {
         messageContainer.removeAll();
+        messageMap.clear();
         //Lấy toàn bộ tin nhắn
         for (Message msg : messages) {
 

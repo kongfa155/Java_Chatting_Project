@@ -175,7 +175,7 @@ public class ChatPanel extends javax.swing.JPanel {
                         "Supported Files",
                         "png", "jpg", "jpeg",
                         "pdf", "docx", "xlsx", "pptx",
-                        "mp4"
+                        "mp4", "mp3", "wav"
                 );
 
         chooser.setFileFilter(filter);

@@ -33,10 +33,16 @@ public class FriendshipService {
     @Autowired
     private NotificationService notificationService; //Thao tác db bảng Noti, dùng để tạo thông báo
     //1. Gửi lời mời kết bạn
+    //    Luồng xử lý:
+    //    1. Tìm user bằng email
+    //    2. Check thông tin hợp lý
+    //    3. Reset trạng thái nếu đã bị từ chối
+    //    4. Nếu chưa có tạo mới
+    //    5. Gửi thông báo
 
     @Transactional
     public ApiResponse<Void> sendFriendRequest(String senderId, String email) {
-
+        //Tìm user
         User receiver = userRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException("USER_NOT_FOUND", "Không tìm thấy người dùng"));
         //Không cho phép kết bạn với chính mình
@@ -51,11 +57,11 @@ public class FriendshipService {
             Friendship f = existing.get();
 
             if (f.getStatus() == FriendshipStatus.ACCEPTED) {
-                throw new AppException("ALREADY_FRIENDS", "Already friends");
+                throw new AppException("ALREADY_FRIENDS", "Các bạn đã là bạn");
             }
             //Nếu chưa nhưng đã gửi lời mời thì thông báo là đã gửi
             if (f.getStatus() == FriendshipStatus.PENDING) {
-                throw new AppException("REQUEST_ALREADY_SENT", "Friend request already sent");
+                throw new AppException("REQUEST_ALREADY_SENT", "Lời mời kết bạn đã được gửi rồi");
             }
             //Nếu đã từng nhưng bị từ chối, cho phép kết bạn lại bằng cách cập nhật trạng thái về pending
             if (f.getStatus() == FriendshipStatus.DECLINED) {
@@ -63,8 +69,6 @@ public class FriendshipService {
                 f.setCreatedAt(LocalDateTime.now());
 
                 // Khi tự close transaction, Hibernate thấy cập nhật dữ liệu, tự cập nhật
-                // Nếu cần thiết thì có thể tự gọi
-//                friendshipRepository.save(f);
                 return ApiResponse.success("Friend request resent", null);
             }
         }
@@ -95,10 +99,10 @@ public class FriendshipService {
     public ApiResponse<Void> acceptRequest(String friendshipId, String currentUserId) {
         //Tìm yêu cầu kết bạn
         Friendship friendship = friendshipRepository.findById(friendshipId)
-                .orElseThrow(() -> new AppException("NOT_FOUND", "Friendship not found"));
+                .orElseThrow(() -> new AppException("NOT_FOUND", "Không tìm thấy quan hệ bạn bè"));
         //Kiểm tra quyền chấp nhận kết bạn, chỉ người được gửi mới được chấp nhận
         if (!friendship.getFriendId().equals(currentUserId)) {
-            throw new AppException("FORBIDDEN", "You are not allowed");
+            throw new AppException("FORBIDDEN", "Bạn không được phép kết bạn với chính mình");
         }
 
         // Cập nhật trạng thái, JPA tự cập nhật lại thông qua dirty Checking
@@ -117,10 +121,10 @@ public class FriendshipService {
     public ApiResponse<Void> rejectRequest(String friendshipId, String currentUserId) {
 
         Friendship friendship = friendshipRepository.findById(friendshipId)
-                .orElseThrow(() -> new AppException("NOT_FOUND", "Friendship not found"));
+                .orElseThrow(() -> new AppException("NOT_FOUND", "Không tìm thấy bạn"));
 
         if (!friendship.getFriendId().equals(currentUserId)) {
-            throw new AppException("FORBIDDEN", "You are not allowed");
+            throw new AppException("FORBIDDEN", "Bạn không được phép thực hiện hành vi này với chính mình");
         }
 
         // Dirty check tự cập nhật, không cần gọi save
@@ -142,13 +146,12 @@ public class FriendshipService {
     public ApiResponse<List<FriendRequestResponseDTO>> getPendingRequests(String userId) {
         //Nhận về DTO nên gọi var
         var requests = friendshipRepository.findPendingRequests(userId);
-
         // Debug
-        System.out.println("==== DEBUG REQUESTS ====");
-        for (FriendRequestResponseDTO r : requests) {
-            System.out.println("Name: " + r.getDisplayName());
-            System.out.println("UserId: " + r.getUserId());
-        }
+        //  System.out.println("==== DEBUG REQUESTS ====");
+        //        for (FriendRequestResponseDTO r : requests) {
+        //            System.out.println("Name: " + r.getDisplayName());
+        //            System.out.println("UserId: " + r.getUserId());
+        //        }
         //Lấy thành công
         return ApiResponse.success(
                 "Pending friend requests fetched",
@@ -170,37 +173,30 @@ public class FriendshipService {
 
     @Transactional
     public ApiResponse<Void> deleteFriend(String userA, String userB) {
-
+        //Kiểm tra trạng thái bạn
         Optional<Friendship> existing
                 = friendshipRepository.findFriendshipBetween(userA, userB);
 
         if (existing.isEmpty()) {
-            throw new AppException("NOT_FOUND", "Friendship not found");
+            throw new AppException("NOT_FOUND", "Không tìm thấy bạn");
         }
 
         Friendship f = existing.get();
 
-        // ❗ check trạng thái chi tiết
+        // Check trạng thái chi tiết
         if (f.getStatus() == FriendshipStatus.DECLINED) {
-            throw new AppException("ALREADY_UNFRIENDED", "Already unfriended");
+            throw new AppException("ALREADY_UNFRIENDED", "Đã xóa kết bạn sẵn");
         }
 
         if (f.getStatus() == FriendshipStatus.PENDING) {
-            throw new AppException("NOT_FRIEND", "Friend request not accepted yet");
+            throw new AppException("NOT_FRIEND", "Lời mời kết bạn chưa được chấp nhận");
         }
 
-        // ✅ chuyển về DECLINED
+        // chuyển về DECLINED
         f.setStatus(FriendshipStatus.DECLINED);
 
-        // (optional) cập nhật thời gian
+        // cập nhật thời gian
         f.setCreatedAt(LocalDateTime.now());
-
-        // (optional) gửi thông báo
-        notificationService.createNotification(
-                userB,
-                "Bạn đã bị hủy kết bạn",
-                NotificationType.FRIEND
-        );
 
         return ApiResponse.success("Unfriended successfully", null);
     }

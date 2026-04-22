@@ -9,11 +9,7 @@ import chattingappbackend.models.Notification;
 
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, String> {
-
-    // 1. Tạo thông báo
-    // 👉 KHÔNG cần viết query, dùng sẵn save()
-    // notificationRepository.save(notification);
-    // 2. Lấy danh sách thông báo
+    // Lấy danh sách thông báo
     List<Notification> findByUserIdAndIsDeletedFalseOrderByCreatedAtDesc(String userId);
 
 }

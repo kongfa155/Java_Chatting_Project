@@ -23,7 +23,8 @@ public class NotificationController {
     private JwtUtil jwtUtil;
 
     // lấy danh sách thông báo
-    @GetMapping("/{userId}")
+    @GetMapping
+    // GET /api/notifications
     public ApiResponse<List<Notification>> getNotifications(
             HttpServletRequest request
     ) {

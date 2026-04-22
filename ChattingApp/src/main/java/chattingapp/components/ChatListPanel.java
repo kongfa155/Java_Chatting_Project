@@ -18,7 +18,7 @@ public class ChatListPanel extends javax.swing.JPanel {
 
     private ChatItemPanel selectedItem; //Lưu item hiện tại đang chọn
     private ChatSelectionListener chatSelectionListener;
-    private java.util.List<ChatData> allChats = new java.util.ArrayList<>(); // Lưu danh sách các chat
+    private java.util.List<User> allFriends = new java.util.ArrayList<>(); // Lưu danh sách các chat
 
     /**
      * Creates new form ChatListPanel
@@ -83,7 +83,7 @@ public class ChatListPanel extends javax.swing.JPanel {
 
                 listContainer.removeAll();
 
-                allChats.clear(); // reset
+                allFriends.clear(); // reset
 
                 for (FriendLoadDTO f : friends) {
 
@@ -92,15 +92,9 @@ public class ChatListPanel extends javax.swing.JPanel {
                     user.setDisplayName(f.getDisplayName());
                     user.setAvatarUrl(f.getAvatarUrl());
 
-                    Message msg = new Message();
-                    msg.setContent("");
-                    msg.setSentAt(java.time.LocalDateTime.now());
+                    allFriends.add(user);
 
-                    ChatData data = new ChatData(user, msg, 0);
-
-                    allChats.add(data); // ✅ lưu lại
-
-                    ChatItemPanel item = createItem(data);
+                    ChatItemPanel item = createItem(user);
                     listContainer.add(item);
                 }
 
@@ -111,7 +105,8 @@ public class ChatListPanel extends javax.swing.JPanel {
         });
     }
 
-    private ChatItemPanel createItem(ChatData data) {
+    private ChatItemPanel createItem(User user) {
+        ChatData data = new ChatData(user, null, 0);
         ChatItemPanel item = new ChatItemPanel(data);
         FriendService service = new FriendService(); // Tạo instance service
 
@@ -157,11 +152,14 @@ public class ChatListPanel extends javax.swing.JPanel {
 
         String lower = keyword.toLowerCase();
 
-        for (ChatData data : allChats) {
-            String name = data.getContact().getDisplayName().toLowerCase();
+        for (User user : allFriends) {
+            String name = user.getDisplayName();
+            if (name == null) {
+                name = "";
+            }
 
-            if (name.contains(lower)) {
-                listContainer.add(createItem(data));
+            if (name.toLowerCase().contains(lower)) {
+                listContainer.add(createItem(user));
             }
         }
 

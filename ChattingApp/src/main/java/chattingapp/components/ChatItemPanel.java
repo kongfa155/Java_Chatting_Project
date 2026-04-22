@@ -22,7 +22,6 @@ public class ChatItemPanel extends javax.swing.JPanel {
         this.data = data;
         bindData(data);
         initHoverEffect();
-        lblUnread.setVisible(false);
     }
 
     /**
@@ -43,33 +42,21 @@ public class ChatItemPanel extends javax.swing.JPanel {
 
     private void bindData(ChatData data) {
 
-        if (data == null) {
+        if (data == null || data.getContact() == null) {
             return;
         }
 
         // Avatar
-        lblAvatar.setIcon(AvatarUtil.loadAvatar(data.getContact().getAvatarUrl(), 40, true));
+        String avatarUrl = data.getContact().getAvatarUrl();
+        if (avatarUrl != null && !avatarUrl.isEmpty()) {
+            lblAvatar.setIcon(AvatarUtil.loadAvatar(avatarUrl, 40, true));
+        } else {
+            lblAvatar.setIcon(null); // hoặc set avatar default
+        }
 
         // Tên
-        lblName.setText(data.getContact().getDisplayName());
-
-        // Tin nhắn cuối
-        if (data.getLastMessage() != null) {
-            lblLastMessage.setText(data.getLastMessage().getContent());
-            lblTime.setText(TimeUtil.formatTime(data.getLastMessage().getSentAt()));
-        } else {
-            lblLastMessage.setText("");
-            lblTime.setText("");
-        }
-
-        // Số tin chưa đọc
-        if (data.getUnreadCount() > 0) {
-            lblUnread.setText(String.valueOf(data.getUnreadCount()));
-            lblUnread.setVisible(true);
-        } else {
-            lblUnread.setText("");
-            lblUnread.setVisible(false);
-        }
+        String name = data.getContact().getDisplayName();
+        lblName.setText(name != null ? name : "Unknown");
     }
     private boolean selected = false;
 
@@ -125,12 +112,8 @@ public class ChatItemPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         lblAvatar = new javax.swing.JLabel();
-        rightPanel = new javax.swing.JPanel();
-        lblTime = new javax.swing.JLabel();
-        lblUnread = new javax.swing.JLabel();
         textPanel = new javax.swing.JPanel();
         lblName = new javax.swing.JLabel();
-        lblLastMessage = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setMaximumSize(new java.awt.Dimension(2147483647, 70));
@@ -138,27 +121,9 @@ public class ChatItemPanel extends javax.swing.JPanel {
         setLayout(new java.awt.BorderLayout());
 
         lblAvatar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        lblAvatar.setOpaque(true);
         lblAvatar.setPreferredSize(new java.awt.Dimension(60, 70));
         add(lblAvatar, java.awt.BorderLayout.WEST);
-
-        rightPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 5, 10, 10));
-        rightPanel.setLayout(new javax.swing.BoxLayout(rightPanel, javax.swing.BoxLayout.Y_AXIS));
-
-        lblTime.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
-        lblTime.setForeground(new java.awt.Color(120, 120, 120));
-        lblTime.setText("Time");
-        rightPanel.add(lblTime);
-
-        lblUnread.setBackground(new java.awt.Color(255, 59, 48));
-        lblUnread.setForeground(new java.awt.Color(255, 255, 255));
-        lblUnread.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblUnread.setText("Nhãn");
-        lblUnread.setMaximumSize(new java.awt.Dimension(22, 18));
-        lblUnread.setOpaque(true);
-        lblUnread.setPreferredSize(new java.awt.Dimension(22, 18));
-        rightPanel.add(lblUnread);
-
-        add(rightPanel, java.awt.BorderLayout.EAST);
 
         textPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 5, 10, 5));
         textPanel.setLayout(new javax.swing.BoxLayout(textPanel, javax.swing.BoxLayout.Y_AXIS));
@@ -167,22 +132,13 @@ public class ChatItemPanel extends javax.swing.JPanel {
         lblName.setText("Tên");
         textPanel.add(lblName);
 
-        lblLastMessage.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
-        lblLastMessage.setForeground(new java.awt.Color(100, 100, 100));
-        lblLastMessage.setText("Tin nhắn cuối");
-        textPanel.add(lblLastMessage);
-
         add(textPanel, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel lblAvatar;
-    private javax.swing.JLabel lblLastMessage;
     private javax.swing.JLabel lblName;
-    private javax.swing.JLabel lblTime;
-    private javax.swing.JLabel lblUnread;
-    private javax.swing.JPanel rightPanel;
     private javax.swing.JPanel textPanel;
     // End of variables declaration//GEN-END:variables
 }

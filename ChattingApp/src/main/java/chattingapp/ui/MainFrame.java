@@ -33,6 +33,7 @@ public class MainFrame extends javax.swing.JFrame {
         });
 
     }
+
     //Hàm dùng để cập nhật lại danh sách tin nhắn
     public static void updateChatList() {
         if (instance != null) {
@@ -42,6 +43,10 @@ public class MainFrame extends javax.swing.JFrame {
 
     public ChatPanel getChatPanel() {
         return chatPanel1;
+    }
+
+    public chattingapp.components.ChatListPanel getChatListPanel() {
+        return chatListPanel1;
     }
 
     private void initData() {

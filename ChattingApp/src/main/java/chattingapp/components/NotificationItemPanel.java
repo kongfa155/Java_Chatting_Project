@@ -23,6 +23,7 @@ public class NotificationItemPanel extends javax.swing.JPanel {
 
         initComponents();
         this.notification = notification;
+        lblTime.setVisible(false);
         loadData();
     }
 
@@ -102,6 +103,7 @@ public class NotificationItemPanel extends javax.swing.JPanel {
 
         lblTime.setBackground(new java.awt.Color(204, 204, 204));
         lblTime.setText("Time");
+        lblTime.setEnabled(false);
         jPanel1.add(lblTime);
 
         add(jPanel1, java.awt.BorderLayout.CENTER);

@@ -9,6 +9,8 @@ import chattingapp.models.Message;
 import chattingapp.models.User;
 import chattingapp.services.FriendService;
 import chattingapp.dtos.FriendLoadDTO;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -19,6 +21,7 @@ public class ChatListPanel extends javax.swing.JPanel {
     private ChatItemPanel selectedItem; //Lưu item hiện tại đang chọn
     private ChatSelectionListener chatSelectionListener;
     private java.util.List<User> allFriends = new java.util.ArrayList<>(); // Lưu danh sách các chat
+    private Map<String, String> userMap = new HashMap<>();
 
     /**
      * Creates new form ChatListPanel
@@ -73,6 +76,10 @@ public class ChatListPanel extends javax.swing.JPanel {
         });
     }
 
+    public Map<String, String> getUserMap() {
+        return userMap;
+    }
+
     private void loadFriends() {
 
         FriendService service = new FriendService();
@@ -93,7 +100,7 @@ public class ChatListPanel extends javax.swing.JPanel {
                     user.setAvatarUrl(f.getAvatarUrl());
 
                     allFriends.add(user);
-
+                    userMap.put(user.getUserId(), user.getDisplayName());
                     ChatItemPanel item = createItem(user);
                     listContainer.add(item);
                 }

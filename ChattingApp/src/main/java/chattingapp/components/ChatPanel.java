@@ -282,8 +282,7 @@ public class ChatPanel extends javax.swing.JPanel {
                         }
                     }
 
-                    NotificationManager.add(notification);
-
+//                    NotificationManager.add(notification);
                     javax.swing.SwingUtilities.invokeLater(() -> {
                         chattingapp.components.SideBarPanel.updateNotificationUI();
                         chattingapp.components.SideBarPanel.updateBadgeExternal();
@@ -297,10 +296,36 @@ public class ChatPanel extends javax.swing.JPanel {
     public void handleIncomingMessage(Message message) {
 
         System.out.println("WebSocket đã nhận được tin nhắn: " + message.getContent());
+
         chattingapp.ui.MainFrame.updateChatList();
 
         String myId = SessionManager.getCurrentUser().getUserId();
 
+        // 🔥 LẤY USER MAP
+        java.util.Map<String, String> userMap
+                = chattingapp.ui.MainFrame.getInstance().getChatListPanel().getUserMap();
+
+        String senderId = message.getSenderId();
+
+        // ❌ không tạo notification nếu mình gửi
+        if (!senderId.equals(myId)
+                && (currentChatUserId == null || !senderId.equals(currentChatUserId))) {
+
+            String name = userMap.getOrDefault(senderId, "Unknown");
+
+            chattingapp.models.Notification noti = new chattingapp.models.Notification();
+            noti.setContent(name + " đã gửi tin nhắn");
+            noti.setRead(false);
+
+            NotificationManager.add(noti);
+
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                chattingapp.components.SideBarPanel.updateNotificationUI();
+                chattingapp.components.SideBarPanel.updateBadgeExternal();
+            });
+        }
+
+        // 👉 logic hiển thị chat
         boolean isCurrentChat = currentChatUserId != null
                 && ((message.getSenderId().equals(currentChatUserId) && message.getReceiverId().equals(myId))
                 || (message.getSenderId().equals(myId) && message.getReceiverId().equals(currentChatUserId)));
@@ -728,9 +753,9 @@ public class ChatPanel extends javax.swing.JPanel {
         }
         //Lấy nội dung
         String text = txtMessage.getText()
-        .replace("\r", "")
-        .replace("\n", "\\n") // 🔥 QUAN TRỌNG
-        .trim();
+                .replace("\r", "")
+                .replace("\n", "\\n") // 🔥 QUAN TRỌNG
+                .trim();
         if (text.isEmpty()) {
             return;
         }

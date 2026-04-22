@@ -52,8 +52,9 @@ public class ChatPanel extends javax.swing.JPanel {
     public ChatPanel() {
         //Setup UI cơ bản
         initComponents();
+        //Set holder cho khung chat
         JScrollPane.getVerticalScrollBar().setUnitIncrement(30);
-        ScrollMes.putClientProperty("JTextField.placeholderText", "Type a message...");
+        ScrollMes.putClientProperty("JTextField.placeholderText", "Nhập tin nhắn...");
         fileDrawer = new FileDrawerPanel();
         fileDrawer.setVisible(false);
         //Thêm panel vào bên phải
@@ -93,8 +94,108 @@ public class ChatPanel extends javax.swing.JPanel {
     }
 
     //Websocket
+    private boolean isWsConnected = false;
+
+    public void initWebSocket() {
+        //Log
+        //System.out.println("Gọi WebSocket");
+        //Kiểm tra xem đã có WS chưa, nếu có thì không tạo lại
+        if (isWsConnected) {
+            //System.out.println("WS đã có");
+            return;
+        }
+        //Kiểm tra xem đã login chưa, nếu chưa delay xong lặp lại sau 500ms
+        if (SessionManager.getUserId() == null) {
+            new javax.swing.Timer(500, e -> {
+                if (SessionManager.getUserId() != null) {
+                    ((javax.swing.Timer) e.getSource()).stop();
+                    initWebSocket();
+                }
+            }).start();
+            return;
+        }
+        //Tạo kết nối Websocket
+        if (stompClient == null) {
+            stompClient = new StompClientService();
+        }
+
+        // Gọi hàm connect mới với 2 listener
+        stompClient.connect(
+                message -> {
+                    handleIncomingMessage(message);
+                },
+                notification -> {
+
+                    //System.out.println("Có thông báo mới: " + notification.getContent());
+
+                    //Nếu đang chat với người gửi → bỏ qua
+                    if (notification.getType() == NotificationType.MESSAGE) {
+
+                        if (currentChatUserId != null
+                        && notification.getContent().contains(currentChatUserId)) {
+
+                            //System.out.println("Cùng chat k noti");
+                            return;
+                        }
+                    }
+
+//                    NotificationManager.add(notification);
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+                        chattingapp.components.SideBarPanel.updateNotificationUI();
+                        chattingapp.components.SideBarPanel.updateBadgeExternal();
+                    });
+                }
+        );
+
+        isWsConnected = true;
+    }
+
+    public void handleIncomingMessage(Message message) {
+
+        //System.out.println("WebSocket đã nhận được tin nhắn: " + message.getContent());
+        //Cập nhật danh sách chat
+        chattingapp.ui.MainFrame.updateChatList();
+
+        String myId = SessionManager.getCurrentUser().getUserId();
+
+        // Map tên user
+        java.util.Map<String, String> userMap
+                = chattingapp.ui.MainFrame.getInstance().getChatListPanel().getUserMap();
+
+        String senderId = message.getSenderId();
+
+        // Không tạo noti khi mình gửi hoặc không mở chat đó
+        if (!senderId.equals(myId)
+                && (currentChatUserId == null || !senderId.equals(currentChatUserId))) {
+            //Map tên user với id
+            String name = userMap.getOrDefault(senderId, "Unknown");
+            //Tạo thông báo cho biết user nào đã gửi
+            chattingapp.models.Notification noti = new chattingapp.models.Notification();
+            noti.setContent(name + " đã gửi tin nhắn");
+            noti.setRead(false);
+
+            NotificationManager.add(noti);
+            //Cập nhật thông báo 
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                chattingapp.components.SideBarPanel.updateNotificationUI();
+                chattingapp.components.SideBarPanel.updateBadgeExternal();
+            });
+        }
+
+        // logic hiển thị chat
+        boolean isCurrentChat = currentChatUserId != null
+                && ((message.getSenderId().equals(currentChatUserId) && message.getReceiverId().equals(myId))
+                || (message.getSenderId().equals(myId) && message.getReceiverId().equals(currentChatUserId)));
+
+        if (isCurrentChat) {
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                addSingleMessage(message);
+            });
+        }
+    }
+    //Render tin nhắn
     private void addSingleMessage(Message msg) {
-        System.out.println("Cập nhật giao diện thêm tin nhắn: " + msg.getContent());
+        //System.out.println("Cập nhật giao diện thêm tin nhắn: " + msg.getContent());
         //Điều kiện để lựa bên hiển thị tin nhắn
         boolean isMine
                 = msg.getSenderId().equals(
@@ -234,109 +335,6 @@ public class ChatPanel extends javax.swing.JPanel {
 //
 //        return chattingapp.models.MessageType.FILE;
 //    }
-    private boolean isWsConnected = false;
-
-    public void initWebSocket() {
-        //Log
-        System.out.println("Gọi WebSocket");
-        //Kiểm tra xem đã có WS chưa, nếu có thì không tạo lại
-        if (isWsConnected) {
-            System.out.println("WS đã có");
-            return;
-        }
-        //Kiểm tra xem đã login chưa, nếu chưa delay xong lặp lại sau 500ms
-        if (SessionManager.getUserId() == null) {
-            new javax.swing.Timer(500, e -> {
-                if (SessionManager.getUserId() != null) {
-                    ((javax.swing.Timer) e.getSource()).stop();
-                    initWebSocket();
-                }
-            }).start();
-            return;
-        }
-        //Tạo kết nối Websocket
-        if (stompClient == null) {
-            stompClient = new StompClientService();
-        }
-
-        // Gọi hàm connect mới với 2 listener
-        stompClient.connect(
-                message -> {
-                    handleIncomingMessage(message);
-                },
-                notification -> {
-
-                    System.out.println("🔥 NHẬN NOTI: " + notification.getContent());
-
-                    // 🚫 Nếu đang chat với người gửi → bỏ qua
-                    if (notification.getType() == NotificationType.MESSAGE) {
-
-                        // ⚠️ notification.getUserId() = receiver (mày)
-                        // nên phải lấy sender từ content hoặc thêm field senderId
-                        // 👉 TEMP FIX (dựa vào currentChatUserId)
-                        if (currentChatUserId != null
-                        && notification.getContent().contains(currentChatUserId)) {
-
-                            System.out.println("🚫 Đang chat → bỏ notification");
-                            return;
-                        }
-                    }
-
-//                    NotificationManager.add(notification);
-                    javax.swing.SwingUtilities.invokeLater(() -> {
-                        chattingapp.components.SideBarPanel.updateNotificationUI();
-                        chattingapp.components.SideBarPanel.updateBadgeExternal();
-                    });
-                }
-        );
-
-        isWsConnected = true;
-    }
-
-    public void handleIncomingMessage(Message message) {
-
-        System.out.println("WebSocket đã nhận được tin nhắn: " + message.getContent());
-
-        chattingapp.ui.MainFrame.updateChatList();
-
-        String myId = SessionManager.getCurrentUser().getUserId();
-
-        // 🔥 LẤY USER MAP
-        java.util.Map<String, String> userMap
-                = chattingapp.ui.MainFrame.getInstance().getChatListPanel().getUserMap();
-
-        String senderId = message.getSenderId();
-
-        // ❌ không tạo notification nếu mình gửi
-        if (!senderId.equals(myId)
-                && (currentChatUserId == null || !senderId.equals(currentChatUserId))) {
-
-            String name = userMap.getOrDefault(senderId, "Unknown");
-
-            chattingapp.models.Notification noti = new chattingapp.models.Notification();
-            noti.setContent(name + " đã gửi tin nhắn");
-            noti.setRead(false);
-
-            NotificationManager.add(noti);
-
-            javax.swing.SwingUtilities.invokeLater(() -> {
-                chattingapp.components.SideBarPanel.updateNotificationUI();
-                chattingapp.components.SideBarPanel.updateBadgeExternal();
-            });
-        }
-
-        // 👉 logic hiển thị chat
-        boolean isCurrentChat = currentChatUserId != null
-                && ((message.getSenderId().equals(currentChatUserId) && message.getReceiverId().equals(myId))
-                || (message.getSenderId().equals(myId) && message.getReceiverId().equals(currentChatUserId)));
-
-        if (isCurrentChat) {
-            javax.swing.SwingUtilities.invokeLater(() -> {
-                addSingleMessage(message);
-            });
-        }
-    }
-
     private void renderMessages(java.util.List<Message> messages) {
         messageContainer.removeAll();
         messageMap.clear();

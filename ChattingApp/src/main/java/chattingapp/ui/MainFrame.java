@@ -33,7 +33,7 @@ public class MainFrame extends javax.swing.JFrame {
         });
 
     }
-
+    //Hàm dùng để cập nhật lại danh sách tin nhắn
     public static void updateChatList() {
         if (instance != null) {
             instance.chatListPanel1.receiveNewMessage();
@@ -45,8 +45,9 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private void initData() {
-
+        //Chia giao diện hệ thống, thanh bên trái cho sidebar
         leftSplitPane.setDividerLocation(70);
+        //Chia giao diện làm đôi tiếp, bên phải là khung chat, bên trái là danh sách bạn bè và sidebar
         mainSplitPane.setDividerLocation(300);
 
         //Cấp cao thiết lập kênh đàm thoại, yêu cầu chatPanel tiếng hành load lại giao diện khung chat

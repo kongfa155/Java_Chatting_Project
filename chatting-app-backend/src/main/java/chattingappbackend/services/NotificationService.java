@@ -36,10 +36,10 @@ public class NotificationService {
                 type
         );
 
-        // ✅ JPA dùng save()
+        // JPA dùng save()
         notificationRepository.save(notification);
 
-        // 🚀 REALTIME PUSH
+        // Dùng Websocket để thông báo ngay lập tức
         messagingTemplate.convertAndSend(
                 "/topic/notifications/" + userId,
                 notification

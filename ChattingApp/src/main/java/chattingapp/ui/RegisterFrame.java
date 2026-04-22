@@ -15,7 +15,6 @@ import javax.swing.JOptionPane;
  */
 public class RegisterFrame extends javax.swing.JFrame {
 
-
     /**
      * Creates new form LoginFrame
      */
@@ -212,38 +211,39 @@ public class RegisterFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_dangNhapMouseClicked
 
     private void btnRegActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegActionPerformed
-String username = txtUsername.getText().trim();
-    String displayName = txtDisplayName.getText().trim();
-    String email = txtEmail.getText().trim();
-    String password = new String(txtPassword.getPassword());
-    Boolean gender = radNam.isSelected();
+        //Lấy dữ liệu từ Form
+        String username = txtUsername.getText().trim();
+        String displayName = txtDisplayName.getText().trim();
+        String email = txtEmail.getText().trim();
+        String password = new String(txtPassword.getPassword());
+        Boolean gender = radNam.isSelected();
+        //Validate
+        if (username.isEmpty() || displayName.isEmpty() || email.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ tất cả các trường!");
+            return;
+        }
+        //Vô hiệu nút đăng ký chống spam
+        btnReg.setEnabled(false);
+        btnReg.setText("Đang xử lý...");
+        //Gọi tới service đăng ký
+        UserService userService = new UserService();
+        RegisterRequestDTO dto = new RegisterRequestDTO(username, password, email, displayName, gender, "");
 
-    if (username.isEmpty() || displayName.isEmpty() || email.isEmpty() || password.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ tất cả các trường!");
-        return;
-    }
-
-    btnReg.setEnabled(false);
-    btnReg.setText("Đang xử lý...");
-
-    UserService userService = new UserService();
-    RegisterRequestDTO dto = new RegisterRequestDTO(username, password, email, displayName, gender, "");
-
-    userService.register(dto)
-        .thenCompose(regRes -> userService.getRegisterOTP(new chattingapp.dtos.user.register.RegisterOTPRequestDTO(username)))
-        .thenAccept(otpRes -> javax.swing.SwingUtilities.invokeLater(() -> {
+        userService.register(dto)
+                .thenCompose(regRes -> userService.getRegisterOTP(new chattingapp.dtos.user.register.RegisterOTPRequestDTO(username)))
+                .thenAccept(otpRes -> javax.swing.SwingUtilities.invokeLater(() -> {
             JOptionPane.showMessageDialog(this, "Đăng ký thành công! Vui lòng kiểm tra mã OTP trong Email.");
             new OTPFrame(email, username, "REGISTER").setVisible(true);
             this.dispose();
         }))
-        .exceptionally(ex -> {
-            javax.swing.SwingUtilities.invokeLater(() -> {
-                chattingapp.utils.GlobalErrorHandler.handle(this, ex);
-                btnReg.setEnabled(true);
-                btnReg.setText("Đăng ký");
-            });
-            return null;
-        });
+                .exceptionally(ex -> {
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+                        chattingapp.utils.GlobalErrorHandler.handle(this, ex);
+                        btnReg.setEnabled(true);
+                        btnReg.setText("Đăng ký");
+                    });
+                    return null;
+                });
     }//GEN-LAST:event_btnRegActionPerformed
 
     /**

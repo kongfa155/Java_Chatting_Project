@@ -28,21 +28,20 @@ public class NotificationItemPanel extends javax.swing.JPanel {
 
     private void loadData() {
         lblContent.setText(notification.getContent());
-
+        //Format time
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm dd/MM");
 
         if (notification.getCreatedAt() != null) {
-        lblTime.setText(notification.getCreatedAt().format(formatter));
-    } else {
-        lblTime.setText("--:--");
-    }
-
+            lblTime.setText(notification.getCreatedAt().format(formatter));
+        } else {
+            lblTime.setText("--:--");
+        }
 
         updateStyle();
     }
 
     public void updateStyle() {
-
+        //Nếu đã đọc màu xám
         if (notification.isRead()) {
 
             setBackground(new Color(240, 240, 240));
@@ -95,6 +94,7 @@ public class NotificationItemPanel extends javax.swing.JPanel {
         lblDot.setPreferredSize(new java.awt.Dimension(16, 16));
         add(lblDot, java.awt.BorderLayout.LINE_START);
 
+        jPanel1.setOpaque(false);
         jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.Y_AXIS));
 
         lblContent.setText("Nội dung thông báo");
@@ -111,6 +111,7 @@ public class NotificationItemPanel extends javax.swing.JPanel {
         // TODO add your handling code here:
         notification.setRead(true);
         updateStyle();
+        SideBarPanel.updateBadgeExternal();
     }//GEN-LAST:event_formMouseClicked
 
     private void formMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseEntered

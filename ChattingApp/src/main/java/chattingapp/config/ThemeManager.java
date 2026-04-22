@@ -18,13 +18,13 @@ public class ThemeManager {
             //Sử dụng FlatLaf để làm cho giao diện hiện đại hơn
             FlatLightLaf.setup();
             
-            //Thiết kế màu và bo tròn các nút
+            //Thiết kế màu và bo tròn các nút, textfield, passwordfield
             UIManager.put("Button.arc", 10);
             UIManager.put("Component.arc", 10);
             UIManager.put("TextComponent.arc", 10);
             //Nút ẩn hiện mật khẩu
             UIManager.put("PasswordField.showRevealButton", true);
-
+            //Màu chủ đạo, nền xanh chữ trắng
             UIManager.put("Button.background", new java.awt.Color(0, 104, 255));
             UIManager.put("Button.foreground", java.awt.Color.WHITE);
         } catch (Exception ex){

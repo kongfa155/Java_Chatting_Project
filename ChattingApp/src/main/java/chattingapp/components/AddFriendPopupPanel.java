@@ -84,20 +84,20 @@ public class AddFriendPopupPanel extends javax.swing.JPanel {
         add(jTabbedPane1, java.awt.BorderLayout.PAGE_START);
     }// </editor-fold>//GEN-END:initComponents
 private void loadFriendRequests() {
-
+        //Gọi tới dịch vụ của Friendship
         FriendService service = new FriendService();
-
+        //Lấy tất cả lời mời
         service.getFriendRequests()
                 .thenAccept(list -> {
 //                    System.out.println("Số request: " + list.size());
 
-                    for (FriendRequestResponseDTO dto : list) {
-//                        System.out.println("Friend name: " + dto.getDisplayName());
-                    }
+//                    for (FriendRequestResponseDTO dto : list) {
+////                        System.out.println("Friend name: " + dto.getDisplayName());
+//                    }
                     SwingUtilities.invokeLater(() -> {
 
                         ListRequestPanel.removeAll();
-
+                        //Render từng lời mời thành giao diện
                         for (FriendRequestResponseDTO dto : list) {
 
                             FriendRequestItemPanel item
@@ -140,7 +140,7 @@ private void loadFriendRequests() {
     private void searchUser() {
 
         String email = txtSearch.getText().trim();
-
+        //Dùng userservice để tìm người dùng
         UserService userService = new UserService();
 
         userService.searchUser(email)
@@ -159,7 +159,7 @@ private void loadFriendRequests() {
 
                         return;
                     }
-
+                    //Tạo thông tin nếu tìm thấy người dùng có cùng email
                     SearchResultItemPanel item
                             = new SearchResultItemPanel(
                                     user.getDisplayName(),

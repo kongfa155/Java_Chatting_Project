@@ -24,8 +24,9 @@ public class FriendshipController {
 
     @Autowired
     private JwtUtil jwtUtil; //Lấy user id từ JWT
+    
     //Gửi lời mời kết bạn cần có email được truyền dưới dạng query param
-
+    // POST /api/friendships/send?email=
     @PostMapping("/send")
     public ResponseEntity<ApiResponse<Void>> send(
             @RequestParam String email,
@@ -40,6 +41,7 @@ public class FriendshipController {
     }
 
     //Chấp nhận lời mời kêt sbanj truyền id dưới dạng path variable
+    // POST /api/friendships/accept/{id}
     @PostMapping("/accept/{id}")
     public ResponseEntity<ApiResponse<Void>> accept(
             @PathVariable String id,
@@ -53,6 +55,7 @@ public class FriendshipController {
     }
 
     //Lấy các lời mời ở trạng thái pending
+    // GET /api/friendships/requests
     @GetMapping("/requests")
     public ResponseEntity<?> getPendingRequests(HttpServletRequest request) {
 
@@ -64,6 +67,7 @@ public class FriendshipController {
     }
 
     //Lấy danh sách bạn bè của user
+    //GET /api/friendships/friends
     @GetMapping("/friends")
     public ResponseEntity<?> getFriends(HttpServletRequest request) {
 
@@ -75,6 +79,7 @@ public class FriendshipController {
     }
 
     //Từ chối lời mời kết bạn
+    //POST /api/friendships/reject/{id}
     @PostMapping("/reject/{id}")
     public ResponseEntity<ApiResponse<Void>> reject(
             @PathVariable String id,
@@ -85,8 +90,8 @@ public class FriendshipController {
                 friendshipService.rejectRequest(id, currentUserId)
         );
     }
-    // Xóa bạn
-
+    // Xóa bạn thông qua id truyền qua queryParam
+    // POST /api/friendships/delete?friendId=
     @PostMapping("/delete")
     public ResponseEntity<ApiResponse<Void>> deleteFriend(
             @RequestParam String friendId,

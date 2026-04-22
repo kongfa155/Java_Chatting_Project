@@ -24,22 +24,23 @@ public class NotificationListPanel extends javax.swing.JPanel {
     public void setData(List<Notification> list) {
         pnlContainer.removeAll(); // Xóa các item cũ trong container
 
-    for (Notification n : list) {
-        // Sử dụng class ItemPanel bạn đã tạo
-        NotificationItemPanel item = new NotificationItemPanel(n);
-        
-        // Cố định chiều cao tối đa để không bị giãn
-        item.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, 60));
-        
-        pnlContainer.add(item);
-        pnlContainer.add(javax.swing.Box.createVerticalStrut(5)); // Khoảng cách giữa các thông báo
-    }
+        for (Notification n : list) {
+            // Sử dụng class ItemPanel
+            NotificationItemPanel item = new NotificationItemPanel(n);
 
-    // Quan trọng: Thêm một Glue ở cuối để đẩy các item lên trên cùng
-    pnlContainer.add(javax.swing.Box.createVerticalGlue());
+            // Cố định chiều cao tối đa để không bị giãn
+            item.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, 60));
 
-    pnlContainer.revalidate();
-    pnlContainer.repaint();
+            pnlContainer.add(item);
+            pnlContainer.add(javax.swing.Box.createVerticalStrut(5)); // Khoảng cách giữa các thông báo
+        }
+
+        // Thêm một Glue ở cuối để đẩy các item lên trên cùng
+        //Glue là item tạo khoảng cách ảo sẽ tự chiếm toàn bộ diện tích còn trống
+        pnlContainer.add(javax.swing.Box.createVerticalGlue());
+
+        pnlContainer.revalidate();
+        pnlContainer.repaint();
     }
 
     /**

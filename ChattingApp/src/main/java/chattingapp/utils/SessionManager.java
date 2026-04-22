@@ -11,6 +11,8 @@ import chattingapp.models.User;
  *
  * @author CP
  */
+
+//Lớp này được tạo để lưu thông tin người dùng sau khi login, giúp dễ truy xuất từ mọi file
 public class SessionManager {
 
     private static String jwtToken;

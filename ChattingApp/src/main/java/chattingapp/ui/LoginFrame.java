@@ -25,14 +25,15 @@ public class LoginFrame extends javax.swing.JFrame {
      */
     public LoginFrame() {
         initComponents();
+        //Gắn logo
         ImageIcon icon = new ImageIcon(
                 getClass().getResource("/images/logo.png")
         );
-
+        //Scale lại logo
         Image img = icon.getImage().getScaledInstance(350, 100, Image.SCALE_SMOOTH);
-
         lblLogo.setIcon(new ImageIcon(img));
-        //Set vị trí ban đầu ở giữa
+        
+        //Set vị trí ban đầu ở giữa cho Frame đăng nhập
         this.setLocationRelativeTo(null);
         //Cập nhật text hiển thị khi chưa nhập input cho số điện thoại và mật khẩu
         txtUsername.putClientProperty("JTextField.placeholderText", "Tên đăng nhập");
@@ -419,21 +420,23 @@ public class LoginFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_btnVerifyActionPerformed
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
+        //Lấy dữ liệu từ Form
         String username = txtUsername.getText().trim();
         char[] passwordChars = txtPassword.getPassword();
         String password = new String(passwordChars);
-
+        //Validate
         if (username.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // Chống spam
+        // Chống spam đăng nhập 
         btnLogin.setEnabled(false);
         btnLogin.setText("Đang đăng nhập...");
 
         new chattingapp.services.UserService().login(new chattingapp.dtos.user.login.LoginRequetDTO(username, password))
                 .thenAccept(response -> {
+                    //Set thông tin đăng nhập của session
                     javax.swing.SwingUtilities.invokeLater(() -> {
                         User user = new User();
                         user.setUserId(response.userId());
@@ -444,10 +447,10 @@ public class LoginFrame extends javax.swing.JFrame {
                         user.setEmail(response.email());
 
                         SessionManager.setSession(response.accessToken(), user);
-
+                        //Tạo giao diện đăng nhập chính và hiển thị
                         MainFrame main = new MainFrame();
                         main.setVisible(true);
-
+                        //Đóng giao diện đăng nhập lại
                         this.dispose();
                     });
                 })
@@ -464,6 +467,7 @@ public class LoginFrame extends javax.swing.JFrame {
                     });
                     return null;
                 })
+                //Xóa password khỏi RAM sau khi đăng nhập xong
                 .thenRun(() -> java.util.Arrays.fill(passwordChars, '0')); // Bảo mật memory
     }//GEN-LAST:event_btnLoginActionPerformed
 

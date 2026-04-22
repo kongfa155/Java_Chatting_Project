@@ -16,8 +16,9 @@ import chattingapp.dtos.FriendLoadDTO;
  */
 public class ChatListPanel extends javax.swing.JPanel {
 
-    private ChatItemPanel selectedItem;
+    private ChatItemPanel selectedItem; //Lưu item hiện tại đang chọn
     private ChatSelectionListener chatSelectionListener;
+    private java.util.List<ChatData> allChats = new java.util.ArrayList<>(); // Lưu danh sách các chat
 
     /**
      * Creates new form ChatListPanel
@@ -27,7 +28,6 @@ public class ChatListPanel extends javax.swing.JPanel {
         setupUI();
         loadFriends();
     }
-    private java.util.List<ChatData> allChats = new java.util.ArrayList<>();
 
     //Hàm này sau này dùng để cập nhật lại list khi có tin nhắn mới
     public void receiveNewMessage() {
@@ -51,7 +51,7 @@ public class ChatListPanel extends javax.swing.JPanel {
         listContainer.setBorder(
                 javax.swing.BorderFactory.createEmptyBorder(5, 0, 5, 0)
         );
-
+        //lắng nghe sự kiện tìm kiếm để tìm kiếm theo từng từ khóa kể cả khi xóa
         scrollPane.getVerticalScrollBar().putClientProperty("JScrollBar.showButtons", false);
         txtSearch.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
             public void insertUpdate(javax.swing.event.DocumentEvent e) {
@@ -76,7 +76,7 @@ public class ChatListPanel extends javax.swing.JPanel {
     private void loadFriends() {
 
         FriendService service = new FriendService();
-
+        //Gọi Service bạn bè để tìm danh sách các người bạn
         service.getFriends().thenAccept(friends -> {
 
             javax.swing.SwingUtilities.invokeLater(() -> {
@@ -128,8 +128,8 @@ public class ChatListPanel extends javax.swing.JPanel {
                                         "Thông báo",
                                         javax.swing.JOptionPane.WARNING_MESSAGE
                                 );
-                                
-                                 chattingapp.ui.MainFrame.getInstance().getChatPanel().resetChat();
+
+                                chattingapp.ui.MainFrame.getInstance().getChatPanel().resetChat();
                                 receiveNewMessage(); // reload list chat
                                 return;
                             }

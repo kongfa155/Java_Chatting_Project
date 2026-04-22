@@ -67,6 +67,7 @@ public class SearchResultItemPanel extends javax.swing.JPanel {
         lblName = new javax.swing.JLabel();
         lblPhone = new javax.swing.JLabel();
 
+        setBackground(new java.awt.Color(255, 255, 255));
         setMaximumSize(new java.awt.Dimension(250, 55));
         setMinimumSize(new java.awt.Dimension(250, 55));
         setPreferredSize(new java.awt.Dimension(250, 55));
@@ -83,6 +84,7 @@ public class SearchResultItemPanel extends javax.swing.JPanel {
         btnAddFriend.addActionListener(this::btnAddFriendActionPerformed);
         add(btnAddFriend, java.awt.BorderLayout.EAST);
 
+        jPanel1.setOpaque(false);
         jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.Y_AXIS));
 
         lblName.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N

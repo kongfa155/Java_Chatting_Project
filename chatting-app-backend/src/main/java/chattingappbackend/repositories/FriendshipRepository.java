@@ -17,7 +17,8 @@ import chattingappbackend.models.FriendshipStatus;
 @Repository
 public interface FriendshipRepository extends JpaRepository<Friendship, String> {
 
-    // 1. Tìm quan hệ giữa 2 user (JPQL)
+    // 1. Tìm quan hệ giữa 2 user
+    // Tìm theo cả 2 chiều tại quan hệ khi tạo chỉ được tạo một chiều
     @Query("""
         SELECT f FROM Friendship f
         WHERE (f.userId = :userA AND f.friendId = :userB)

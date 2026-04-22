@@ -12,6 +12,8 @@ import java.util.List;
  *
  * @author CP
  */
+
+//Quản lý notificaiton ở FE, dùng để hạn chế load lại
 public class NotificationManager {
 
     private static final List<Notification> notifications = new ArrayList<>();

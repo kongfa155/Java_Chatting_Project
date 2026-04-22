@@ -26,10 +26,10 @@ public class SideBarPanel extends javax.swing.JPanel {
     /**
      * Creates new form SideBarPanel
      */
-    //Fake data
-    private User currentUser;
-    private javax.swing.JLabel lblBadge;
-    private JPopupMenu currentPopup;
+    //Các trạng thái chính
+    private User currentUser; //User hiện tại là ai
+    private javax.swing.JLabel lblBadge; // Số notification
+    private JPopupMenu currentPopup; //Trạng thái của popup
 
     public SideBarPanel() {
         initComponents();
@@ -58,6 +58,7 @@ public class SideBarPanel extends javax.swing.JPanel {
         }
     }
 
+    //Hàm này dùng để cập nhật avatar người dùng + lấy thông tin id người dùng
     private void loadUser() {
         currentUser = SessionManager.getCurrentUser();
 
@@ -86,8 +87,9 @@ public class SideBarPanel extends javax.swing.JPanel {
     }
 
     public void updateBadge() {
+        //Lấy số thông báo chưa có trong cache
         int count = NotificationManager.getUnreadCount();
-
+        //Nếu có thông báo hiển thị giao diện badge
         javax.swing.SwingUtilities.invokeLater(() -> {
             if (count > 0) {
                 lblBadge.setText(String.valueOf(count));
@@ -99,9 +101,7 @@ public class SideBarPanel extends javax.swing.JPanel {
     }
 
     public final void setAvatar(String avatarURL) {
-//        lblAvatar.setText("");
-        System.out.println("RAW avatar = [" + avatarURL + "]");
-
+//Chạy luồng riêng để thực hiện load avatar
         new Thread(() -> {
             ImageIcon icon = AvatarUtil.loadAvatar(avatarURL, 40, true);
 
@@ -123,7 +123,7 @@ public class SideBarPanel extends javax.swing.JPanel {
 
         userMenu = new javax.swing.JPopupMenu();
         menuEditProfile = new javax.swing.JMenuItem();
-        menuUpdatePhone = new javax.swing.JMenuItem();
+        menuUpdateEmail = new javax.swing.JMenuItem();
         menuUpdatePassword = new javax.swing.JMenuItem();
         menuLogout = new javax.swing.JMenuItem();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 10), new java.awt.Dimension(0, 10), new java.awt.Dimension(32767, 10));
@@ -138,10 +138,10 @@ public class SideBarPanel extends javax.swing.JPanel {
         menuEditProfile.addActionListener(this::menuEditProfileActionPerformed);
         userMenu.add(menuEditProfile);
 
-        menuUpdatePhone.setText("Cập nhật Email");
-        menuUpdatePhone.setToolTipText("");
-        menuUpdatePhone.addActionListener(this::menuUpdatePhoneActionPerformed);
-        userMenu.add(menuUpdatePhone);
+        menuUpdateEmail.setText("Cập nhật Email");
+        menuUpdateEmail.setToolTipText("");
+        menuUpdateEmail.addActionListener(this::menuUpdateEmailActionPerformed);
+        userMenu.add(menuUpdateEmail);
 
         menuUpdatePassword.setText("Đổi mật khẩu");
         menuUpdatePassword.addActionListener(this::menuUpdatePasswordActionPerformed);
@@ -204,35 +204,36 @@ public class SideBarPanel extends javax.swing.JPanel {
 //        userMenu.show(this, evt.getX(), evt.getY());
     }//GEN-LAST:event_lblAvatarMouseClicked
 
+    
     private void menuEditProfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuEditProfileActionPerformed
         // TODO add your handling code here:
         if (currentUser == null) {
             return;
         }
-
+        //Tạo giao diện edit thông tin người dùng, set vị trí chính diện
         EditProfileDialog dialogEdit = new EditProfileDialog();
         dialogEdit.setLocationRelativeTo(null);
         dialogEdit.setVisible(true);
 
     }//GEN-LAST:event_menuEditProfileActionPerformed
 
-    private void menuUpdatePhoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuUpdatePhoneActionPerformed
+    private void menuUpdateEmailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuUpdateEmailActionPerformed
         // TODO add your handling code here:
         if (currentUser == null) {
             return;
         }
-
+        //Tạo giao diện update email
         UpdateEmailDialog dialogPhone = new UpdateEmailDialog();
         dialogPhone.setLocationRelativeTo(null);
         dialogPhone.setVisible(true);
-    }//GEN-LAST:event_menuUpdatePhoneActionPerformed
+    }//GEN-LAST:event_menuUpdateEmailActionPerformed
 
     private void menuUpdatePasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuUpdatePasswordActionPerformed
         // TODO add your handling code here:
         if (currentUser == null) {
             return;
         }
-
+        //Tạo giao diện cập nhật mật khẩu
         UpdatePasswordDialog passDialog = new UpdatePasswordDialog();
         passDialog.setLocationRelativeTo(null);
         passDialog.setVisible(true);
@@ -269,20 +270,21 @@ public class SideBarPanel extends javax.swing.JPanel {
 
     private void btnNotifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNotifyActionPerformed
         // TODO add your handling code here:
-        NotificationManager.markAllRead();
+        //Cập nhật lại giao diện
         updateBadge();
-
+        //Tạo giao diện của sổ nổi cho thông báo
         currentPopup = new JPopupMenu();
 
         NotificationListPanel panel = new NotificationListPanel();
+        //Load toàn bộ thông báo đang nằm trong list cache
         panel.setData(NotificationManager.getAll());
 
         panel.setPreferredSize(new java.awt.Dimension(300, 400));
 
         currentPopup.setLayout(new java.awt.BorderLayout());
-currentPopup.add(panel);
+        currentPopup.add(panel);
 
-currentPopup.show(btnNotify, btnNotify.getWidth() + 5, 0);
+        currentPopup.show(btnNotify, btnNotify.getWidth() + 5, 0);
     }//GEN-LAST:event_btnNotifyActionPerformed
 
     private void menuLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuLogoutActionPerformed
@@ -305,8 +307,8 @@ currentPopup.show(btnNotify, btnNotify.getWidth() + 5, 0);
     private javax.swing.JLabel lblAvatar;
     private javax.swing.JMenuItem menuEditProfile;
     private javax.swing.JMenuItem menuLogout;
+    private javax.swing.JMenuItem menuUpdateEmail;
     private javax.swing.JMenuItem menuUpdatePassword;
-    private javax.swing.JMenuItem menuUpdatePhone;
     private javax.swing.JPopupMenu userMenu;
     // End of variables declaration//GEN-END:variables
 }
